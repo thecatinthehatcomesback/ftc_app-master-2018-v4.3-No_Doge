@@ -120,7 +120,7 @@ public class CatMecanumHardware
 
 
     /* Initialize standard Hardware interfaces */
-    public void init(HardwareMap ahwMap , LinearOpMode theOpMode)  throws InterruptedException  {
+    public void init(HardwareMap ahwMap, LinearOpMode theOpMode)  throws InterruptedException  {
 
         // Save reference to Hardware map
         hwMap = ahwMap;
@@ -745,13 +745,38 @@ public class CatMecanumHardware
      */
     public boolean isColorRed(ColorSensor sensorToUse) {
         /**
-         *
+         * Compare red and blue to decide which is seen
          */
 
-        boolean isRed = false;
+        boolean isRed;
+
+        // Just a simple camparison of the two colors to see which is seen
+        if (sensorToUse.red() > sensorToUse.blue()) {
+            isRed = true;
+        } else {
+            isRed = false;
+        }
 
 
         return isRed;
+    }
+    public boolean findLine(ColorSensor sensorToUse) {
+        /**
+         * Tell once it finds a line
+         */
+
+        boolean lineFound;
+        int sensorAlpha = sensorToUse.alpha();
+
+        // TODO: 12/5/2018 Make sure to get some alpha values and stuff
+        if (sensorAlpha > (800)) {
+            lineFound = true;
+        } else {
+            lineFound = false;
+        }
+
+
+        return lineFound;
     }
 
     /**

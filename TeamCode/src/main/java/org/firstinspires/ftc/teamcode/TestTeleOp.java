@@ -12,7 +12,6 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -65,6 +64,7 @@ public class TestTeleOp extends LinearOpMode {
         double rightBack = 0;
         double SF;
 
+
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
@@ -73,6 +73,7 @@ public class TestTeleOp extends LinearOpMode {
              * ---   Driver 1 controls   ---
              * ---   \/ \/ \/ \/ \/ \/   ---
              */
+
 
             // Speed adjustments
             if (gamepad1.left_bumper) {
@@ -84,21 +85,15 @@ public class TestTeleOp extends LinearOpMode {
             }
 
             //select direction
-            if (gamepad1.y){
-                inReverse = false;
-                if(robot.isRedAlliance) {
-                    robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SHOT_RED);
-                } else {
-                    robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SHOT_BLUE);
-                }
+            if (gamepad1.y && (runtime.seconds() > 0.5)) {
+               robot.pattern = robot.pattern.next();
+               runtime.reset();
+               robot.lights.setPattern(robot.pattern);
             }
-            if (gamepad1.a) {
-                inReverse = true;
-                if(robot.isRedAlliance) {
-                    robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_LAVA_PALETTE);
-                } else {
-                    robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_OCEAN_PALETTE);
-                }
+            if (gamepad1.a && (runtime.seconds() > 0.5)) {
+                robot.pattern = robot.pattern.previous();
+                runtime.reset();
+                robot.lights.setPattern(robot.pattern);
             }
 
             // Input for drive train
@@ -170,14 +165,14 @@ public class TestTeleOp extends LinearOpMode {
             telemetry.addData("Tail Motor Position: ", robot.tailMotor.getCurrentPosition());
             // IMU Sensor
             telemetry.addData("Z Y X: ", "%.1f, %.1f, %.1f", angles.firstAngle, angles.secondAngle, angles.thirdAngle);
-            // Team Marker Servo
-            telemetry.addData("Marker Pos", " %.2f", robot.markerServo.getPosition());
             // Sensors
             telemetry.addData("Ultrasonic Level:", "%.3f", robot.landerSeer.getDistance(DistanceUnit.CM));
             telemetry.addData("Potentiometer Voltage?", robot.potentiometer.getVoltage());
             telemetry.addData("Pot Ang:", robot.getPoteniometorAngle());
             telemetry.addData("FrontLeft: ", "  R %3d,  G %3d,  B %3d,",
                     robot.frontLeftColor.red(), robot.frontLeftColor.green(), robot.frontLeftColor.blue());
+            telemetry.addData("FrontRight: ", "  R %3d,  G %3d,  B %3d,",
+                    robot.frontRightColor.red(), robot.frontRightColor.green(), robot.frontRightColor.blue());
 
             telemetry.addData("Pattern", "%s",robot.pattern.toString());
             telemetry.update();
