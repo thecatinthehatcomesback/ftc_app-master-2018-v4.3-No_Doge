@@ -1,5 +1,5 @@
 /*
-      MechanumHardware.java
+      CatMechanumHardware.java
 
         An "hardware" class intended to contain common code for accessing the hardware
         This is a modified (stripped down) version of CatBotHardware to

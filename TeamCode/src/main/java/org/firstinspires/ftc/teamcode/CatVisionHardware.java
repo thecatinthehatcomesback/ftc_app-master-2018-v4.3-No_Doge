@@ -1,13 +1,11 @@
 /*
       CatVisionHardware.java
 
-        An "hardware" class intended to contain common code for accessing the hardware
-        This is a modified (stripped down) version of CatBotHardware to
-        be used with Mecanum drivetrain.  This is mostly to test the machine vision
+        An "hardware" class intended to contain common code for accessing the camera
+        This is mostly to test the machine vision.
+        This version uses the Tensor Flow system from the FTC SDK.
+        Pervious versions used the DogeCV library (which uses OpenCV)
 
-        This file is a HEAVILY modified version from the FTC SDK.
-
-        Modifications by FTC Team #10273 Cat in the Hat Comes Back
 */
 
 package org.firstinspires.ftc.teamcode;
