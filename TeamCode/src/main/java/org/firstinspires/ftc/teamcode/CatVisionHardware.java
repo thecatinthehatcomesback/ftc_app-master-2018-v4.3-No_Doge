@@ -51,7 +51,7 @@ public class CatVisionHardware
 
     // Objects and Detectors
     private VuforiaLocalizer vuforia;
-    private TFObjectDetector tfod;
+    public TFObjectDetector tfod;
 
 
 
@@ -77,6 +77,9 @@ public class CatVisionHardware
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, LABEL_SILVER_MINERAL);
+
+        // And now ACTIVATE!!!
+        tfod.activate();
     }
 
     public samplingPos findGoldPos() {

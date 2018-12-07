@@ -150,8 +150,8 @@ public class CatMecanumHardware
         potentiometer    = hwMap.analogInput.get("potentiometer");
         frontLeftColor   = hwMap.get(ColorSensor.class, "front_left_color");
         frontRightColor  = hwMap.get(ColorSensor.class, "front_right_color");
-        backLeftColor    = hwMap.get(ColorSensor.class, "back_left_color");
-        backRightColor   = hwMap.get(ColorSensor.class, "back_right_color");
+        backLeftColor    = hwMap.get(ColorSensor.class, "rear_left_color");
+        backRightColor   = hwMap.get(ColorSensor.class, "rear_right_color");
 
         // Define motor direction //
         leftFrontMotor.setDirection(DcMotor.Direction.FORWARD);
@@ -658,12 +658,13 @@ public class CatMecanumHardware
 
         tailMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         // Get motor down
-        tailMotor.setTargetPosition(-8300);
+        extendTail();
         tailMotor.setPower(1.0);
         // Wait until the robot is completely finished
         while(tailMotor.isBusy()){
-            robotWait(1.0);
             if (saftey.seconds() > 4.5) {
+                // Turn off the encoders to just back out hard
+                tailMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 tailMotor.setPower(-1.0);
                 robotWait(.3);
                 tailMotor.setPower(0.0);

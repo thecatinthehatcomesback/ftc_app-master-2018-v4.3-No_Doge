@@ -49,7 +49,8 @@ public class MecAutonomousBasic extends LinearOpMode {
          */
         robot.init(hardwareMap, this);
         // Init IMU sensor later when the match starts
-        //eyes.initDogeforia(hardwareMap, this);
+        // Init our Machine Vision
+        eyes.initVision(hardwareMap);
 
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Status: ", "Resetting Encoders...");
@@ -182,6 +183,7 @@ public class MecAutonomousBasic extends LinearOpMode {
 
         // Find and store the values of the sampling
         samplingPos = eyes.findGoldPos();
+        eyes.tfod.deactivate();
 
         switch(samplingPos) {
             case LEFT:
