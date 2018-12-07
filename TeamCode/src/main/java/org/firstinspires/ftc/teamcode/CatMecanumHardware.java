@@ -107,6 +107,8 @@ public class CatMecanumHardware
     public AnalogInput potentiometer                = null;
     public ColorSensor frontLeftColor               = null;
     public ColorSensor frontRightColor              = null;
+    public ColorSensor backLeftColor                = null;
+    public ColorSensor backRightColor               = null;
 
 
     /* local OpMode members. */
@@ -148,6 +150,8 @@ public class CatMecanumHardware
         potentiometer    = hwMap.analogInput.get("potentiometer");
         frontLeftColor   = hwMap.get(ColorSensor.class, "front_left_color");
         frontRightColor  = hwMap.get(ColorSensor.class, "front_right_color");
+        backLeftColor    = hwMap.get(ColorSensor.class, "back_left_color");
+        backRightColor   = hwMap.get(ColorSensor.class, "back_right_color");
 
         // Define motor direction //
         leftFrontMotor.setDirection(DcMotor.Direction.FORWARD);

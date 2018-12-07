@@ -80,7 +80,7 @@ public class MecanumTeleOp extends LinearOpMode {
             }
 
             //select direction
-            if (gamepad1.y){
+            if (gamepad1.dpad_up){
                 inReverse = false;
                 if(robot.isRedAlliance) {
                     robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SHOT_RED);
@@ -88,7 +88,7 @@ public class MecanumTeleOp extends LinearOpMode {
                     robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SHOT_BLUE);
                 }
             }
-            if (gamepad1.a) {
+            if (gamepad1.dpad_down) {
                 inReverse = true;
                 if(robot.isRedAlliance) {
                     robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_LAVA_PALETTE);

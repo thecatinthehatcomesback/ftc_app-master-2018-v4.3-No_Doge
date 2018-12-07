@@ -181,7 +181,7 @@ public class MecAutonomousBasic extends LinearOpMode {
         robot.mecDriveHorizontal(robot.DRIVE_SPEED,-3.0,2.0);
 
         // Find and store the values of the sampling
-        //samplingPos = eyes.findGoldPos();
+        samplingPos = eyes.findGoldPos();
 
         switch(samplingPos) {
             case LEFT:
