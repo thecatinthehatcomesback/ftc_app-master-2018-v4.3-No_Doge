@@ -357,8 +357,8 @@ public class CatMecanumHardware
                 int rightBackPosition = rightBackMotor.getCurrentPosition();
 
                 //  Exit the method once robot stops
-                if (!leftFrontMotor.isBusy() && !rightFrontMotor.isBusy() &&
-                        !leftBackMotor.isBusy() && !rightBackMotor.isBusy()) {
+                if (!leftFrontMotor.isBusy() || !rightFrontMotor.isBusy() ||
+                        !leftBackMotor.isBusy() || !rightBackMotor.isBusy()) {
                     keepDriving = false;
                 }
 
