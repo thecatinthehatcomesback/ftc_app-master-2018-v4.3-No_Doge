@@ -1,5 +1,5 @@
 /**
- MecAutonomousIntermediate.java
+ MecAutonomousBasic.java
 
  A Linear OpMode class to be an autonomous method for both Blue & Red where
  we pick which side of the lander we are hanging off of with gamepad1 and
@@ -18,6 +18,7 @@
  */
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -34,7 +35,7 @@ public class MecAutonomousIntermediate extends LinearOpMode {
     private double timeDelay;
     private boolean isRedAlliance = true;
     private boolean isCraterSide = true;
-    private boolean isParkRedCrater = true;
+    private boolean isParkNearCrater = true;
 
     private CatVisionHardware.samplingPos samplingPos = CatVisionHardware.samplingPos.RIGHT;
 
@@ -48,7 +49,8 @@ public class MecAutonomousIntermediate extends LinearOpMode {
          */
         robot.init(hardwareMap, this);
         // Init IMU sensor later when the match starts
-        //eyes.initDogeforia(hardwareMap, this);
+        // Init our Machine Vision
+        eyes.initVision(hardwareMap);
 
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Status: ", "Resetting Encoders...");
@@ -89,18 +91,20 @@ public class MecAutonomousIntermediate extends LinearOpMode {
             if (((gamepad1.dpad_left) && delayTimer.seconds() > 0.8)) {
                 if (isRedAlliance) {
                     isRedAlliance = false;
+                    robot.isRedAlliance = false;
                 } else {
                     isRedAlliance = true;
+                    robot.isRedAlliance = true;
                 }
                 delayTimer.reset();
             }
 
             //change which crater we'll park in :)
             if (((gamepad1.a) && delayTimer.seconds() > 0.8)) {
-                if (isParkRedCrater) {
-                    isParkRedCrater = false;
+                if (isParkNearCrater) {
+                    isParkNearCrater = false;
                 } else {
-                    isParkRedCrater = true;
+                    isParkNearCrater = true;
                 }
                 delayTimer.reset();
             }
@@ -115,14 +119,19 @@ public class MecAutonomousIntermediate extends LinearOpMode {
                 delayTimer.reset();
             }
 
-            //// TODO: 9/21/2018 Eventually get LED code working...
             // LED code...
             if (isRedAlliance) {
-               // robot.blinky(CatBotHardware.LED_LightUpType.RED);
-               // robot.allianceColor = CatBotHardware.LED_LightUpType.RED;
+                if(isCraterSide){
+                    robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
+                 } else {
+                    robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SHOT_RED);
+                }
             } else {
-               // robot.blinky(CatBotHardware.LED_LightUpType.BLUE);
-              //  robot.allianceColor = CatBotHardware.LED_LightUpType.BLUE;
+                if(isCraterSide){
+                    robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
+                } else {
+                    robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SHOT_BLUE);
+                }
             }
 
             telemetry.addData("Delay Timer: ", timeDelay);
@@ -139,10 +148,10 @@ public class MecAutonomousIntermediate extends LinearOpMode {
                 telemetry.addData("Lander Side: ", "Depot");
             }
 
-            if (isParkRedCrater) {
-                telemetry.addData("Parking Crater: ", "Red");
+            if (isParkNearCrater) {
+                telemetry.addData("Parking Crater: ", "Near");
             } else {
-                telemetry.addData("Parking Crater: ", "Blue");
+                telemetry.addData("Parking Crater: ", "Far");
             }
             telemetry.update();
 
@@ -173,8 +182,40 @@ public class MecAutonomousIntermediate extends LinearOpMode {
         robot.mecDriveHorizontal(robot.DRIVE_SPEED,-3.0,2.0);
 
         // Find and store the values of the sampling
-        //samplingPos = eyes.findGoldPos();
+        samplingPos = eyes.findGoldPos();
+        eyes.tfod.deactivate();
 
+        switch(samplingPos) {
+            case LEFT:
+                if (isRedAlliance) {
+                    robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_LAVA_PALETTE);
+                } else {
+                    robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_OCEAN_PALETTE);
+                }
+
+                break;
+            case RIGHT:
+                if (isRedAlliance) {
+                    robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.COLOR_WAVES_LAVA_PALETTE);
+                } else {
+                    robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.COLOR_WAVES_OCEAN_PALETTE);
+                }
+
+                break;
+            case CENTER:
+                if (isRedAlliance) {
+                    robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SINELON_LAVA_PALETTE);
+                } else {
+                    robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SINELON_OCEAN_PALETTE);
+                }
+
+                break;
+            case UNKNOWN:
+                robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.WHITE);
+                break;
+
+
+        }
         //Delay the amount we selected
         robot.robotWait(timeDelay);
 
@@ -222,6 +263,12 @@ public class MecAutonomousIntermediate extends LinearOpMode {
                 robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED, 20, 4.0);
                 break;
         }
+        if (isRedAlliance) {
+            robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SINELON_LAVA_PALETTE);
+        } else {
+            robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SINELON_OCEAN_PALETTE);
+        }
+
         robot.mecTurn(robot.TURN_SPEED, -75, 3.0);
 
         // Drive Forward about 4 foot (To wall)
@@ -239,13 +286,14 @@ public class MecAutonomousIntermediate extends LinearOpMode {
         robot.markerIn();
         robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED,-6,2);
         // Turn 45 towards the right crater
-        if ((isParkRedCrater && isRedAlliance) || (!isRedAlliance && !isParkRedCrater)) {
+        if (isParkNearCrater) {
             robot.mecTurn(robot.TURN_SPEED, -134, 3.0);
         } else {
             robot.mecTurn(robot.TURN_SPEED, -41, 3.0);
         }
 
         // Drive Backwards 6 feet (To crater)
+        // TODO: 12/8/2018 Add ADV here
         robot.mecDriveVertical(robot.DRIVE_SPEED, -64.0, 8.0);
         robot.robotWait( 0.5);
         robot.mecDriveVertical(robot.CREEP_SPEED, -4,3.0);
@@ -253,18 +301,18 @@ public class MecAutonomousIntermediate extends LinearOpMode {
     public void driveDepot() throws InterruptedException {
 
         // Slide if left or right
-        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED, 10, 3.0);
+        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED, 12, 3.0);
         switch (samplingPos) {
             case LEFT:
                 robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED, 14, 4.0);
                 break;
             case RIGHT:
             case UNKNOWN:
-                robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED, -20, 4.0);
+                robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED, -22, 4.0);
                 break;
         }
         // Drive forward
-        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED, 34, 4.0);
+        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED, 32, 4.0);
 
         // Switch back to the center
         switch (samplingPos) {
@@ -273,26 +321,32 @@ public class MecAutonomousIntermediate extends LinearOpMode {
                 break;
             case RIGHT:
             case UNKNOWN:
-                robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED, 20, 4.0);
+                robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED, 22, 4.0);
                 break;
         }
 
-
+        if (isRedAlliance) {
+            robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SINELON_LAVA_PALETTE);
+        } else {
+            robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SINELON_OCEAN_PALETTE);
+        }
         // Drive 4 foot and drop mineral off
-        robot.mecDriveVertical(robot.DRIVE_SPEED, 16, 3.0);
+        robot.mecDriveVertical(robot.DRIVE_SPEED, 13, 3.0);
+
+        // Turn 45 towards the right crater
+        if (isParkNearCrater) {
+            robot.mecTurn(robot.TURN_SPEED, -42, 3.0);
+        } else{
+            robot.mecTurn(robot.TURN_SPEED, 42, 3.0);
+        }
         // Drop Marker
         robot.markerRelease();
         robot.robotWait(1.0);
         robot.markerIn();
-        // Turn 45 towards the right crater
-        if ((isParkRedCrater && isRedAlliance) || (!isRedAlliance && !isParkRedCrater)) {
-            robot.mecTurn(robot.TURN_SPEED, -41, 3.0);
-        } else{
-            robot.mecTurn(robot.TURN_SPEED, 41, 3.0);
-        }
-
         // Drive Backwards 6 feet (To crater)
-        robot.mecDriveVertical(robot.DRIVE_SPEED, -87.0, 8.0);
+        robot.mecDriveVertical(robot.DRIVE_SPEED, -15.0, 3.0);
+        robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED,-9,3.0);
+        robot.mecDriveVertical(robot.DRIVE_SPEED, -72.0, 8.0);
         robot.robotWait( 0.5);
         robot.mecDriveVertical(robot.CREEP_SPEED, -4,3.0);
     }

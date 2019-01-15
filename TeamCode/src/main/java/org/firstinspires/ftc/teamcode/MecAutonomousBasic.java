@@ -300,18 +300,18 @@ public class MecAutonomousBasic extends LinearOpMode {
     public void driveDepot() throws InterruptedException {
 
         // Slide if left or right
-        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED, 10, 3.0);
+        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED, 12, 3.0);
         switch (samplingPos) {
             case LEFT:
                 robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED, 14, 4.0);
                 break;
             case RIGHT:
             case UNKNOWN:
-                robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED, -20, 4.0);
+                robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED, -22, 4.0);
                 break;
         }
         // Drive forward
-        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED, 34, 4.0);
+        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED, 32, 4.0);
 
         // Switch back to the center
         switch (samplingPos) {
@@ -320,7 +320,7 @@ public class MecAutonomousBasic extends LinearOpMode {
                 break;
             case RIGHT:
             case UNKNOWN:
-                robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED, 20, 4.0);
+                robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED, 22, 4.0);
                 break;
         }
 
@@ -330,21 +330,69 @@ public class MecAutonomousBasic extends LinearOpMode {
             robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SINELON_OCEAN_PALETTE);
         }
         // Drive 4 foot and drop mineral off
-        robot.mecDriveVertical(robot.DRIVE_SPEED, 16, 3.0);
+        robot.mecDriveVertical(robot.DRIVE_SPEED, 13, 3.0);
+
+        // Turn 45 towards the right crater
+        if (isParkNearCrater) {
+            robot.mecTurn(robot.TURN_SPEED, -42, 3.0);
+        } else{
+            robot.mecTurn(robot.TURN_SPEED, 42, 3.0);
+        }
         // Drop Marker
         robot.markerRelease();
         robot.robotWait(1.0);
         robot.markerIn();
-        // Turn 45 towards the right crater
-        if (isParkNearCrater) {
-            robot.mecTurn(robot.TURN_SPEED, -41, 3.0);
-        } else{
-            robot.mecTurn(robot.TURN_SPEED, 41, 3.0);
-        }
-
         // Drive Backwards 6 feet (To crater)
-        robot.mecDriveVertical(robot.DRIVE_SPEED, -87.0, 8.0);
+        robot.mecDriveVertical(robot.DRIVE_SPEED, -15.0, 3.0);
+        robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED,-9,3.0);
+        robot.mecDriveVertical(robot.DRIVE_SPEED, -72.0, 8.0);
         robot.robotWait( 0.5);
         robot.mecDriveVertical(robot.CREEP_SPEED, -4,3.0);
+        danceParty();
+    }
+
+    class lightFlash {
+        RevBlinkinLedDriver.BlinkinPattern color;
+        int                                msTime;
+        lightFlash(RevBlinkinLedDriver.BlinkinPattern newcolor, int newmsTime){
+            color = newcolor;
+            msTime = newmsTime;
+        }
+
+    }
+    void danceParty()
+    {
+        //  theses are the coulours that we can use
+        // HOT_PINK,  DARK_RED, RED, RED_ORANGE, ORANGE, GOLD, YELLOW, LAWN_GREEN, LIME, DARK_GREEN,
+        // GREEN, BLUE_GREEN, AQUA, SKY_BLUE, DARK_BLUE, BLUE, BLUE_VIOLET, VIOLET, WHITE, GRAY,
+        // DARK_GRAY, BLACK;
+        lightFlash[] lights = new lightFlash[] {
+                new lightFlash (RevBlinkinLedDriver.BlinkinPattern.RED, 200),
+                new lightFlash (RevBlinkinLedDriver.BlinkinPattern.WHITE, 200),
+                new lightFlash (RevBlinkinLedDriver.BlinkinPattern.BLACK, 100),
+                new lightFlash (RevBlinkinLedDriver.BlinkinPattern.BLUE, 200),
+                new lightFlash (RevBlinkinLedDriver.BlinkinPattern.WHITE, 200),
+                new lightFlash (RevBlinkinLedDriver.BlinkinPattern.BLACK, 100),
+                new lightFlash (RevBlinkinLedDriver.BlinkinPattern.BLUE, 200),
+                new lightFlash (RevBlinkinLedDriver.BlinkinPattern.RED, 200),
+                new lightFlash (RevBlinkinLedDriver.BlinkinPattern.BLACK, 100)
+        };
+
+        int lightindex = 0;
+        ElapsedTime danceTime = new ElapsedTime();
+        robot.lights.setPattern(lights[lightindex].color);
+        danceTime.reset();
+        while(opModeIsActive()) {
+            if (danceTime.milliseconds() > lights[lightindex].msTime) {
+                lightindex++;
+                if (lightindex >= lights.length){
+                    lightindex = 0;
+                }
+                robot.lights.setPattern(lights[lightindex].color);
+
+                danceTime.reset();
+            }
+        }
+
     }
 }
