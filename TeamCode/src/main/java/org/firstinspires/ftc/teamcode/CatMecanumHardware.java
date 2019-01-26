@@ -155,7 +155,7 @@ public class CatMecanumHardware
 
         // Define motor direction //
         leftFrontMotor.setDirection(DcMotor.Direction.FORWARD);
-        rightFrontMotor.setDirection(DcMotor.Direction.REVERSE);
+        rightFrontMotor.setDirection(DcMotor.Direction.FORWARD);
         leftBackMotor.setDirection(DcMotor.Direction.FORWARD);
         rightBackMotor.setDirection(DcMotor.Direction.REVERSE);
         tailMotor.setDirection(DcMotor.Direction.FORWARD);
