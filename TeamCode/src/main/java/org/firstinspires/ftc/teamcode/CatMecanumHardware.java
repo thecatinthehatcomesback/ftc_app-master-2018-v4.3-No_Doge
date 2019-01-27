@@ -60,7 +60,7 @@ public class CatMecanumHardware
     static final double     DRIVE_SPEED             = 0.45;
     static final double     HYPER_SPEED             = 0.6;
     static final double     CHILL_SPEED             = 0.25;
-    static final double     CREEP_SPEED             = 0.1;
+    static final double     CREEP_SPEED             = 0.10;
     static final double     TURN_SPEED              = 0.35;
 
     // Marker Servo
@@ -68,8 +68,11 @@ public class CatMecanumHardware
     static final double     MARKER_OUT              = 0.27;
 
     // Enums!
-    enum huh {
-
+    enum DRIVE_MODE {
+        findLine,
+        followWall,
+        driveTilDistance,
+        driveUsingGyroStraight
     }
 
 
@@ -233,7 +236,14 @@ public class CatMecanumHardware
         rightBackMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
-    public void mecDriveVertical(double power, double distance, double timeoutS)  throws InterruptedException {
+    public void mecDriveVertical(double power,
+                                 double distance,
+                                 double timeoutS, DRIVE_MODE driveMode)  throws InterruptedException {
+        mecDriveVertical(power, distance, timeoutS, driveMode, null, null);
+    }
+        public void mecDriveVertical(double power,
+                                     double distance,
+                                     double timeoutS, DRIVE_MODE driveMode, ColorSensor leftColSen, ColorSensor rightColSen)  throws InterruptedException {
         /**
          * This is a simpler mecanum drive method that drives blindly
          * straight vertically
@@ -272,19 +282,55 @@ public class CatMecanumHardware
 
             drive(power, power, power, power);
 
+            /// TODO: 1/26/2019 FIX THIS!!!
+            if (driveMode == DRIVE_MODE.findLine) {
+                // Turn on the color sensors we want and find the base alpha
+                int baseAlpha = findBaseDelta(rightColSen);
+            }
+
             while (opMode.opModeIsActive() &&
                     (runtime.seconds() < timeoutS) &&
                     keepDriving) {
 
-                int leftFrontPosition = leftFrontMotor.getCurrentPosition();
+                // Get the current Pos for telemetry
+                int leftFrontPosition  = leftFrontMotor.getCurrentPosition();
                 int rightFrontPosition = rightFrontMotor.getCurrentPosition();
-                int leftBackPosition = leftBackMotor.getCurrentPosition();
-                int rightBackPosition = rightBackMotor.getCurrentPosition();
+                int leftBackPosition   = leftBackMotor.getCurrentPosition();
+                int rightBackPosition  = rightBackMotor.getCurrentPosition();
 
-                //  Exit the method once robot stops
-                if (!leftFrontMotor.isBusy() || !rightFrontMotor.isBusy() ||
-                        !leftBackMotor.isBusy() || !rightBackMotor.isBusy()) {
-                    keepDriving = false;
+                if (driveMode == DRIVE_MODE.driveTilDistance) {
+                    //  Exit the method once robot stops
+                    if (!leftFrontMotor.isBusy() || !rightFrontMotor.isBusy() ||
+                            !leftBackMotor.isBusy() || !rightBackMotor.isBusy()) {
+                        keepDriving = false;
+                    }
+                }
+
+                if (driveMode == DRIVE_MODE.findLine) {
+                    // Turn on the color sensors we want and find the base alpha
+                    int baseAlpha = findBaseDelta(rightColSen);
+
+
+                    // Once left side hits color, turn left side motors off
+                    if (findLine(baseAlpha, leftColSen)) {
+                        leftFrontMotor.setPower(0.0);
+                        leftBackMotor.setPower(0.0);
+
+                        if (rightFrontMotor.getPower() == 0.0) {
+                            keepDriving = false;
+                        }
+                        opMode.telemetry.addData("Stop:", "left");
+                    }
+                    // Once right side hits color, turn right side motors off
+                    if (findLine(baseAlpha, rightColSen)) {
+                        rightFrontMotor.setPower(0.0);
+                        rightBackMotor.setPower(0.0);
+
+                        if (leftFrontMotor.getPower() == 0.0) {
+                            keepDriving = false;
+                        }
+                        opMode.telemetry.addData("Stop:", "right");
+                    }
                 }
 
                 // Log Messages
@@ -303,7 +349,7 @@ public class CatMecanumHardware
 
 
             // Stop all motion
-            drive(0, 0, 0, 0);
+            drive(0.0, 0.0, 0.0, 0.0);
         }
     }
     public void mecDriveHorizontal(double power, double distance, double timeoutS) {
@@ -765,21 +811,31 @@ public class CatMecanumHardware
 
         return isRed;
     }
-    public boolean findLine(ColorSensor sensorToUse) {
+    public int findBaseDelta(ColorSensor colorSensor) {
         /**
-         * Tell once it finds a line
+         * Before starting to look for a line, find the the current Alpha
+         * to add to the threshold so as to give wiggle-room to finding the
+         * line.
+        */
+        int baseDelta = Math.abs(colorSensor.red() - colorSensor.blue());
+
+        return baseDelta;
+    }
+    public boolean findLine(int baseDelta, ColorSensor colorSensor) {
+        /**
+         * Tell the robot once a color sensor
+         * finds a line.
          */
-
         boolean lineFound;
-        int sensorAlpha = sensorToUse.alpha();
+        // Take the absolute value of the difference of red and blue
+        int currentDelta = Math.abs(colorSensor.red() - colorSensor.blue());
 
-        // TODO: 12/5/2018 Make sure to get some alpha values and stuff
-        if (sensorAlpha > (800)) {
+        // Check to see if the line is found
+        if (currentDelta > (baseDelta + 70)) {
             lineFound = true;
         } else {
             lineFound = false;
         }
-
 
         return lineFound;
     }

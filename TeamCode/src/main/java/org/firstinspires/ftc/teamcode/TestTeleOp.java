@@ -169,14 +169,18 @@ public class TestTeleOp extends LinearOpMode {
             telemetry.addData("Ultrasonic Level:", "%.3f", robot.landerSeer.getDistance(DistanceUnit.CM));
             telemetry.addData("Potentiometer Voltage?", robot.potentiometer.getVoltage());
             telemetry.addData("Pot Ang:", robot.getPoteniometorAngle());
-            telemetry.addData("FrontLeft: ", "  R %3d,  G %3d,  B %3d,",
-                    robot.frontLeftColor.alpha(), robot.frontLeftColor.red(), robot.frontLeftColor.green(), robot.frontLeftColor.blue());
-            telemetry.addData("FrontRight: ", "  R %3d,  G %3d,  B %3d,",
-                    robot.frontRightColor.alpha(), robot.frontRightColor.red(), robot.frontRightColor.green(), robot.frontRightColor.blue());
-            telemetry.addData("BackLeft: ", "  R %3d,  G %3d,  B %3d,",
-                    robot.backLeftColor.alpha(), robot.backLeftColor.red(), robot.backLeftColor.green(), robot.backLeftColor.blue());
+            telemetry.addData("FrontLeft: ", "  A: %3d,  R %3d,  G %3d,  B %3d,",
+                    robot.frontLeftColor.alpha(), robot.frontLeftColor.red(),
+                    robot.frontLeftColor.green(), robot.frontLeftColor.blue());
+            telemetry.addData("FrontRight: ", "  A: %3d,  R %3d,  G %3d,  B %3d,",
+                    robot.frontRightColor.alpha(), robot.frontRightColor.red(),
+                    robot.frontRightColor.green(), robot.frontRightColor.blue());
+            telemetry.addData("BackLeft: ", "  A: %3d,  R %3d,  G %3d,  B %3d,",
+                    robot.backLeftColor.alpha(), robot.backLeftColor.red(),
+                    robot.backLeftColor.green(), robot.backLeftColor.blue());
             telemetry.addData("BackRight: ", "  A %3d,  R %3d,  G %3d,  B %3d,",
-                    robot.backRightColor.alpha(), robot.backRightColor.red(), robot.backRightColor.green(), robot.backRightColor.blue());
+                    robot.backRightColor.alpha(), robot.backRightColor.red(),
+                    robot.backRightColor.green(), robot.backRightColor.blue());
 
             telemetry.addData("Pattern", "%s",robot.pattern.toString());
             telemetry.update();

@@ -178,7 +178,7 @@ public class MecAutonomousBasic extends LinearOpMode {
         // Lower robot here
         robot.lowerRobot();
         robot.mecDriveHorizontal(robot.DRIVE_SPEED,3.0,2.0);
-        robot.mecDriveVertical(robot.DRIVE_SPEED,3.0,2.0);
+        robot.mecDriveVertical(robot.DRIVE_SPEED,3.0,2.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
         robot.mecDriveHorizontal(robot.DRIVE_SPEED,-3.0,2.0);
 
         // Find and store the values of the sampling
@@ -240,7 +240,7 @@ public class MecAutonomousBasic extends LinearOpMode {
     }
     public void driveCrater()  throws InterruptedException {
         // Slide if left or right
-        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED, 10, 3.0);
+        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED, 10, 3.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
         switch (samplingPos) {
             case LEFT:
                 robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED, 14, 4.0);
@@ -251,8 +251,8 @@ public class MecAutonomousBasic extends LinearOpMode {
                 break;
         }
         // Drive forward
-        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED, 12, 4.0);
-        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED, -10.5, 4.0);
+        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED, 12, 4.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
+        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED, -10.5, 4.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
         // Switch back to the center
         switch (samplingPos) {
             case LEFT:
@@ -272,17 +272,17 @@ public class MecAutonomousBasic extends LinearOpMode {
         robot.mecTurn(robot.TURN_SPEED, -75, 3.0);
 
         // Drive Forward about 4 foot (To wall)
-        robot.mecDriveVertical(robot.DRIVE_SPEED, 49.0, 3.0);
+        robot.mecDriveVertical(robot.DRIVE_SPEED, 49.0, 3.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
         robot.mecTurn(robot.TURN_SPEED, -127, 3.0);
         // Slides right against the wall
         robot.mecDriveHorizontal(CatMecanumHardware.HYPER_SPEED,-5,2);
         // Drive into depot
-        robot.mecDriveVertical(robot.DRIVE_SPEED, 45, 3.5);
+        robot.mecDriveVertical(robot.DRIVE_SPEED, 45, 3.5, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
         robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED,3, 2);
         robot.markerRelease();
         robot.mecDriveHorizontal(CatMecanumHardware.HYPER_SPEED,3, 2);
         robot.robotWait (0.7);
-        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED,-10,3);
+        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED,-10,3, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
         robot.markerIn();
         robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED,-6,2);
         // Turn 45 towards the right crater
@@ -293,14 +293,14 @@ public class MecAutonomousBasic extends LinearOpMode {
         }
 
         // Drive Backwards 6 feet (To crater)
-        robot.mecDriveVertical(robot.DRIVE_SPEED, -64.0, 8.0);
+        robot.mecDriveVertical(robot.DRIVE_SPEED, -64.0, 8.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
         robot.robotWait( 0.5);
-        robot.mecDriveVertical(robot.CREEP_SPEED, -4,3.0);
+        robot.mecDriveVertical(robot.CREEP_SPEED, -4,3.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
     }
     public void driveDepot() throws InterruptedException {
 
         // Slide if left or right
-        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED, 12, 3.0);
+        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED, 12, 3.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
         switch (samplingPos) {
             case LEFT:
                 robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED, 14, 4.0);
@@ -311,7 +311,7 @@ public class MecAutonomousBasic extends LinearOpMode {
                 break;
         }
         // Drive forward
-        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED, 32, 4.0);
+        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED, 32, 4.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
 
         // Switch back to the center
         switch (samplingPos) {
@@ -330,7 +330,7 @@ public class MecAutonomousBasic extends LinearOpMode {
             robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SINELON_OCEAN_PALETTE);
         }
         // Drive 4 foot and drop mineral off
-        robot.mecDriveVertical(robot.DRIVE_SPEED, 13, 3.0);
+        robot.mecDriveVertical(robot.DRIVE_SPEED, 13, 3.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
 
         // Turn 45 towards the right crater
         if (isParkNearCrater) {
@@ -343,11 +343,11 @@ public class MecAutonomousBasic extends LinearOpMode {
         robot.robotWait(1.0);
         robot.markerIn();
         // Drive Backwards 6 feet (To crater)
-        robot.mecDriveVertical(robot.DRIVE_SPEED, -15.0, 3.0);
+        robot.mecDriveVertical(robot.DRIVE_SPEED, -15.0, 3.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
         robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED,-9,3.0);
-        robot.mecDriveVertical(robot.DRIVE_SPEED, -72.0, 8.0);
+        robot.mecDriveVertical(robot.DRIVE_SPEED, -72.0, 8.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
         robot.robotWait( 0.5);
-        robot.mecDriveVertical(robot.CREEP_SPEED, -4,3.0);
+        robot.mecDriveVertical(robot.CREEP_SPEED, -4,3.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
         danceParty();
     }
 
