@@ -255,6 +255,11 @@ public class CatMecanumHardware
         int newRightBackTarget;
         ElapsedTime runtime = new ElapsedTime();
         boolean keepDriving = true;
+        int baseDelta = 0;
+        if (driveMode == DRIVE_MODE.findLine) {
+            // Turn on the color sensors we want and find the base alpha
+            baseDelta = findBaseDelta(rightColSen);
+        }
 
         if (opMode.opModeIsActive()) {
 
@@ -283,10 +288,6 @@ public class CatMecanumHardware
             drive(power, power, power, power);
 
             /// TODO: 1/26/2019 FIX THIS!!!
-            if (driveMode == DRIVE_MODE.findLine) {
-                // Turn on the color sensors we want and find the base alpha
-                int baseAlpha = findBaseDelta(rightColSen);
-            }
 
             while (opMode.opModeIsActive() &&
                     (runtime.seconds() < timeoutS) &&
@@ -307,12 +308,8 @@ public class CatMecanumHardware
                 }
 
                 if (driveMode == DRIVE_MODE.findLine) {
-                    // Turn on the color sensors we want and find the base alpha
-                    int baseAlpha = findBaseDelta(rightColSen);
-
-
                     // Once left side hits color, turn left side motors off
-                    if (findLine(baseAlpha, leftColSen)) {
+                    if (findLine(baseDelta, leftColSen)) {
                         leftFrontMotor.setPower(0.0);
                         leftBackMotor.setPower(0.0);
 
@@ -322,7 +319,7 @@ public class CatMecanumHardware
                         opMode.telemetry.addData("Stop:", "left");
                     }
                     // Once right side hits color, turn right side motors off
-                    if (findLine(baseAlpha, rightColSen)) {
+                    if (findLine(baseDelta, rightColSen)) {
                         rightFrontMotor.setPower(0.0);
                         rightBackMotor.setPower(0.0);
 
