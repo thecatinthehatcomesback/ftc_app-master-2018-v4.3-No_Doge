@@ -281,11 +281,11 @@ public class MecAutonomousIntermediate extends LinearOpMode {
         // Drive into depot
         robot.mecDriveVertical(robot.DRIVE_SPEED, 45, 3.5, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
         robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED,3, 2);
-        robot.markerRelease();
+        //robot.markerRelease();
         robot.mecDriveHorizontal(CatMecanumHardware.HYPER_SPEED,3, 2);
         robot.robotWait (0.7);
         robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED,-10,3, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
-        robot.markerIn();
+        //robot.markerIn();
         robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED,-6,2);
         // Turn 45 towards the right crater
         if (isParkNearCrater) {
@@ -342,9 +342,9 @@ public class MecAutonomousIntermediate extends LinearOpMode {
             robot.mecTurn(robot.TURN_SPEED, 42, 3.0);
         }
         // Drop Marker
-        robot.markerRelease();
+        //robot.markerRelease();
         robot.robotWait(1.0);
-        robot.markerIn();
+        //robot.markerIn();
         // Drive Backwards 6 feet (To crater)
         robot.mecDriveVertical(robot.DRIVE_SPEED, -15.0, 3.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
         robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED,-9,3.0);

@@ -67,14 +67,31 @@ public class CatMecanumHardware
     static final double     GATE_CLOSE              = 0.20;
 
     // Arm positions
-    static final int        ARM_FLOOR               = 1000;
-    static final int        ARM_RELEASE_MARKER      = 800;
-    static final int        ARM_DEPOT_DROPOFF       = 700;
-    static final int        ARM_OVER_SAMPLING       = 300;
+    static final int        ARM_FLOOR               = 6680;
+    static final int        ARM_DEPOT_DROPOFF       = 5700;
+    static final int        ARM_OVER_SAMPLING       = 5215;
+    static final int        ARM_STRAIGHT_UP         = 2550;
     static final int        ARM_STORED              = 0;
     static final double     ARM_POWER               = 0.6;
     static final double     EXTEND_POWER            = 0.6;
+    // TODO: 2/2/2019 UHH... WHAAAAA??
+    public int[] armPos = new int[5]; {
+    /**
+     * Each of the encoder ticks that we need to reach the
+     * desired positions of the intake and arm.
+     */
 
+    //  Folded in
+    armPos[0] = 0;
+    //  In a 90 degree from the floor/robot
+    armPos[1] = 2550;
+    //  Safe distance over the sampling field
+    armPos[2] = 5215;
+    //  Dropping the team marker height
+    armPos[3] = 5700;
+    //  Floor level
+    armPos[4] = 6680;
+}
     // Enums!
     enum DRIVE_MODE {
         findLine,
@@ -118,8 +135,8 @@ public class CatMecanumHardware
     public ModernRoboticsI2cRangeSensor landerSeer  = null;
     public ColorSensor frontLeftColor               = null;
     public ColorSensor frontRightColor              = null;
-    public ColorSensor rearLeftColor = null;
-    public ColorSensor rearRightColor = null;
+    public ColorSensor rearLeftColor                = null;
+    public ColorSensor rearRightColor               = null;
 
 
     /* local OpMode members. */
@@ -213,25 +230,7 @@ public class CatMecanumHardware
      * ---   Arm Movement Patterns   ---
      * ---   \/ \/ \/ \/ \/ \/ \/    ---
      */
-    // TODO: 2/2/2019 UHH... WHAAAAA??
-    public int[] armPos = new int[5]; {
-    /**
-     * Each of the encoder ticks that we need to reach the
-     * desired positions of the intake and arm.
-     */
-
-    //  Folded in
-    armPos[0] = 0;
-    //  In a 90 degree from the floor/robot
-    armPos[1] = 2550;
-    //  Safe distance over the sampling field
-    armPos[2] = 5215;
-    //  Dropping the team marker height
-    armPos[3] = 5700;
-    //  Floor level
-    armPos[4] = 6680;
-    }
-    public void moveArm(int targetPos){
+    public void rotateArm(int targetPos){
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         armMotor.setTargetPosition(targetPos);

@@ -171,8 +171,6 @@ public class TestTeleOp extends LinearOpMode {
             }// IMU Sensor
             Orientation angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
-            robot.getPoteniometorAngle();
-
 
             /**
              * ---   _________   ---
@@ -185,8 +183,6 @@ public class TestTeleOp extends LinearOpMode {
             telemetry.addData("Z Y X: ", "%.1f, %.1f, %.1f", angles.firstAngle, angles.secondAngle, angles.thirdAngle);
             // Sensors
             telemetry.addData("Ultrasonic Level:", "%.3f", robot.landerSeer.getDistance(DistanceUnit.CM));
-            telemetry.addData("Potentiometer Voltage?", robot.potentiometer.getVoltage());
-            telemetry.addData("Pot Ang:", robot.getPoteniometorAngle());
             telemetry.addData("FrontLeft: ", "  A: %3d,  R %3d,  G %3d,  B %3d,",
                     robot.frontLeftColor.alpha(), robot.frontLeftColor.red(),
                     robot.frontLeftColor.green(), robot.frontLeftColor.blue());
