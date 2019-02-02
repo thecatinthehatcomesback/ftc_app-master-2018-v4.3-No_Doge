@@ -61,37 +61,22 @@ public class CatMecanumHardware
     static final double     CHILL_SPEED             = 0.25;
     static final double     CREEP_SPEED             = 0.10;
     static final double     TURN_SPEED              = 0.35;
+    static final double     ARM_POWER               = 0.8;
+
 
     // Gate Servo Constants
     static final double     GATE_OPEN               = 0.80;
     static final double     GATE_CLOSE              = 0.20;
 
     // Arm positions
-    static final int        ARM_FLOOR               = 6680;
+    static final int        ARM_FLOOR               = 6400; // was 6680
     static final int        ARM_DEPOT_DROPOFF       = 5700;
     static final int        ARM_OVER_SAMPLING       = 5215;
     static final int        ARM_STRAIGHT_UP         = 2550;
-    static final int        ARM_STORED              = 0;
-    static final double     ARM_POWER               = 0.6;
-    static final double     EXTEND_POWER            = 0.6;
-    // TODO: 2/2/2019 UHH... WHAAAAA??
-    public int[] armPos = new int[5]; {
-    /**
-     * Each of the encoder ticks that we need to reach the
-     * desired positions of the intake and arm.
-     */
+    static final int        ARM_STOWED              = 0;
+    static final double     EXTEND_POWER            = -0.7;
 
-    //  Folded in
-    armPos[0] = 0;
-    //  In a 90 degree from the floor/robot
-    armPos[1] = 2550;
-    //  Safe distance over the sampling field
-    armPos[2] = 5215;
-    //  Dropping the team marker height
-    armPos[3] = 5700;
-    //  Floor level
-    armPos[4] = 6680;
-}
+
     // Enums!
     enum DRIVE_MODE {
         findLine,
@@ -195,6 +180,8 @@ public class CatMecanumHardware
         tailMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         tailMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         extenderMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         // Set all motors to run at no power so that the robot doesn't move during init //
         leftFrontMotor.setPower(0);
@@ -231,10 +218,17 @@ public class CatMecanumHardware
      * ---   \/ \/ \/ \/ \/ \/ \/    ---
      */
     public void rotateArm(int targetPos){
-        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        /**
+         * A simple method to move the
+         */
+
+        // Set the mode to use encoder
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        // Start moving to the target position with the correct power
         armMotor.setTargetPosition(targetPos);
         armMotor.setPower(ARM_POWER);
+
+        // Use the timer as a fail-safe in case the
         ElapsedTime runtime = new ElapsedTime();
         runtime.reset();
         while(armMotor.isBusy() && (runtime.seconds() < 3.0) ){
@@ -243,21 +237,29 @@ public class CatMecanumHardware
             }
         }
     }
-    public void extendArm(){
+    public void extendArm() {
+        /**
+         * Simply throw the intake on the end
+         * of the arm outwards.
+         */
         extenderMotor.setPower(EXTEND_POWER);
         ElapsedTime runtime = new ElapsedTime();
         runtime.reset();
-        while (runtime.seconds() <0.7){
+        while (runtime.seconds() < 0.7){
             if (!opMode.opModeIsActive()) {
                 return;
             }
         }
     }
-    public void retractArm(){
+    public void retractArm() {
+        /**
+         * Simply pull back the intake on the
+         * end of the arm outwards.
+         */
         extenderMotor.setPower(-EXTEND_POWER);
         ElapsedTime runtime = new ElapsedTime();
         runtime.reset();
-        while (runtime.seconds() <0.7){
+        while (runtime.seconds() < 0.7){
             if (!opMode.opModeIsActive()) {
                 return;
             }

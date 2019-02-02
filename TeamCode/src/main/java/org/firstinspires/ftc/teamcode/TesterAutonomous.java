@@ -59,14 +59,14 @@ public class TesterAutonomous extends LinearOpMode {
          *
          \*/
 
+        double intakeTIMING = 0;
+
         /*robot.advMecDrive(CatMecanumHardware.DRIVE_SPEED, 20, 0+45, 3);
         robot.advMecDrive(CatMecanumHardware.DRIVE_SPEED, 20, 90+45, 3);
         robot.advMecDrive(CatMecanumHardware.DRIVE_SPEED, 20, 180+45, 3);
         robot.advMecDrive(CatMecanumHardware.DRIVE_SPEED, 20, 270+45, 3);*/
 
 
-        robot.mecDriveVertical(CatMecanumHardware.CREEP_SPEED, 40, 6,
-                CatMecanumHardware.DRIVE_MODE.findLine, robot.frontLeftColor, robot.frontRightColor);
 
         /**
          * What we plan to test in this autonomous:
