@@ -24,8 +24,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@Autonomous(name="Intermediate Autonomous", group="CatAuto")
-public class MecAutonomousAdvanced extends LinearOpMode {
+@Autonomous(name="State Autonomous", group="CatAuto")
+public class MecAutonomousState extends LinearOpMode {
 
     /* Declare OpMode members. */
     CatMecanumHardware robot = new CatMecanumHardware();      // Use our mecanum hardware
@@ -59,15 +59,6 @@ public class MecAutonomousAdvanced extends LinearOpMode {
         robot.resetEncoders();
         idle();
         robot.runToPosition();
-
-        // Send telemetry message to indicate successful Encoder reset
-        telemetry.addData("Path0", "Starting at :%7d  :%7d  :%7d  :%7d",
-                robot.leftFrontMotor.getCurrentPosition(),
-                robot.rightFrontMotor.getCurrentPosition(),
-                robot.leftBackMotor.getCurrentPosition(),
-                robot.rightBackMotor.getCurrentPosition());
-        telemetry.addData("Status:", "  Initialized...  BOOM!");
-        telemetry.update();
 
         // After init is pushed but before Start we can change the delay using dpad up/down //
         delayTimer.reset();
@@ -175,16 +166,15 @@ public class MecAutonomousAdvanced extends LinearOpMode {
          *
          \*/
 
-
-        // Lower robot here
-        robot.lowerRobot();
-        robot.mecDriveHorizontal(robot.DRIVE_SPEED,3.0,2.0);
-        robot.mecDriveVertical(robot.DRIVE_SPEED,3.0,2.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
-        robot.mecDriveHorizontal(robot.DRIVE_SPEED,-3.0,2.0);
-
         // Find and store the values of the sampling
         samplingPos = eyes.findGoldPos();
         eyes.tfod.deactivate();
+
+        // Lower robot here
+        robot.lowerRobot();
+        robot.mecDriveHorizontal(robot.DRIVE_SPEED,4.5,2.0);
+        robot.mecDriveVertical(robot.DRIVE_SPEED,3.0,2.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
+        robot.mecDriveHorizontal(robot.DRIVE_SPEED,-4.5,2.0);
 
         switch(samplingPos) {
             case LEFT:
@@ -214,8 +204,6 @@ public class MecAutonomousAdvanced extends LinearOpMode {
             case UNKNOWN:
                 robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.WHITE);
                 break;
-
-
         }
         //Delay the amount we selected
         robot.robotWait(timeDelay);
@@ -240,115 +228,121 @@ public class MecAutonomousAdvanced extends LinearOpMode {
          */
     }
     public void driveCrater()  throws InterruptedException {
-        // Slide if left or right
-        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED, 10, 3.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
+
+        //drives forward to avoid hiting the landers leg
+        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED,12,3.0,CatMecanumHardware.DRIVE_MODE.driveTilDistance);
+        robot.mecTurn(CatMecanumHardware.TURN_SPEED ,-90,3.5);
+        robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED,-4,1.5);
+        //drives toward wall and aims toward the craytor
+        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED,36,6,CatMecanumHardware.DRIVE_MODE.driveTilDistance);
+        robot.mecTurn(CatMecanumHardware.TURN_SPEED,125,2);
+        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED,6,2,CatMecanumHardware.DRIVE_MODE.driveTilDistance);
+        //lower arm
+        robot.moveArm(CatMecanumHardware.ARM_RELEASE_MARKER);
+        //Extend arm to depot
+        robot.extendArm();
+        //Spit out team marker
+        robot.intakeServo.setPower(1.0);
+        robot.robotWait(.5);
+        //Bring back arm
+        robot.moveArm(CatMecanumHardware.ARM_DEPOT_DROPOFF);
+        robot.intakeServo.setPower(0.0);
+        robot.retractArm();
+        //lifts arm to avoid hitting the lander's leg
+        robot.moveArm(CatMecanumHardware.ARM_OVER_SAMPLING);
+        //turns to aim at the sample field
+        robot.mecTurn(CatMecanumHardware.TURN_SPEED,90,3);
+        robot.moveArm(CatMecanumHardware.ARM_RELEASE_MARKER);
+        robot.intakeServo.setPower(-1.0);
+        //tries to sample from the side
         switch (samplingPos) {
             case LEFT:
-                robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED, 14, 4.0);
+                break;
+            case CENTER:
+                robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED,-7,2.5,CatMecanumHardware.DRIVE_MODE.driveTilDistance);
+                robot.extendArm();
                 break;
             case RIGHT:
+                robot.extendArm();
+                robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED,5,2.5,CatMecanumHardware.DRIVE_MODE.driveTilDistance);
+                break;
             case UNKNOWN:
-                robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED, -20, 4.0);
                 break;
         }
-        // Drive forward
-        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED, 12, 4.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
-        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED, -10.5, 4.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
-        // Switch back to the center
-        switch (samplingPos) {
-            case LEFT:
-                robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED, -14, 4.0);
-                break;
-            case RIGHT:
-            case UNKNOWN:
-                robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED, 20, 4.0);
-                break;
+        robot.mecTurn(robot.TURN_SPEED, 77, 1.5);
+        robot.robotWait(.3);
+        robot.mecTurn(CatMecanumHardware.TURN_SPEED,90,1.5);
+        robot.intakeServo.setPower(0.0);
+        //puts the arm into the crater
+        robot.moveArm(CatMecanumHardware.ARM_DEPOT_DROPOFF);
+        if (samplingPos==CatVisionHardware.samplingPos.LEFT)
+        {
+            robot.extendArm();
         }
-        if (isRedAlliance) {
-            robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SINELON_LAVA_PALETTE);
-        } else {
-            robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SINELON_OCEAN_PALETTE);
-        }
+        robot.mecTurn(CatMecanumHardware.TURN_SPEED,25,2.5);
+        robot.moveArm(CatMecanumHardware.ARM_RELEASE_MARKER);
+        //tries to pick up minerals
+        robot.intakeServo.setPower(1.0);
+        robot.robotWait(.75);
+        robot.intakeServo.setPower(0.0);
 
-        robot.mecTurn(robot.TURN_SPEED, -75, 3.0);
 
-        // Drive Forward about 4 foot (To wall)
-        robot.mecDriveVertical(robot.DRIVE_SPEED, 49.0, 3.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
-        robot.mecTurn(robot.TURN_SPEED, -127, 3.0);
-        // Slides right against the wall
-        robot.mecDriveHorizontal(CatMecanumHardware.HYPER_SPEED,-5,2);
-        // Drive into depot
-        robot.mecDriveVertical(robot.DRIVE_SPEED, 45, 3.5, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
-        robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED,3, 2);
-        robot.markerRelease();
-        robot.mecDriveHorizontal(CatMecanumHardware.HYPER_SPEED,3, 2);
-        robot.robotWait (0.7);
-        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED,-10,3, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
-        robot.markerIn();
-        robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED,-6,2);
-        // Turn 45 towards the right crater
-        if (isParkNearCrater) {
-            robot.mecTurn(robot.TURN_SPEED, -134, 3.0);
-        } else {
-            robot.mecTurn(robot.TURN_SPEED, -41, 3.0);
-        }
-
-        // Drive Backwards 6 feet (To crater)
-        // TODO: 12/8/2018 Add ADV here
-        robot.mecDriveVertical(robot.DRIVE_SPEED, -64.0, 8.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
-        robot.robotWait( 0.5);
-        robot.mecDriveVertical(robot.CREEP_SPEED, -4,3.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
     }
     public void driveDepot() throws InterruptedException {
-
-        // Slide if left or right
-        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED, 12, 3.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
+        //Lower arm
+        robot.moveArm(CatMecanumHardware.ARM_DEPOT_DROPOFF);
+        //Extend arm to depot
+        robot.extendArm();
+        //Finish lower arm
+        robot.moveArm(CatMecanumHardware.ARM_RELEASE_MARKER);
+        //Spit out team marker
+        robot.intakeServo.setPower(1.0);
+        robot.robotWait(.5);
+        //Bring back arm
+        robot.moveArm(CatMecanumHardware.ARM_DEPOT_DROPOFF);
+        robot.intakeServo.setPower(0.0);
+        robot.retractArm();
+        //Turn to gold
         switch (samplingPos) {
             case LEFT:
-                robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED, 14, 4.0);
+                robot.mecTurn(robot.TURN_SPEED,-30,2.5);
                 break;
             case RIGHT:
+                robot.mecTurn(robot.TURN_SPEED,30,2.5);
+                break;
             case UNKNOWN:
-                robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED, -22, 4.0);
-                break;
+                robot.mecTurn(robot.TURN_SPEED,30,2.5);
         }
-        // Drive forward
-        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED, 32, 4.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
-
-        // Switch back to the center
-        switch (samplingPos) {
-            case LEFT:
-                robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED, -14, 4.0);
-                break;
-            case RIGHT:
-            case UNKNOWN:
-                robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED, 22, 4.0);
-                break;
-        }
-
+        //Pick up gold
+        robot.moveArm(CatMecanumHardware.ARM_FLOOR);
+        robot.intakeServo.setPower(-1.0);
+        robot.extendArm();
+        robot.intakeServo.setPower(0.0);
+        //Pick up arm
+        robot.moveArm(CatMecanumHardware.ARM_DEPOT_DROPOFF);
+        robot.retractArm();
+        //sets LEDs to color of the alliance
         if (isRedAlliance) {
             robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SINELON_LAVA_PALETTE);
         } else {
             robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SINELON_OCEAN_PALETTE);
         }
-        // Drive 4 foot and drop mineral off
-        robot.mecDriveVertical(robot.DRIVE_SPEED, 13, 3.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
+        //Drive to side
+        robot.mecTurn(robot.TURN_SPEED,0,2.5);
+        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED,12,3.0,CatMecanumHardware.DRIVE_MODE.driveTilDistance);
+        robot.mecTurn(CatMecanumHardware.TURN_SPEED ,90,3.5);
+        //Lower arm
+        robot.moveArm(CatMecanumHardware.ARM_DEPOT_DROPOFF);
+        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED,12,3.0,CatMecanumHardware.DRIVE_MODE.driveTilDistance);
+        robot.mecTurn(CatMecanumHardware.TURN_SPEED,100,1);
+        //Extend arm to crater
+        robot.extendArm();
+        //moves closer to crater
+        robot.moveArm(CatMecanumHardware.ARM_RELEASE_MARKER);
+        //tries to pick up minerals
+        robot.intakeServo.setPower(1.0);
+        robot.robotWait(.75);
+        robot.intakeServo.setPower(0.0);
 
-        // Turn 45 towards the right crater
-        if (isParkNearCrater) {
-            robot.mecTurn(robot.TURN_SPEED, -42, 3.0);
-        } else{
-            robot.mecTurn(robot.TURN_SPEED, 42, 3.0);
-        }
-        // Drop Marker
-        robot.markerRelease();
-        robot.robotWait(1.0);
-        robot.markerIn();
-        // Drive Backwards 6 feet (To crater)
-        robot.mecDriveVertical(robot.DRIVE_SPEED, -15.0, 3.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
-        robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED,-9,3.0);
-        robot.mecDriveVertical(robot.DRIVE_SPEED, -72.0, 8.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
-        robot.robotWait( 0.5);
-        robot.mecDriveVertical(robot.CREEP_SPEED, -4,3.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
     }
 }

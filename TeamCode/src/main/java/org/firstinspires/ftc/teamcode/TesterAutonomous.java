@@ -48,8 +48,8 @@ public class TesterAutonomous extends LinearOpMode {
         telemetry.addData("Path0", "Starting at :%7d  :%7d  :7d  :7d",
                 robot.leftFrontMotor.getCurrentPosition(),
                 robot.rightFrontMotor.getCurrentPosition(),
-                robot.leftBackMotor.getCurrentPosition(),
-                robot.rightBackMotor.getCurrentPosition());
+                robot.leftRearMotor.getCurrentPosition(),
+                robot.rightRearMotor.getCurrentPosition());
         telemetry.update();
 
         waitForStart();

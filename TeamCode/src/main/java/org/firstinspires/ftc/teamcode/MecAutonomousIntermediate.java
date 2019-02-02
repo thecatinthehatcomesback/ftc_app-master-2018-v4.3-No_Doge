@@ -20,11 +20,13 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
 @Autonomous(name="Intermediate Autonomous", group="CatAuto")
+@Disabled
 public class MecAutonomousIntermediate extends LinearOpMode {
 
     /* Declare OpMode members. */
@@ -64,8 +66,8 @@ public class MecAutonomousIntermediate extends LinearOpMode {
         telemetry.addData("Path0", "Starting at :%7d  :%7d  :%7d  :%7d",
                 robot.leftFrontMotor.getCurrentPosition(),
                 robot.rightFrontMotor.getCurrentPosition(),
-                robot.leftBackMotor.getCurrentPosition(),
-                robot.rightBackMotor.getCurrentPosition());
+                robot.leftRearMotor.getCurrentPosition(),
+                robot.rightRearMotor.getCurrentPosition());
         telemetry.update();
 
         // After init is pushed but before Start we can change the delay using dpad up/down //

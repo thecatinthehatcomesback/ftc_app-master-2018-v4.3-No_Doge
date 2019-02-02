@@ -19,7 +19,6 @@ import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -63,9 +62,18 @@ public class CatMecanumHardware
     static final double     CREEP_SPEED             = 0.10;
     static final double     TURN_SPEED              = 0.35;
 
-    // Marker Servo
-    static final double     MARKER_IN               = 0.55;
-    static final double     MARKER_OUT              = 0.27;
+    // Gate Servo Constants
+    static final double     GATE_OPEN               = 0.80;
+    static final double     GATE_CLOSE              = 0.20;
+
+    // Arm positions
+    static final int        ARM_FLOOR               = 1000;
+    static final int        ARM_RELEASE_MARKER      = 800;
+    static final int        ARM_DEPOT_DROPOFF       = 700;
+    static final int        ARM_OVER_SAMPLING       = 300;
+    static final int        ARM_STORED              = 0;
+    static final double     ARM_POWER               = 0.6;
+    static final double     EXTEND_POWER            = 0.6;
 
     // Enums!
     enum DRIVE_MODE {
@@ -87,31 +95,31 @@ public class CatMecanumHardware
     // Motors
     public DcMotor  leftFrontMotor   = null;
     public DcMotor  rightFrontMotor  = null;
-    public DcMotor  leftBackMotor    = null;
-    public DcMotor  rightBackMotor   = null;
+    public DcMotor leftRearMotor = null;
+    public DcMotor rightRearMotor = null;
     public DcMotor  tailMotor        = null;
     public DcMotor  armMotor         = null;
+    public DcMotor  extenderMotor    = null;
 
-    //LED stufff
+    //LED stuff
     public RevBlinkinLedDriver lights = null;
     public RevBlinkinLedDriver.BlinkinPattern pattern;
     public static boolean isRedAlliance = true;
 
-    public Servo    identityRelease  = null;
-    public Servo    markerServo      = null;
+    // The servo keeping the minerals inside the intake
+    public Servo    gateServo        = null;
 
     // Two Vex motors = Continuous Servos
     public CRServo  intakeServo      = null;
-    public CRServo  extenderServo    = null;
+    //public CRServo  extenderServo    = null;
 
 
     // Sensors
     public ModernRoboticsI2cRangeSensor landerSeer  = null;
-    public AnalogInput potentiometer                = null;
     public ColorSensor frontLeftColor               = null;
     public ColorSensor frontRightColor              = null;
-    public ColorSensor backLeftColor                = null;
-    public ColorSensor backRightColor               = null;
+    public ColorSensor rearLeftColor = null;
+    public ColorSensor rearRightColor = null;
 
 
     /* local OpMode members. */
@@ -134,64 +142,133 @@ public class CatMecanumHardware
         // Define and Initialize Motors //
         leftFrontMotor   = hwMap.dcMotor.get("left_front_motor");
         rightFrontMotor  = hwMap.dcMotor.get("right_front_motor");
-        leftBackMotor    = hwMap.dcMotor.get("left_rear_motor");
-        rightBackMotor   = hwMap.dcMotor.get("right_rear_motor");
+        leftRearMotor    = hwMap.dcMotor.get("left_rear_motor");
+        rightRearMotor   = hwMap.dcMotor.get("right_rear_motor");
         tailMotor        = hwMap.dcMotor.get("tail_motor");
         armMotor         = hwMap.dcMotor.get("arm_motor");
+        extenderMotor    = hwMap.dcMotor.get("extendey");
 
-        // blinkin stuff
+        // Blinkin LED stuff //
         lights           = hwMap.get(RevBlinkinLedDriver.class, "blinky");
-        pattern = RevBlinkinLedDriver.BlinkinPattern.RAINBOW_RAINBOW_PALETTE;
+        pattern          = RevBlinkinLedDriver.BlinkinPattern.RAINBOW_RAINBOW_PALETTE;
         lights.setPattern(pattern);
+
         // Define and Initialize Servos //
-        identityRelease  = hwMap.servo.get("identity_release");
         intakeServo      = hwMap.crservo.get("intakey");
-        extenderServo    = hwMap.crservo.get("extendey");
-        markerServo      = hwMap.servo.get("markey");
-        // Define and Initialize Sensors
+        gateServo        = hwMap.servo.get("gate");
+
+        // Define and Initialize Sensors //
         landerSeer       = hwMap.get(ModernRoboticsI2cRangeSensor.class, "lander_seer");
-        potentiometer    = hwMap.analogInput.get("potentiometer");
         frontLeftColor   = hwMap.get(ColorSensor.class, "front_left_color");
         frontRightColor  = hwMap.get(ColorSensor.class, "front_right_color");
-        backLeftColor    = hwMap.get(ColorSensor.class, "rear_left_color");
-        backRightColor   = hwMap.get(ColorSensor.class, "rear_right_color");
+        rearLeftColor    = hwMap.get(ColorSensor.class, "rear_left_color");
+        rearRightColor   = hwMap.get(ColorSensor.class, "rear_right_color");
 
-        // Define motor direction //
+        // Define motor directions //
         leftFrontMotor.setDirection(DcMotor.Direction.FORWARD);
-        rightFrontMotor.setDirection(DcMotor.Direction.FORWARD);
-        leftBackMotor.setDirection(DcMotor.Direction.FORWARD);
-        rightBackMotor.setDirection(DcMotor.Direction.REVERSE);
-        tailMotor.setDirection(DcMotor.Direction.FORWARD);
+        rightFrontMotor.setDirection(DcMotor.Direction.REVERSE);
+        leftRearMotor.setDirection(DcMotor.Direction.FORWARD);
+        rightRearMotor.setDirection(DcMotor.Direction.REVERSE);
         tailMotor.setDirection(DcMotor.Direction.FORWARD);
         intakeServo.setDirection(DcMotorSimple.Direction.FORWARD);
+        extenderMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+
         // Set motor modes //
         runNoEncoders();
         tailMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         tailMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        // Set all motors to no power //
-        leftFrontMotor.setPower(0);
-        rightBackMotor.setPower(0);
-        leftBackMotor.setPower(0);
-        rightBackMotor.setPower(0);
-        tailMotor.setPower(0);
+        extenderMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        markerServo.setPosition(MARKER_IN);
+        // Set all motors to run at no power so that the robot doesn't move during init //
+        leftFrontMotor.setPower(0);
+        rightRearMotor.setPower(0);
+        leftRearMotor.setPower(0);
+        rightRearMotor.setPower(0);
+        tailMotor.setPower(0);
+        intakeServo.setPower(0);
+        extenderMotor.setPower(0);
+
+        // Set Servos to init positions //
+        gateServo.setPosition(GATE_CLOSE);
     }
 
 
 
     /**
      * ---   _____________________   ---
-     * ---   Servo control methods   ---
+     * ---   Servo Control Methods   ---
      * ---   \/ \/ \/ \/ \/ \/ \/    ---
      */
-    public void markerRelease() {
-        // Set the marker out
-        markerServo.setPosition(MARKER_OUT);
+    public void gateOpen() {
+        // Set the gate open
+        gateServo.setPosition(GATE_OPEN);
     }
-    public void markerIn() {
-        // Set the marker servo back in
-        markerServo.setPosition(MARKER_IN);
+    public void gateClose() {
+        // Set the gate close
+        gateServo.setPosition(GATE_CLOSE);
+    }
+
+    /**
+     * ---   _____________________   ---
+     * ---   Arm Movement Patterns   ---
+     * ---   \/ \/ \/ \/ \/ \/ \/    ---
+     */
+    // TODO: 2/2/2019 UHH... WHAAAAA??
+    public int[] armPos = new int[5]; {
+    /**
+     * Each of the encoder ticks that we need to reach the
+     * desired positions of the intake and arm.
+     */
+
+    //  Folded in
+    armPos[0] = 0;
+    //  In a 90 degree from the floor/robot
+    armPos[1] = 2550;
+    //  Safe distance over the sampling field
+    armPos[2] = 5215;
+    //  Dropping the team marker height
+    armPos[3] = 5700;
+    //  Floor level
+    armPos[4] = 6680;
+    }
+    public void moveArm(int targetPos){
+        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        armMotor.setTargetPosition(targetPos);
+        armMotor.setPower(ARM_POWER);
+        ElapsedTime runtime = new ElapsedTime();
+        runtime.reset();
+        while(armMotor.isBusy() && (runtime.seconds() < 3.0) ){
+            if (!opMode.opModeIsActive()) {
+                return;
+            }
+        }
+    }
+    public void extendArm(){
+        extenderMotor.setPower(EXTEND_POWER);
+        ElapsedTime runtime = new ElapsedTime();
+        runtime.reset();
+        while (runtime.seconds() <0.7){
+            if (!opMode.opModeIsActive()) {
+                return;
+            }
+        }
+    }
+    public void retractArm(){
+        extenderMotor.setPower(-EXTEND_POWER);
+        ElapsedTime runtime = new ElapsedTime();
+        runtime.reset();
+        while (runtime.seconds() <0.7){
+            if (!opMode.opModeIsActive()) {
+                return;
+            }
+        }
+    }
+    public void hungryHungryHippo() {
+        /**
+         * During autonomous, we use this to turn on the
+         * intake, extend
+         */
     }
 
     /**
@@ -199,43 +276,44 @@ public class CatMecanumHardware
      * ---   Driving chassis methods   ---
      * ---   \/ \/ \/ \/ \/ \/ \/ \/   ---
      */
+    // Basic all four drive motor power and setMode methods
     public void drive(double leftFront, double rightFront, double leftBack, double rightBack) {
         /**
          * Simply setting the powers of each motor in less characters
          */
         leftFrontMotor.setPower(leftFront);
         rightFrontMotor.setPower(rightFront);
-        leftBackMotor.setPower(leftBack);
-        rightBackMotor.setPower(rightBack);
+        leftRearMotor.setPower(leftBack);
+        rightRearMotor.setPower(rightBack);
     }
     public void resetEncoders(){
 
         leftFrontMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightFrontMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftBackMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightBackMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftRearMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightRearMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
     public void runUsingEncoders(){
         leftFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftBackMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightBackMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
     public void runNoEncoders(){
 
         leftFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightFrontMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        leftBackMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightBackMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftRearMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightRearMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
     public void runToPosition(){
 
         leftFrontMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightFrontMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        leftBackMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightBackMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftRearMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightRearMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
-
+    // Driving Methods:
     public void mecDriveVertical(double power,
                                  double distance,
                                  double timeoutS, DRIVE_MODE driveMode)  throws InterruptedException {
@@ -246,7 +324,8 @@ public class CatMecanumHardware
                                      double timeoutS, DRIVE_MODE driveMode, ColorSensor leftColSen, ColorSensor rightColSen)  throws InterruptedException {
         /**
          * This is a simpler mecanum drive method that drives blindly
-         * straight vertically
+         * straight vertically or using the color sensors to find a
+         * line.
          */
 
         int newLeftFrontTarget;
@@ -274,8 +353,8 @@ public class CatMecanumHardware
             runToPosition();
             leftFrontMotor.setTargetPosition(newLeftFrontTarget);
             rightFrontMotor.setTargetPosition(newRightFrontTarget);
-            leftBackMotor.setTargetPosition(newLeftBackTarget);
-            rightBackMotor.setTargetPosition(newRightBackTarget);
+            leftRearMotor.setTargetPosition(newLeftBackTarget);
+            rightRearMotor.setTargetPosition(newRightBackTarget);
 
             // Reset the timeout time and start motion.
             runtime.reset();
@@ -287,31 +366,31 @@ public class CatMecanumHardware
 
             drive(power, power, power, power);
 
-            /// TODO: 1/26/2019 FIX THIS!!!
-
             while (opMode.opModeIsActive() &&
                     (runtime.seconds() < timeoutS) &&
                     keepDriving) {
 
-                // Get the current Pos for telemetry
+                // Get the current Pos for telemetry only
                 int leftFrontPosition  = leftFrontMotor.getCurrentPosition();
                 int rightFrontPosition = rightFrontMotor.getCurrentPosition();
-                int leftBackPosition   = leftBackMotor.getCurrentPosition();
-                int rightBackPosition  = rightBackMotor.getCurrentPosition();
+                int leftBackPosition   = leftRearMotor.getCurrentPosition();
+                int rightBackPosition  = rightRearMotor.getCurrentPosition();
 
+                // One drive mode that drives blindly straight
                 if (driveMode == DRIVE_MODE.driveTilDistance) {
                     //  Exit the method once robot stops
                     if (!leftFrontMotor.isBusy() || !rightFrontMotor.isBusy() ||
-                            !leftBackMotor.isBusy() || !rightBackMotor.isBusy()) {
+                            !leftRearMotor.isBusy() || !rightRearMotor.isBusy()) {
                         keepDriving = false;
                     }
                 }
 
+                // The other drive mode using color sensors to fine lines
                 if (driveMode == DRIVE_MODE.findLine) {
                     // Once left side hits color, turn left side motors off
                     if (findLine(baseDelta, leftColSen)) {
                         leftFrontMotor.setPower(0.0);
-                        leftBackMotor.setPower(0.0);
+                        leftRearMotor.setPower(0.0);
 
                         if (rightFrontMotor.getPower() == 0.0) {
                             keepDriving = false;
@@ -321,7 +400,7 @@ public class CatMecanumHardware
                     // Once right side hits color, turn right side motors off
                     if (findLine(baseDelta, rightColSen)) {
                         rightFrontMotor.setPower(0.0);
-                        rightBackMotor.setPower(0.0);
+                        rightRearMotor.setPower(0.0);
 
                         if (leftFrontMotor.getPower() == 0.0) {
                             keepDriving = false;
@@ -330,11 +409,7 @@ public class CatMecanumHardware
                     }
                 }
 
-                // Log Messages
-                /*Log.d("catbot", String.format("encoderDrive targ[%5d,%5d], curr[%5d,%5d] power [%.3f,%.3f]",
-                        newLeftTarget,  newRightTarget, leftPosition, rightPosition, leftSpeed, rightSpeed));*/
-
-                // Display it for the driver
+                // Display it all for the driver
                 opMode.telemetry.addData("New Path",  "Running to :%7d :%7d :%7d :%7d",
                         newLeftFrontTarget,  newRightFrontTarget, newLeftBackTarget, newRightBackTarget);
                 opMode.telemetry.addData("Current Path",  "Running at :%7d :%7d :%7d :%7d",
@@ -345,7 +420,7 @@ public class CatMecanumHardware
             }
 
 
-            // Stop all motion
+            // Stop all motion at the end
             drive(0.0, 0.0, 0.0, 0.0);
         }
     }
@@ -376,8 +451,8 @@ public class CatMecanumHardware
             runToPosition();
             leftFrontMotor.setTargetPosition(newLeftFrontTarget);
             rightFrontMotor.setTargetPosition(newRightFrontTarget);
-            leftBackMotor.setTargetPosition(newLeftBackTarget);
-            rightBackMotor.setTargetPosition(newRightBackTarget);
+            leftRearMotor.setTargetPosition(newLeftBackTarget);
+            rightRearMotor.setTargetPosition(newRightBackTarget);
 
             // Reset the timeout time and start motion.
             runtime.reset();
@@ -396,12 +471,12 @@ public class CatMecanumHardware
 
                 int leftFrontPosition = leftFrontMotor.getCurrentPosition();
                 int rightFrontPosition = rightFrontMotor.getCurrentPosition();
-                int leftBackPosition = leftBackMotor.getCurrentPosition();
-                int rightBackPosition = rightBackMotor.getCurrentPosition();
+                int leftBackPosition = leftRearMotor.getCurrentPosition();
+                int rightBackPosition = rightRearMotor.getCurrentPosition();
 
                 //  Exit the method once robot stops
                 if (!leftFrontMotor.isBusy() || !rightFrontMotor.isBusy() ||
-                        !leftBackMotor.isBusy() || !rightBackMotor.isBusy()) {
+                        !leftRearMotor.isBusy() || !rightRearMotor.isBusy()) {
                     keepDriving = false;
                 }
 
@@ -439,7 +514,7 @@ public class CatMecanumHardware
          * powers for \ side of motors while we subtract Sin from Cos
          * for the / side of motors.
          */
-// TODO: 12/3/2018 Continue work on this....
+// TODO: 1/20/2018 Continue work on this....
 
         double leftFrontMod  = Math.sin(Math.toRadians(vectorAng))  + Math.cos(Math.toRadians(vectorAng));
         double rightFrontMod = -Math.sin(Math.toRadians(vectorAng)) + Math.cos(Math.toRadians(vectorAng));
@@ -468,8 +543,8 @@ public class CatMecanumHardware
             // TODO: 11/19/2018 DO WE WANT TO USE RUN TO POSITION????
             leftFrontMotor.setTargetPosition(newLeftFrontTarget);
             rightFrontMotor.setTargetPosition(newRightFrontTarget);
-            leftBackMotor.setTargetPosition(newLeftBackTarget);
-            rightBackMotor.setTargetPosition(newRightBackTarget);
+            leftRearMotor.setTargetPosition(newLeftBackTarget);
+            rightRearMotor.setTargetPosition(newRightBackTarget);
 
             // Reset the timeout time and start motion.
             runtime.reset();
@@ -495,12 +570,12 @@ public class CatMecanumHardware
                 // Find the current positions so that we can display it later
                 int leftFrontPosition  = leftFrontMotor.getCurrentPosition();
                 int rightFrontPosition = rightFrontMotor.getCurrentPosition();
-                int leftBackPosition   = leftBackMotor.getCurrentPosition();
-                int rightBackPosition  = rightBackMotor.getCurrentPosition();
+                int leftBackPosition   = leftRearMotor.getCurrentPosition();
+                int rightBackPosition  = rightRearMotor.getCurrentPosition();
 
                 //  Exit the method once robot stops
                 if (!leftFrontMotor.isBusy() && !rightFrontMotor.isBusy() &&
-                        !leftBackMotor.isBusy() && !rightBackMotor.isBusy()) {
+                        !leftRearMotor.isBusy() && !rightRearMotor.isBusy()) {
                     keepDriving = false;
                 }
 
@@ -545,13 +620,13 @@ public class CatMecanumHardware
             if (clockwiseTurn) {
                 leftFrontMotor.setPower(power);
                 rightFrontMotor.setPower(-power);
-                leftBackMotor.setPower(power);
-                rightBackMotor.setPower(-power);
+                leftRearMotor.setPower(power);
+                rightRearMotor.setPower(-power);
             } else {
                 leftFrontMotor.setPower(-power);
                 rightFrontMotor.setPower(power);
-                leftBackMotor.setPower(-power);
-                rightBackMotor.setPower(power);
+                leftRearMotor.setPower(-power);
+                rightRearMotor.setPower(power);
             }
             // keep looping while we are still active, and there is time left, and both motors are running.
             int wrapAdjust = 0;
@@ -612,7 +687,7 @@ public class CatMecanumHardware
         //  Way high out of hook at our own field
         tailPos[2] = 8500;
 
-    };
+    }
     public void retractTail() {
         /**
          * Pull tail inside the robot/reattach to the lander
@@ -627,9 +702,9 @@ public class CatMecanumHardware
     }
 
     /**
-     * ---   ______________   ---
-     * ---   Common Methods   ---
-     * ---   \/ \/ \/ \/ \/   ---
+     * ---   ____________________________   ---
+     * ---   Common Miscellaneous Methods   ---
+     * ---  \/ \/ \/ \/ \/ \/ \/ \/ \/ \/   ---
      */
     public void robotWait(double seconds) {
         ElapsedTime delaytimer = new ElapsedTime();
@@ -720,42 +795,6 @@ public class CatMecanumHardware
         // Pull tail back into the robot (not there yet...)
     }
 
-    // Potentiometor //
-    public double getPoteniometorAngle() {
-
-        /**
-         * Arm folded in        = 0.135V
-         * Arm about vertical   = 1.200V
-         * Arm extended back    = 3.250V
-         *
-         *
-         * :::MATH:::
-         *
-         * If
-         * 180 = mx + b
-         * x = 1.2
-         * and
-         * 45 = mx + b
-         * x = 0.135
-         *
-         * rise/run must be
-         * m = (1.2-0.135) / (180-45) == 126.76
-         *
-         *
-         * 180 = (126.76)(1.2) + b
-         * b = 27.888
-         */
-
-        double degrees;
-        double m = 126.76;
-        double x = potentiometer.getVoltage();
-        double b = 27.888;
-
-        degrees = (m*x) + b;
-
-        return degrees;
-    }
-
     /**
      * ---   ___________   ---
      * ---   IMU Methods   ---
@@ -798,7 +837,7 @@ public class CatMecanumHardware
 
         boolean isRed;
 
-        // Just a simple camparison of the two colors to see which is seen
+        // Just a simple caparison of the two colors to see which is seen
         if (sensorToUse.red() > sensorToUse.blue()) {
             isRed = true;
         } else {

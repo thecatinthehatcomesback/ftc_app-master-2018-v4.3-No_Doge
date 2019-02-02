@@ -70,7 +70,7 @@ public class MecanumTeleOp extends LinearOpMode {
              * ---   \/ \/ \/ \/ \/ \/   ---
              */
 
-            // Speed adjustments
+            // Drive speed adjustments
             if (gamepad1.left_bumper) {
                 driveSpeed = 1;
             } else if (gamepad1.right_bumper) {
@@ -79,7 +79,7 @@ public class MecanumTeleOp extends LinearOpMode {
                 driveSpeed = 0.6;
             }
 
-            //select direction
+            // Direction Selection
             if (gamepad1.dpad_up){
                 inReverse = false;
                 if(robot.isRedAlliance) {
@@ -98,7 +98,7 @@ public class MecanumTeleOp extends LinearOpMode {
             }
 
             // Input for drive train
-            if(inReverse) {
+            if (inReverse) {
                 leftFront  = gamepad1.right_stick_y - gamepad1.right_stick_x + gamepad1.left_stick_x;
                 rightFront = gamepad1.right_stick_y + gamepad1.right_stick_x - gamepad1.left_stick_x;
                 leftBack   = gamepad1.right_stick_y + gamepad1.right_stick_x + gamepad1.left_stick_x;
@@ -110,7 +110,8 @@ public class MecanumTeleOp extends LinearOpMode {
                 rightBack  = -gamepad1.right_stick_y + gamepad1.right_stick_x - gamepad1.left_stick_x;
             }
 
-            // Calculate the scale factor to reduce the powers
+
+            // Calculate the scale factor
             SF = robot.findScalor(leftFront, rightFront, leftBack, rightBack);
             // Set powers to each drive motor
             leftFront  = leftFront  * SF * driveSpeed;
@@ -119,11 +120,14 @@ public class MecanumTeleOp extends LinearOpMode {
             rightBack  = rightBack  * SF * driveSpeed;
 
 
-            // drive //
+            // DRIVE!!!
             robot.drive(leftFront, rightFront, leftBack, rightBack);
 
-            // Driver 1 Tail Control
-            robot.tailMotor.setPower(gamepad1.left_trigger -gamepad1.right_trigger);
+            // Tail Control
+            robot.tailMotor.setPower(gamepad1.left_trigger - gamepad1.right_trigger);
+
+
+
 
 
             /**
@@ -132,24 +136,20 @@ public class MecanumTeleOp extends LinearOpMode {
              * ---   \/ \/ \/ \/ \/ \/   ---
              */
 
-            // Tail control  for Driver 2
-            /*
-            if (gamepad2.y) {
-                robot.retractTail();
-            }
-            if (gamepad2.x) {
-                robot.extendTail();
-            }
-            */
-
             // Intake Spinning Controls
             robot.intakeServo.setPower(gamepad2.right_trigger*0.87 - gamepad2.left_trigger*0.87);
 
             //**  Arm controls **//
-            // Lower/raise arm
-            robot.armMotor.setPower(-gamepad2.right_stick_y);
-            // Extend/retract arm
-            robot.extenderServo.setPower(gamepad2.left_stick_x*0.8);
+            // Lower/Raise arm
+            robot.armMotor.setPower(gamepad2.right_stick_y);
+            // Extend/Retract arm
+            robot.extenderMotor.setPower(gamepad2.left_stick_x * 0.8);
+            // Open/Close gate
+            if(gamepad2.left_bumper) {
+                robot.gateClose();
+            } else if (gamepad2.right_bumper) {
+                robot.gateOpen();
+            }
 
 
             // Driver help
