@@ -29,6 +29,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 public class TestTeleOp extends LinearOpMode {
 
     /* Declare OpMode members. */
+    private ElapsedTime runTime = new ElapsedTime();
     private ElapsedTime elapsedGameTime = new ElapsedTime();
 
     /* Declare OpMode members. */
@@ -66,13 +67,18 @@ public class TestTeleOp extends LinearOpMode {
             robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_OCEAN_PALETTE);
         }
         // Go!
+        runTime.reset();
         elapsedGameTime.reset();
+        boolean tailRetracted = false;
+        boolean needsToBeRetracted = true;
         double driveSpeed;
         double leftFront;
         double rightFront;
         double leftBack;
         double rightBack;
         double SF;
+        int newEncTicks = 0;
+        int oldEncTicks = 0;
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
@@ -170,6 +176,40 @@ public class TestTeleOp extends LinearOpMode {
                 robot.extendTail();
             }// IMU Sensor
             Orientation angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+
+            /// TODO: 2/4/2019 TEST THIS!!!
+            if (tailRetracted && needsToBeRetracted) {
+                // Get the current encoder value
+                newEncTicks = robot.tailMotor.getCurrentPosition();
+                // Set tail to retract slowly at quarter power
+                robot.tailMotor.setPower(-0.4);
+
+                // Every so often, check the values
+                if (runTime.milliseconds() > 750) {
+                    // Once the encoder ticks slows down or stops
+                    if ((newEncTicks - oldEncTicks) > -80) {
+                        // Cut power to tail
+                        robot.tailMotor.setPower(0.0);
+                        // Tell EVERYONE!!!
+                        telemetry.addData("Status: ", "Success!!!");
+                        telemetry.update();
+                        robot.robotWait(3.0);
+                        // End this
+                        tailRetracted = true;
+                        needsToBeRetracted = false;
+                    }
+
+                    // Otherwise continue as normal and reset timer
+                    telemetry.addData("Status: ", "Still going...");
+                    runTime.reset();
+                    oldEncTicks = newEncTicks;
+                }
+                telemetry.addData("Current Enc Ticks: ", newEncTicks);
+                telemetry.addData("Old Enc Ticks: ", oldEncTicks);
+                telemetry.update();
+            }
+
+            /// TODO: 2/4/2019 After so much time pull the arm back in
 
 
             /**

@@ -1,16 +1,15 @@
 /**
- MecAutonomousBasic.java
+ MecAutonomousState.java
 
  A Linear OpMode class to be an autonomous method for both Blue & Red where
- we pick which side of the lander we are hanging off of with gamepad1 and
- detect the gold with DogeCV, hit the right element, place our team marker
- in our depot and park in either crater according to what we say using gamepad1
- at the beginning of the match.
+ we pick which side of the lander we are hanging off of at the start of the match,
+ detect the gold with TensorFlow, hit the correct element, place the  Cat Hat
+ team marker in our depot, and park in either crater according to what we chose
+ using gamepad1 at the beginning of the match.
 
- MecBasic is written to use the most basic approach to our autonomous route
- with the help of mechanical sorting intake and a servo to drop our team marker
- off in the depot.  This autonomous is used for our first qualifier this year
- (November 10, 2018).
+ MecStateAutonomous is written for the Minnesota State competition to account for the
+ changes to our robot since the December tournament including a new arm and intake.
+ (February 8-9, 2019)
 
  This file is a modified version from the FTC SDK.
 
@@ -28,14 +27,13 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class MecAutonomousState extends LinearOpMode {
 
     /* Declare OpMode members. */
-    CatMecanumHardware robot = new CatMecanumHardware();      // Use our mecanum hardware
-    CatVisionHardware eyes = new CatVisionHardware();   // Doge and vision init
-    private ElapsedTime runTime = new ElapsedTime();
+    CatMecanumHardware robot = new CatMecanumHardware();  // Use our mecanum hardware
+    CatVisionHardware eyes = new CatVisionHardware();     // Doge and vision init
     private ElapsedTime delayTimer = new ElapsedTime();
     private double timeDelay;
     private boolean isRedAlliance = true;
-    private boolean isCraterSide = true;
-    private boolean isParkNearCrater = true;
+    private boolean isCraterSide = false;
+    private boolean parkInOurCrater = true;
 
     private CatVisionHardware.samplingPos samplingPos = CatVisionHardware.samplingPos.RIGHT;
 
@@ -49,20 +47,27 @@ public class MecAutonomousState extends LinearOpMode {
          */
         robot.init(hardwareMap, this);
         // Init IMU sensor later when the match starts
-        // Init our Machine Vision
+        // Init our Machine Vision right away
         eyes.initVision(hardwareMap);
 
-        // Send telemetry message to signify robot waiting;
-        telemetry.addData("Status: ", "Resetting Encoders...");
+        // Send telemetry message to signify robot waiting
+        telemetry.addData("Status: ", "Initializing: (Resetting Encoders...)");
         telemetry.update();
 
         robot.resetEncoders();
         idle();
         robot.runToPosition();
 
-        // After init is pushed but before Start we can change the delay using dpad up/down //
+
+        /**
+         * After init is pushed but before Start we
+         * can change presets in the OpMode using
+         * the gamepad buttons.
+         */
+
+        // Reset the timer to avoid any unwanted numbers
         delayTimer.reset();
-        // Runs a loop to change certain settings while we wait to start
+        // Runs a loop to change the presets while we wait to start
         while (!opModeIsActive() ) {
             if (this.isStopRequested()) {
                 return;
@@ -79,7 +84,7 @@ public class MecAutonomousState extends LinearOpMode {
                 }
                 delayTimer.reset();
             }
-            // Changes which alliance color we are
+            // Changes which alliance color we belong to
             if (((gamepad1.dpad_left) && delayTimer.seconds() > 0.8)) {
                 if (isRedAlliance) {
                     isRedAlliance = false;
@@ -91,12 +96,12 @@ public class MecAutonomousState extends LinearOpMode {
                 delayTimer.reset();
             }
 
-            //change which crater we'll park in :)
+            // Change which crater we'll park in
             if (((gamepad1.a) && delayTimer.seconds() > 0.8)) {
-                if (isParkNearCrater) {
-                    isParkNearCrater = false;
+                if (parkInOurCrater) {
+                    parkInOurCrater = false;
                 } else {
-                    isParkNearCrater = true;
+                    parkInOurCrater = true;
                 }
                 delayTimer.reset();
             }
@@ -111,7 +116,7 @@ public class MecAutonomousState extends LinearOpMode {
                 delayTimer.reset();
             }
 
-            // LED code...
+            // Cool LED code:
             if (isRedAlliance) {
                 if(isCraterSide){
                     robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
@@ -129,53 +134,58 @@ public class MecAutonomousState extends LinearOpMode {
             telemetry.addData("Delay Timer: ", timeDelay);
 
             if (isRedAlliance) {
-                telemetry.addData("Alliance: ", "Red");
+                telemetry.addData("Alliance:", "Red");
             } else {
-                telemetry.addData("Alliance: ", "Blue");
+                telemetry.addData("Alliance:", "Blue");
             }
 
             if (isCraterSide) {
-                telemetry.addData("Lander Side: ", "Crater");
+                telemetry.addData("Lander Side:", "Crater");
             } else {
-                telemetry.addData("Lander Side: ", "Depot");
+                telemetry.addData("Lander Side:", "Depot");
             }
 
-            if (isParkNearCrater) {
-                telemetry.addData("Parking Crater: ", "Near");
+            if (parkInOurCrater) {
+                telemetry.addData("Parking in the Crater:", "On our alliance side...");
             } else {
-                telemetry.addData("Parking Crater: ", "Far");
+                telemetry.addData("Parking in the Crater:", "Of the other alliance's side...");
             }
             telemetry.update();
 
             /**
-             * We don't need to "waitForStart()" here since we've been
-             * looping all this time and waiting for opMode to be enabled.
+             * We don't need a "waitForStart()" since we've been running our own
+             * loop all this time so that we can make some changes.
              */
 
         }
+        /**
+         * Runs after hit start:
+         * DO STUFF FOR the OPMODE!!!
+          */
+
 
         /**
          * Init the IMU after play so that it is not offset after
          * remaining idle for a minute or two...
-         */
+          */
         robot.IMUinit();
 
         /**
-         * Runs after hit start
-         * DO STUFF FOR OPMODE!!!!!!!!!!!
-         *
-         \*/
-
-        // Find and store the values of the sampling
+         * Find and store the values of the sampling right away
+         * while we are hanging to maximize our camera's PoV
+         * (Point of View)
+          */
         samplingPos = eyes.findGoldPos();
+        // Close down the vision to reduce RAM usage
         eyes.tfod.deactivate();
 
-        // Lower robot here
+        // Lower the robot and begin!
         robot.lowerRobot();
+        // Drive the robot out the hook
         robot.mecDriveHorizontal(robot.DRIVE_SPEED,4.5,2.0);
         robot.mecDriveVertical(robot.DRIVE_SPEED,3.0,2.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
-        //robot.mecDriveHorizontal(robot.DRIVE_SPEED,-4.5,2.0);
 
+        // LED feedback for the sampling field
         switch(samplingPos) {
             case LEFT:
                 if (isRedAlliance) {
@@ -205,7 +215,8 @@ public class MecAutonomousState extends LinearOpMode {
                 robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.WHITE);
                 break;
         }
-        //Delay the amount we selected
+
+        // Delay the rest of the autonomous for the number of seconds we chose
         robot.robotWait(timeDelay);
 
         // Enter the rest of the autonomous based on which side we selected near beginning
@@ -304,15 +315,15 @@ public class MecAutonomousState extends LinearOpMode {
         robot.intakeServo.setPower(0.0);
         robot.retractArm();
         // Drive back to hit gold
-        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED, 10, 2, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
+        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED, -10, 2, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
         //Turn to gold
         switch (samplingPos) {
             case LEFT:
-                robot.mecTurn(robot.TURN_SPEED,-30,2.5);
+                robot.mecTurn(robot.TURN_SPEED,-26,2.5);
                 break;
             case RIGHT:
             case UNKNOWN:
-                robot.mecTurn(robot.TURN_SPEED,30,2.5);
+                robot.mecTurn(robot.TURN_SPEED,26,2.5);
                 break;
         }
         //Pick up gold
@@ -330,22 +341,35 @@ public class MecAutonomousState extends LinearOpMode {
         } else {
             robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SINELON_OCEAN_PALETTE);
         }
-        //Drive to side
-        robot.mecTurn(robot.TURN_SPEED,0,2.5);
-        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED,10,3.0,CatMecanumHardware.DRIVE_MODE.driveTilDistance);
-        robot.mecTurn(CatMecanumHardware.TURN_SPEED ,85,3.5);
-        //Lower arm
-        robot.rotateArm(CatMecanumHardware.ARM_OVER_SAMPLING);
-        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED,14,3.0,CatMecanumHardware.DRIVE_MODE.driveTilDistance);
-        robot.mecTurn(CatMecanumHardware.TURN_SPEED,95,1);
-        //moves closer to crater
-        robot.rotateArm(CatMecanumHardware.ARM_DEPOT_DROPOFF);
+
+        /// TODO: 2/4/2019 Maybe a center versus wall option so that we don't hit alliance partner
+        if (parkInOurCrater) {
+            // Drive to crater nearest the audience
+            robot.mecTurn(CatMecanumHardware.TURN_SPEED ,27,3.5);
+            robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED,10,3.0,CatMecanumHardware.DRIVE_MODE.driveTilDistance);
+            robot.mecTurn(CatMecanumHardware.TURN_SPEED ,85,3.5);
+            //Lower arm
+            robot.rotateArm(CatMecanumHardware.ARM_OVER_SAMPLING);
+            robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED,14,3.0,CatMecanumHardware.DRIVE_MODE.driveTilDistance);
+            robot.mecTurn(CatMecanumHardware.TURN_SPEED,110,1);
+        } else {
+            // Drive to farther crater
+            robot.mecTurn(CatMecanumHardware.TURN_SPEED ,-27,3.5);
+            robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED,10,3.0,CatMecanumHardware.DRIVE_MODE.driveTilDistance);
+            robot.mecTurn(CatMecanumHardware.TURN_SPEED ,-85,3.5);
+            //Lower arm
+            robot.rotateArm(CatMecanumHardware.ARM_OVER_SAMPLING);
+            robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED,14,3.0,CatMecanumHardware.DRIVE_MODE.driveTilDistance);
+            robot.mecTurn(CatMecanumHardware.TURN_SPEED,-100,1);
+            robot.rotateArm(CatMecanumHardware.ARM_DEPOT_DROPOFF);
+        }
+
         //Extend arm to crater
         robot.extendArm();
-        //tries to pick up minerals
+        /*tries to pick up minerals
         robot.intakeServo.setPower(0.87);
         robot.robotWait(2.0);
-        robot.intakeServo.setPower(0.0);
+        robot.intakeServo.setPower(0.0);*/
 
     }
 }

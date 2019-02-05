@@ -98,10 +98,10 @@ public class CatVisionHardware
                         int goldMineralX = (int) recognition.getLeft();
                         // Look for the Gold Pos and decide which side of the sampling field the gold lies
                         if (goldMineralX < 250) {
-                            return samplingPos.LEFT;
-                        }
-                        if (goldMineralX > 550) {
                             return samplingPos.RIGHT;
+                        }  //***Inverted these since the camera was recently placed upside down***//
+                        if (goldMineralX > 550) {
+                            return samplingPos.LEFT;
                         }
                         return samplingPos.CENTER;
                     }
