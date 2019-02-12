@@ -56,12 +56,12 @@ public class CatMecanumHardware
     static final double     COUNTS_PER_INCH         = COUNTS_PER_MOTOR_REV / (WHEEL_DIAMETER_INCHES * 3.1415);
 
     // Autonomous Drive Speeds
-    static final double     DRIVE_SPEED             = 0.55;
+    static final double     DRIVE_SPEED             = 0.6;
     static final double     HYPER_SPEED             = 0.6;
     static final double     CHILL_SPEED             = 0.25;
     static final double     CREEP_SPEED             = 0.10;
-    static final double     TURN_SPEED              = 0.45;
-    static final double     ARM_POWER               = 0.8;
+    static final double     TURN_SPEED              = 0.6;
+    static final double     ARM_POWER               = 0.9;
 
 
     // Gate Servo Constants
@@ -69,10 +69,11 @@ public class CatMecanumHardware
     static final double     GATE_CLOSE              = 0.20;
 
     // Arm positions
-    static final int        ARM_FLOOR               = 6400; // was 6680
+    static final int        ARM_FLOOR               = 6500; // was 6680
     static final int        ARM_DEPOT_DROPOFF       = 5700;
     static final int        ARM_OVER_SAMPLING       = 5215;
     static final int        ARM_STRAIGHT_UP         = 2550;
+    static final int        ARM_TUCKED_IN           = 1800;
     static final int        ARM_STOWED              = 0;
     static final double     EXTEND_POWER            = -0.7;
 
@@ -602,7 +603,6 @@ public class CatMecanumHardware
          */
 
         ElapsedTime runtime = new ElapsedTime();
-        int prevGyro = 0;
         int gyroLoopCount = 0;
 
 
@@ -610,7 +610,7 @@ public class CatMecanumHardware
         if (opMode.opModeIsActive()) {
             int targetAngleZ;
             targetAngleZ  = -degrees;
-            boolean clockwiseTurn = (getCurrentAngle() < degrees);
+            boolean clockwiseTurn = (getCurrentAngle() > targetAngleZ);
 
             // Don't use encoders.  We only use the gyro angle to turn
             runNoEncoders();
@@ -636,23 +636,17 @@ public class CatMecanumHardware
 
                 int zVal = getCurrentAngle();
 
-                if (prevGyro != zVal) {
+                Log.d("catbot", String.format("target %d, current %d  %s", targetAngleZ, zVal, clockwiseTurn ? "CW": "CCW"));
+                opMode.telemetry.addData("Path1",  "Running to %4d", targetAngleZ);
+                opMode.telemetry.addData("Path2", "Current angle is %4d" ,zVal);
+                opMode.telemetry.update();
 
-                    prevGyro = zVal;
-                    gyroLoopCount ++;
-                }
-                zVal = zVal + wrapAdjust;
                 if ((zVal >= targetAngleZ) && (!clockwiseTurn)) {
                     break;
                 }
                 if ((zVal <= targetAngleZ) && (clockwiseTurn)) {
                     break;
                 }
-                Log.d("catbot", String.format("target %d, current %d", targetAngleZ, zVal));
-                opMode.telemetry.addData("Path1",  "Running to %4d", targetAngleZ);
-                opMode.telemetry.addData("Path2", "Current angle is %4d" ,zVal);
-                opMode.telemetry.update();
-
                 // Allow time for other processes to run.
                 opMode.idle();
             }
@@ -684,7 +678,7 @@ public class CatMecanumHardware
         //  All the way down
         tailPos[0] = 0;
         //  Out of hook at Eagan competition
-        tailPos[1] = 8300;
+        tailPos[1] = 8250;
         //  Way high out of hook at our own field
         tailPos[2] = 8500;
 

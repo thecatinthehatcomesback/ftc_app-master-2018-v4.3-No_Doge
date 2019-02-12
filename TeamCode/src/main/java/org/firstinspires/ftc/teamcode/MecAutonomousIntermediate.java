@@ -1,16 +1,14 @@
 /**
- MecAutonomousBasic.java
+ MecAutonomousIntermediate.java
 
  A Linear OpMode class to be an autonomous method for both Blue & Red where
  we pick which side of the lander we are hanging off of with gamepad1 and
- detect the gold with DogeCV, hit the right element, place our team marker
+ detect the gold with TensorFlow, hit the right element, place our team marker
  in our depot and park in either crater according to what we say using gamepad1
  at the beginning of the match.
 
- MecBasic is written to use the most basic approach to our autonomous route
- with the help of mechanical sorting intake and a servo to drop our team marker
- off in the depot.  This autonomous is used for our first qualifier this year
- (November 10, 2018).
+ MecAutonomousIntermediate is a more advanced version of the MecBasic we started
+ with.  This autonomous is used for our 2nd qualifier this year (Dec 8, 2018).
 
  This file is a modified version from the FTC SDK.
 

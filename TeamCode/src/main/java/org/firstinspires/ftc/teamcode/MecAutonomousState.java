@@ -34,6 +34,7 @@ public class MecAutonomousState extends LinearOpMode {
     private boolean isRedAlliance = true;
     private boolean isCraterSide = false;
     private boolean parkInOurCrater = true;
+    private boolean closeToWall = true;
 
     private CatVisionHardware.samplingPos samplingPos = CatVisionHardware.samplingPos.RIGHT;
 
@@ -116,6 +117,16 @@ public class MecAutonomousState extends LinearOpMode {
                 delayTimer.reset();
             }
 
+            // Change how close to the wall we go
+            if (((gamepad1.y) && delayTimer.seconds() > 0.8)) {
+                if (closeToWall) {
+                    closeToWall= false;
+                } else {
+                    closeToWall = true;
+                }
+                delayTimer.reset();
+            }
+
             // Cool LED code:
             if (isRedAlliance) {
                 if(isCraterSide){
@@ -149,6 +160,11 @@ public class MecAutonomousState extends LinearOpMode {
                 telemetry.addData("Parking in the Crater:", "On our alliance side...");
             } else {
                 telemetry.addData("Parking in the Crater:", "Of the other alliance's side...");
+            }
+            if (closeToWall) {
+                telemetry.addData("End position is:", "Close to the wall");
+            } else {
+                telemetry.addData("End position is:", "Away from wall");
             }
             telemetry.update();
 
@@ -184,6 +200,7 @@ public class MecAutonomousState extends LinearOpMode {
         // Drive the robot out the hook
         robot.mecDriveHorizontal(robot.DRIVE_SPEED,4.5,2.0);
         robot.mecDriveVertical(robot.DRIVE_SPEED,3.0,2.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
+        robot.mecTurn(.4,0,1);
 
         // LED feedback for the sampling field
         switch(samplingPos) {
@@ -239,32 +256,53 @@ public class MecAutonomousState extends LinearOpMode {
          */
     }
     public void driveCrater()  throws InterruptedException {
+    //recenters to 0 degrees
+        robot.mecTurn(.4,2,1);
+
+        switch (samplingPos) {
+            case LEFT:
+                robot.mecTurn(robot.TURN_SPEED,-12,2.5);
+                break;
+            case RIGHT:
+            case UNKNOWN:
+                robot.mecTurn(robot.TURN_SPEED,19,2.5);
+                break;
+        }
+        //Pick up gold
+        robot.rotateArm(CatMecanumHardware.ARM_FLOOR);
+        robot.robotWait(.5);
+        robot.extendArm();
+        robot.rotateArm(CatMecanumHardware.ARM_DEPOT_DROPOFF);
+        robot.retractArm();
+        robot.rotateArm(CatMecanumHardware.ARM_STRAIGHT_UP);
+
+
 
         //drives forward to avoid hiting the landers leg
-        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED,12,3.0,CatMecanumHardware.DRIVE_MODE.driveTilDistance);
-        robot.mecTurn(CatMecanumHardware.TURN_SPEED ,-90,3.5);
-        robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED,-4,1.5);
+        robot.mecTurn(CatMecanumHardware.TURN_SPEED,-26,3);
+        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED,10,3.0,CatMecanumHardware.DRIVE_MODE.driveTilDistance);
+        robot.mecTurn(CatMecanumHardware.TURN_SPEED ,-84,3.5);
         //drives toward wall and aims toward the craytor
-        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED,36,6,CatMecanumHardware.DRIVE_MODE.driveTilDistance);
-        robot.mecTurn(CatMecanumHardware.TURN_SPEED,125,2);
-        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED,6,2,CatMecanumHardware.DRIVE_MODE.driveTilDistance);
+        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED,27,6,CatMecanumHardware.DRIVE_MODE.driveTilDistance);
+        robot.mecTurn(CatMecanumHardware.TURN_SPEED,-110,2);
         //lower arm
         robot.rotateArm(CatMecanumHardware.ARM_DEPOT_DROPOFF);
         //Extend arm to depot
         robot.extendArm();
         //Spit out team marker
-        robot.intakeServo.setPower(1.0);
-        robot.robotWait(0.5);
+        robot.intakeServo.setPower(-0.87);
+        robot.robotWait(.5);
         //Bring back arm
         robot.rotateArm(CatMecanumHardware.ARM_OVER_SAMPLING);
         robot.intakeServo.setPower(0.0);
         robot.retractArm();
         //lifts arm to avoid hitting the lander's leg
-        robot.rotateArm(CatMecanumHardware.ARM_STRAIGHT_UP);
+        robot.rotateArm(CatMecanumHardware.ARM_TUCKED_IN);
         //turns to aim at the sample field
-        robot.mecTurn(CatMecanumHardware.TURN_SPEED,90,3);
-        robot.rotateArm(CatMecanumHardware.ARM_FLOOR);
-        robot.intakeServo.setPower(-1.0);
+        robot.mecTurn(0.9,12,3);
+        robot.rotateArm(CatMecanumHardware.ARM_OVER_SAMPLING);
+        robot.extendArm();
+        /**robot.intakeServo.setPower(-.87);
         //tries to sample from the side
         switch (samplingPos) {
             case LEFT:
@@ -292,13 +330,14 @@ public class MecAutonomousState extends LinearOpMode {
         robot.mecTurn(CatMecanumHardware.TURN_SPEED,25,2.5);
         robot.rotateArm(CatMecanumHardware.ARM_OVER_SAMPLING);
         //tries to pick up minerals
-        robot.intakeServo.setPower(1.0);
+        robot.intakeServo.setPower(.87);
         robot.robotWait(.75);
         robot.intakeServo.setPower(0.0);
-
+*/
 
     }
     public void driveDepot() throws InterruptedException {
+        robot.mecTurn(.4,2,1);
         // Drive ahead to deploy marker
         robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED, 10, 2, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
         //Lower arm
@@ -319,20 +358,20 @@ public class MecAutonomousState extends LinearOpMode {
         //Turn to gold
         switch (samplingPos) {
             case LEFT:
-                robot.mecTurn(robot.TURN_SPEED,-26,2.5);
+                robot.mecTurn(robot.TURN_SPEED,-19,2.5);
                 break;
             case RIGHT:
             case UNKNOWN:
-                robot.mecTurn(robot.TURN_SPEED,26,2.5);
+                robot.mecTurn(robot.TURN_SPEED,19,2.5);
                 break;
         }
         //Pick up gold
         robot.rotateArm(CatMecanumHardware.ARM_FLOOR);
         robot.intakeServo.setPower(0.87);
         robot.extendArm();
-        robot.intakeServo.setPower(0.0);
         // Pull the arm back in
         robot.retractArm();
+        robot.intakeServo.setPower(0.0);
         //Pick up arm
         robot.rotateArm(CatMecanumHardware.ARM_STRAIGHT_UP);
         //sets LEDs to color of the alliance
@@ -346,12 +385,23 @@ public class MecAutonomousState extends LinearOpMode {
         if (parkInOurCrater) {
             // Drive to crater nearest the audience
             robot.mecTurn(CatMecanumHardware.TURN_SPEED ,27,3.5);
-            robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED,10,3.0,CatMecanumHardware.DRIVE_MODE.driveTilDistance);
-            robot.mecTurn(CatMecanumHardware.TURN_SPEED ,85,3.5);
-            //Lower arm
-            robot.rotateArm(CatMecanumHardware.ARM_OVER_SAMPLING);
-            robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED,14,3.0,CatMecanumHardware.DRIVE_MODE.driveTilDistance);
-            robot.mecTurn(CatMecanumHardware.TURN_SPEED,110,1);
+            robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED,12,3.0,CatMecanumHardware.DRIVE_MODE.driveTilDistance);
+            if (closeToWall)
+            {
+                robot.mecTurn(CatMecanumHardware.TURN_SPEED, 73, 3.5);
+                //Lower arm
+                robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED, 32, 3.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
+                robot.mecTurn(CatMecanumHardware.TURN_SPEED, 110, 1);
+                robot.rotateArm(CatMecanumHardware.ARM_OVER_SAMPLING);
+            }
+            else {
+                robot.mecTurn(CatMecanumHardware.TURN_SPEED, 78, 3.5);
+                //Lower arm
+                robot.rotateArm(CatMecanumHardware.ARM_OVER_SAMPLING);
+                robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED, 14, 3.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
+                robot.mecTurn(CatMecanumHardware.TURN_SPEED, 120, 1);
+                robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED, 6, 3.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
+            }
         } else {
             // Drive to farther crater
             robot.mecTurn(CatMecanumHardware.TURN_SPEED ,-27,3.5);
@@ -366,10 +416,11 @@ public class MecAutonomousState extends LinearOpMode {
 
         //Extend arm to crater
         robot.extendArm();
-        /*tries to pick up minerals
+        //tries to pick up minerals
+        robot.rotateArm(CatMecanumHardware.ARM_FLOOR);
         robot.intakeServo.setPower(0.87);
         robot.robotWait(2.0);
-        robot.intakeServo.setPower(0.0);*/
+        robot.intakeServo.setPower(0.0);
 
     }
 }
