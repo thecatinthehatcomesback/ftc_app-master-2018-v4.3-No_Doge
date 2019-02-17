@@ -21,10 +21,8 @@ import android.util.Log;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
@@ -48,7 +46,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
  * Motor channel:  Right drive motor:        "right_rear" & "right_front"
  * And so on...
  */
-public class DriveHW
+public class DriveHW extends HWSubsystem
 {
     // Wheel measurements
     static final double     COUNTS_PER_MOTOR_REV    = 537.6;    // Accurate for a NeveRest Orbital 20
@@ -62,7 +60,22 @@ public class DriveHW
     static final double     CREEP_SPEED             = 0.10;
     static final double     TURN_SPEED              = 0.6;
 
+    ElapsedTime runtime = new ElapsedTime();
+    double timeout = 0;
+
+    int targetAngleZ;
+    boolean clockwiseTurn;
+    ColorSensor leftColSen;
+    ColorSensor rightColSen;
+    int baseDelta;
+
     // Enums!
+    enum DRIVE_METHOD {
+        vertical,
+        horizontal,
+        turn
+    }
+
     enum DRIVE_MODE {
         findLine,
         followWall,
@@ -77,6 +90,8 @@ public class DriveHW
     Orientation angles;
     Acceleration gravity;
 
+    private DRIVE_METHOD currentMethod;
+    private DRIVE_MODE currentMode;
 
     /* Public OpMode members. */
     // Motors
@@ -90,20 +105,12 @@ public class DriveHW
     public RevBlinkinLedDriver.BlinkinPattern pattern;
     public static boolean isRedAlliance = true;
 
-    /* local OpMode members. */
-    HardwareMap hwMap           = null;
-    LinearOpMode opMode         = null;
-    CatAsyncHardware mainHW     = null;
 
     /* Constructor */
     public DriveHW(CatAsyncHardware mainHardware){
-
-        mainHW = mainHardware;
-        opMode = mainHW.opMode;
-        hwMap = mainHW.hwMap;
+        super(mainHardware);
 
     }
-
 
     /* Initialize standard Hardware interfaces */
     public void init()  throws InterruptedException  {
@@ -135,6 +142,10 @@ public class DriveHW
         leftRearMotor.setPower(0);
         rightRearMotor.setPower(0);
 
+
+        //sets enums to a defult value
+        currentMode = DRIVE_MODE.driveTilDistance;
+        currentMethod = DRIVE_METHOD.vertical;
     }
 
 
@@ -188,12 +199,18 @@ public class DriveHW
     }
         public void mecDriveVertical(double power,
                                      double distance,
-                                     double timeoutS, DRIVE_MODE driveMode, ColorSensor leftColSen, ColorSensor rightColSen)  throws InterruptedException {
+                                     double timeoutS, DRIVE_MODE driveMode, ColorSensor leftColSenIn, ColorSensor rightColSenIn)  throws InterruptedException {
         /**
          * This is a simpler mecanum drive method that drives blindly
          * straight vertically or using the color sensors to find a
          * line.
          */
+
+        currentMethod = DRIVE_METHOD.vertical;
+        currentMode = driveMode;
+        timeout = timeoutS;
+        leftColSen = leftColSenIn;
+        rightColSen = rightColSenIn;
 
         int newLeftFrontTarget;
         int newRightFrontTarget;
@@ -201,13 +218,13 @@ public class DriveHW
         int newRightBackTarget;
         ElapsedTime runtime = new ElapsedTime();
         boolean keepDriving = true;
-        int baseDelta = 0;
+        baseDelta = 0;
         if (driveMode == DRIVE_MODE.findLine) {
             // Turn on the color sensors we want and find the base alpha
             baseDelta = mainHW.findBaseDelta(rightColSen);
         }
 
-        if (opMode.opModeIsActive()) {
+        if (mainHW.opMode.opModeIsActive()) {
 
             // Determine new target position, and pass to motor controller
             newLeftFrontTarget  = (int) (distance * COUNTS_PER_INCH);
@@ -233,62 +250,6 @@ public class DriveHW
 
             drive(power, power, power, power);
 
-            while (opMode.opModeIsActive() &&
-                    (runtime.seconds() < timeoutS) &&
-                    keepDriving) {
-
-                // Get the current Pos for telemetry only
-                int leftFrontPosition  = leftFrontMotor.getCurrentPosition();
-                int rightFrontPosition = rightFrontMotor.getCurrentPosition();
-                int leftBackPosition   = leftRearMotor.getCurrentPosition();
-                int rightBackPosition  = rightRearMotor.getCurrentPosition();
-
-                // One drive mode that drives blindly straight
-                if (driveMode == DRIVE_MODE.driveTilDistance) {
-                    //  Exit the method once robot stops
-                    if (!leftFrontMotor.isBusy() || !rightFrontMotor.isBusy() ||
-                            !leftRearMotor.isBusy() || !rightRearMotor.isBusy()) {
-                        keepDriving = false;
-                    }
-                }
-
-                // The other drive mode using color sensors to fine lines
-                if (driveMode == DRIVE_MODE.findLine) {
-                    // Once left side hits color, turn left side motors off
-                    if (mainHW.findLine(baseDelta, leftColSen)) {
-                        leftFrontMotor.setPower(0.0);
-                        leftRearMotor.setPower(0.0);
-
-                        if (rightFrontMotor.getPower() == 0.0) {
-                            keepDriving = false;
-                        }
-                        opMode.telemetry.addData("Stop:", "left");
-                    }
-                    // Once right side hits color, turn right side motors off
-                    if (mainHW.findLine(baseDelta, rightColSen)) {
-                        rightFrontMotor.setPower(0.0);
-                        rightRearMotor.setPower(0.0);
-
-                        if (leftFrontMotor.getPower() == 0.0) {
-                            keepDriving = false;
-                        }
-                        opMode.telemetry.addData("Stop:", "right");
-                    }
-                }
-
-                // Display it all for the driver
-                opMode.telemetry.addData("New Path",  "Running to :%7d :%7d :%7d :%7d",
-                        newLeftFrontTarget,  newRightFrontTarget, newLeftBackTarget, newRightBackTarget);
-                opMode.telemetry.addData("Current Path",  "Running at :%7d :%7d :%7d :%7d",
-                        leftFrontPosition, rightFrontPosition, leftBackPosition, rightBackPosition);
-                opMode.telemetry.addData("Power: ", "%.3f", power);
-                opMode.telemetry.addData("Time: ","%.4f seconds", runtime.seconds());
-                opMode.telemetry.update();
-            }
-
-
-            // Stop all motion at the end
-            drive(0.0, 0.0, 0.0, 0.0);
         }
     }
     public void mecDriveHorizontal(double power, double distance, double timeoutS) {
@@ -297,14 +258,15 @@ public class DriveHW
          * straight horizontally (positive numbers should strafe left)
          */
 
+        currentMethod = DRIVE_METHOD.horizontal;
+        timeout = timeoutS;
+
         int newLeftFrontTarget;
         int newRightFrontTarget;
         int newLeftBackTarget;
         int newRightBackTarget;
-        ElapsedTime runtime = new ElapsedTime();
-        boolean keepDriving = true;
 
-        if (opMode.opModeIsActive()) {
+        if (mainHW.opMode.opModeIsActive()) {
 
             // Determine new target position, and pass to motor controller
             // (Multiply by sqrt of 2 to compensate)
@@ -332,38 +294,6 @@ public class DriveHW
             // Due to weight diffence, we compensate by cutting the back wheels half power
             drive(power, power, power*0.8, power*0.8);
 
-            while (opMode.opModeIsActive() &&
-                    (runtime.seconds() < timeoutS) &&
-                    keepDriving) {
-
-                int leftFrontPosition = leftFrontMotor.getCurrentPosition();
-                int rightFrontPosition = rightFrontMotor.getCurrentPosition();
-                int leftBackPosition = leftRearMotor.getCurrentPosition();
-                int rightBackPosition = rightRearMotor.getCurrentPosition();
-
-                //  Exit the method once robot stops
-                if (!leftFrontMotor.isBusy() || !rightFrontMotor.isBusy() ||
-                        !leftRearMotor.isBusy() || !rightRearMotor.isBusy()) {
-                    keepDriving = false;
-                }
-
-                // Log Messages
-                /*Log.d("catbot", String.format("encoderDrive targ[%5d,%5d], curr[%5d,%5d] power [%.3f,%.3f]",
-                        newLeftTarget,  newRightTarget, leftPosition, rightPosition, leftSpeed, rightSpeed));*/
-
-                // Display it for the driver
-                opMode.telemetry.addData("New Path",  "Running to :%7d :%7d :%7d :%7d",
-                        newLeftFrontTarget,  newRightFrontTarget, newLeftBackTarget, newRightBackTarget);
-                opMode.telemetry.addData("Current Path",  "Running at :%7d :%7d :%7d :%7d",
-                        leftFrontPosition, rightFrontPosition, leftBackPosition, rightBackPosition);
-                opMode.telemetry.addData("Power: ", "%.3f", power);
-                opMode.telemetry.addData("Time: ","%.4f seconds", runtime.seconds());
-                opMode.telemetry.update();
-            }
-
-
-            // Stop all motion
-            drive(0, 0, 0, 0);
         }
     }
     public void advMecDrive(double power, double vectorDistance,
@@ -396,7 +326,7 @@ public class DriveHW
         ElapsedTime runtime = new ElapsedTime();
         boolean keepDriving = true;
 
-        if (opMode.opModeIsActive()) {
+        if (mainHW.opMode.opModeIsActive()) {
 
             // Determine new target position and multiply each one to adjust for variation of mec wheels
             newLeftFrontTarget  = (int) (vectorDistance * COUNTS_PER_INCH * leftFrontMod);
@@ -430,52 +360,21 @@ public class DriveHW
             // Drive
             drive(leftFrontMod, rightFrontMod, leftBackMod, rightBackMod);
 
-            while (opMode.opModeIsActive() &&
-                    (runtime.seconds() < timeoutS) &&
-                    keepDriving) {
-
-                // Find the current positions so that we can display it later
-                int leftFrontPosition  = leftFrontMotor.getCurrentPosition();
-                int rightFrontPosition = rightFrontMotor.getCurrentPosition();
-                int leftBackPosition   = leftRearMotor.getCurrentPosition();
-                int rightBackPosition  = rightRearMotor.getCurrentPosition();
-
-                //  Exit the method once robot stops
-                if (!leftFrontMotor.isBusy() && !rightFrontMotor.isBusy() &&
-                        !leftRearMotor.isBusy() && !rightRearMotor.isBusy()) {
-                    keepDriving = false;
-                }
-
-                // Display it for the driver
-                opMode.telemetry.addData("New Path",  "Running to :%7d :%7d :%7d :%7d",
-                        newLeftFrontTarget,  newRightFrontTarget, newLeftBackTarget, newRightBackTarget);
-                opMode.telemetry.addData("Current Path",  "Running at :%7d :%7d :%7d :%7d",
-                        leftFrontPosition, rightFrontPosition, leftBackPosition, rightBackPosition);
-                opMode.telemetry.addData("Power: ", "%.3f", power);
-                opMode.telemetry.addData("Time: ","%.4f seconds", runtime.seconds());
-                opMode.telemetry.update();
-            }
-
-
-            // Stop all motion
-            drive(0, 0, 0, 0);
         }
     }
-    public void mecTurn(double power, int degrees, double timeoutS) throws InterruptedException {  //// TODO: 9/20/2018 Look through this and streamline code
+    public void mecTurn(double power, int degrees, double timeoutS) throws InterruptedException {
         /**
          * Turns counterclockwise with a positive Z angle
          * Turns clockwise with a negative Z angle
          */
 
-        ElapsedTime runtime = new ElapsedTime();
-        int gyroLoopCount = 0;
+        currentMethod = DRIVE_METHOD.turn;
+        timeout = timeoutS;
 
-
-        // Ensure that the opmode is still active
-        if (opMode.opModeIsActive()) {
-            int targetAngleZ;
+        // Ensure that the opMode is still active
+        if (mainHW.opMode.opModeIsActive()) {
             targetAngleZ  = -degrees;
-            boolean clockwiseTurn = (getCurrentAngle() > targetAngleZ);
+            clockwiseTurn = (getCurrentAngle() > targetAngleZ);
 
             // Don't use encoders.  We only use the gyro angle to turn
             runNoEncoders();
@@ -494,39 +393,7 @@ public class DriveHW
                 leftRearMotor.setPower(-power);
                 rightRearMotor.setPower(power);
             }
-            // keep looping while we are still active, and there is time left, and both motors are running.
-            int wrapAdjust = 0;
-            while (opMode.opModeIsActive() &&
-                    (runtime.seconds() < timeoutS)) {
-
-                int zVal = getCurrentAngle();
-
-                Log.d("catbot", String.format("target %d, current %d  %s", targetAngleZ, zVal, clockwiseTurn ? "CW": "CCW"));
-                opMode.telemetry.addData("Path1",  "Running to %4d", targetAngleZ);
-                opMode.telemetry.addData("Path2", "Current angle is %4d" ,zVal);
-                opMode.telemetry.update();
-
-                if ((zVal >= targetAngleZ) && (!clockwiseTurn)) {
-                    break;
-                }
-                if ((zVal <= targetAngleZ) && (clockwiseTurn)) {
-                    break;
-                }
-                // Allow time for other processes to run.
-                opMode.idle();
-            }
-
-
-            // GYRO Telemetry
-            if(runtime.seconds() > 0) {
-                opMode.telemetry.addData("sample1", "Hz = %.1f", gyroLoopCount / runtime.seconds());
-                //DbgLog.msg("GYRO Hz = %.1f  Turn Rate: %.1f", gyroLoopCount / runtime.seconds(), degrees / runtime.seconds());
-            }
-            opMode.telemetry.update();
-
-            // Stop all motion;
-            drive(0, 0, 0, 0);
-        }
+         }
     }
 
     /**
@@ -541,7 +408,7 @@ public class DriveHW
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opMode
         parameters.loggingEnabled = true;
         parameters.loggingTag = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
@@ -610,6 +477,84 @@ public class DriveHW
         // After finding scale factor, we need to scale each motor power down by the same amount...
     }
 
+    @Override
+    public boolean isDone() {
+        boolean keepDriving = true;
+        if ((runtime.seconds() > timeout)) {
+            keepDriving = false;
+        }
+        switch (currentMethod){
+            case vertical:
+                // One drive mode that drives blindly straight
+                if (currentMode == DRIVE_MODE.driveTilDistance) {
+                    //  Exit the method once robot stops
+                    if (!leftFrontMotor.isBusy() || !rightFrontMotor.isBusy() ||
+                            !leftRearMotor.isBusy() || !rightRearMotor.isBusy()) {
+                        keepDriving = false;
+                    }
+                }
+
+                // The other drive mode using color sensors to fine lines
+                if (currentMode == DRIVE_MODE.findLine) {
+
+                    // Once left side hits color, turn left side motors off
+                    if (mainHW.findLine(baseDelta, leftColSen)) {
+                        leftFrontMotor.setPower(0.0);
+                        leftRearMotor.setPower(0.0);
+
+                        if (rightFrontMotor.getPower() == 0.0) {
+                            keepDriving = false;
+                        }
+                    }
+                    // Once right side hits color, turn right side motors off
+                    if (mainHW.findLine(baseDelta, rightColSen)) {
+                        rightFrontMotor.setPower(0.0);
+                        rightRearMotor.setPower(0.0);
+
+                        if (leftFrontMotor.getPower() == 0.0) {
+                            keepDriving = false;
+                        }
+                    }
+                }
+                break;
+
+            case horizontal:
+                //  Exit the method once robot stops
+                if (!leftFrontMotor.isBusy() || !rightFrontMotor.isBusy() ||
+                        !leftRearMotor.isBusy() || !rightRearMotor.isBusy()) {
+
+                    keepDriving = false;
+                }
+
+                // Log Messages
+                //Log.d("catbot", String.format("encoderDrive targ[%5d,%5d], curr[%5d,%5d] power [%.3f,%.3f]",
+                //        newLeftTarget,  newRightTarget, leftPosition, rightPosition, leftSpeed, rightSpeed));
+
+                break;
+            case turn:
+
+                int zVal = getCurrentAngle();
+
+                Log.d("catbot", String.format("target %d, current %d  %s", targetAngleZ, zVal, clockwiseTurn ? "CW": "CCW"));
+
+                if ((zVal >= targetAngleZ) && (!clockwiseTurn)) {
+                    keepDriving = false;
+                }
+                if ((zVal <= targetAngleZ) && (clockwiseTurn)) {
+                    keepDriving = false;
+                }
+                break;
+
+        }
+
+        if (!(keepDriving)){
+            // Stop all motion;
+            drive(0, 0, 0, 0);
+            return true;
+        }
+        return false;
+    }
+
 
 
     /**
@@ -617,7 +562,5 @@ public class DriveHW
      * ---   End of our methods   ---
      * ---   \/ \/ \/ \/ \/ \/    ---
      */
-    public void stuffishable() {
-        /* Placeholder... */
-    }
+
 }// End of class bracket

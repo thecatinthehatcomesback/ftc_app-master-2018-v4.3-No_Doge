@@ -15,9 +15,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -33,7 +31,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Motor channel:  Right drive motor:        "right_rear" & "right_front"
  * And so on...
  */
-public class TailHW
+public class TailHW extends HWSubsystem
 {
 
 
@@ -42,18 +40,12 @@ public class TailHW
 
     public DcMotor  tailMotor        = null;
 
-
-    /* local OpMode members. */
-    HardwareMap hwMap           = null;
-    LinearOpMode opMode         = null;
-    CatAsyncHardware mainHW     = null;
+    ElapsedTime runtime = new ElapsedTime();
 
     /* Constructor */
     public TailHW(CatAsyncHardware mainHardware){
 
-        mainHW = mainHardware;
-        opMode = mainHW.opMode;
-        hwMap = mainHW.hwMap;
+    super(mainHardware);
 
     }
 
@@ -89,7 +81,7 @@ public class TailHW
         //  All the way down
         tailPos[0] = 0;
         //  Out of hook at Eagan competition
-        tailPos[1] = 8250;
+        tailPos[1] = 6150;
         //  Way high out of hook at our own field
         tailPos[2] = 8500;
 
@@ -116,29 +108,30 @@ public class TailHW
          * Pull tail in all the way
          */
 
-        ElapsedTime saftey = new ElapsedTime();
-        saftey.reset();
 
 
+        runtime.reset();
         tailMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         // Get motor down
         extendTail();
         tailMotor.setPower(1.0);
-        // Wait until the robot is completely finished
-        while(tailMotor.isBusy()){
-            if (saftey.seconds() > 4.5) {
-                // Turn off the encoders to just back out hard
-                tailMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                tailMotor.setPower(-1.0);
-                //robotWait(.3);
-                tailMotor.setPower(0.0);
-                break;
-            }
-        }
 
-        // Make sure we stop tail
-        tailMotor.setPower(0.0);
         // Pull tail back into the robot (not there yet...)
+    }
+
+
+    @Override
+    public boolean isDone() {
+        if (runtime.seconds() > 4.5) {
+            // Turn off the encoders to just back out hard
+            tailMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            tailMotor.setPower(-1.0);
+            mainHW.robotWait(.3);
+            tailMotor.setPower(0.0);
+            return true;
+        }
+        return !(tailMotor.isBusy());
+
     }
 
 
@@ -147,7 +140,5 @@ public class TailHW
      * ---   End of our methods   ---
      * ---   \/ \/ \/ \/ \/ \/    ---
      */
-    public void stuffishable() {
-        /* Placeholder... */
-    }
+
 }// End of class bracket

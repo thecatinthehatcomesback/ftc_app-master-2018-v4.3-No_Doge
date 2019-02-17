@@ -13,11 +13,12 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import android.util.Log;
+
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -34,7 +35,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Motor channel:  Right drive motor:        "right_rear" & "right_front"
  * And so on...
  */
-public class ArmHW
+public class ArmHW extends HWSubsystem
 {
 
     /* Public OpMode members. */
@@ -47,6 +48,7 @@ public class ArmHW
 
     // Motors
     public DcMotor  armMotor         = null;
+    public DcMotorEx armMotorEx      = null;
 
     // The servo keeping the minerals inside the intake
     public Servo    gateServo        = null;
@@ -54,17 +56,16 @@ public class ArmHW
     // Two Vex motors = Continuous Servos
     public CRServo  intakeServo      = null;
 
+    //creates runtime to tell how long the moters were running
+    ElapsedTime runtime = new ElapsedTime();
+
     /* local OpMode members. */
-    HardwareMap hwMap           = null;
-    LinearOpMode opMode         = null;
-    CatAsyncHardware mainHW     = null;
+
+
 
     /* Constructor */
     public ArmHW(CatAsyncHardware mainHardware){
-
-        mainHW = mainHardware;
-        opMode = mainHW.opMode;
-        hwMap = mainHW.hwMap;
+        super(mainHardware);
 
     }
 
@@ -88,6 +89,9 @@ public class ArmHW
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+        armMotorEx =(DcMotorEx) armMotor;
+
+        armMotorEx.setTargetPositionTolerance(60);
         // Set all motors to run at no power so that the robot doesn't move during init //
         intakeServo.setPower(0);
 
@@ -128,13 +132,9 @@ public class ArmHW
         armMotor.setPower(ARM_POWER);
 
         // Use the timer as a fail-safe in case the
-        ElapsedTime runtime = new ElapsedTime();
+
         runtime.reset();
-        while(armMotor.isBusy() && (runtime.seconds() < 3.0) ){
-            if (!opMode.opModeIsActive()) {
-                return;
-            }
-        }
+
     }
     public void hungryHungryHippo() {
         /**
@@ -144,12 +144,17 @@ public class ArmHW
     }
 
 
+    @Override
+    public boolean isDone() {
+        Log.d("catbot", String.format(" Arm rotate target %d, current %d ", armMotor.getTargetPosition(),armMotor.getCurrentPosition()));
+
+        return !(armMotor.isBusy() && (runtime.seconds() < 3.0));
+    }
+
     /**
      * ---   __________________   ---
      * ---   End of our methods   ---
      * ---   \/ \/ \/ \/ \/ \/    ---
      */
-    public void stuffishable() {
-        /* Placeholder... */
-    }
+
 }// End of class bracket

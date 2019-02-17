@@ -15,10 +15,8 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -34,7 +32,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Motor channel:  Right drive motor:        "right_rear" & "right_front"
  * And so on...
  */
-public class ExtendHW
+public class ExtendHW extends HWSubsystem
 {
 
     static final double     EXTEND_POWER            = -0.7;
@@ -43,18 +41,14 @@ public class ExtendHW
     // Motors
     public DcMotor  extenderMotor    = null;
 
-    /* local OpMode members. */
-    HardwareMap hwMap           = null;
-    LinearOpMode opMode         = null;
-    CatAsyncHardware mainHW     =null;
+
+    ElapsedTime runtime = new ElapsedTime();
+
 
     /* Constructor */
     public ExtendHW(CatAsyncHardware mainHardware){
 
-        mainHW = mainHardware;
-        opMode = mainHW.opMode;
-        hwMap = mainHW.hwMap;
-
+        super(mainHardware);
     }
 
 
@@ -91,7 +85,7 @@ public class ExtendHW
         ElapsedTime runtime = new ElapsedTime();
         runtime.reset();
         while (runtime.seconds() < 0.7){
-            if (!opMode.opModeIsActive()) {
+            if (!mainHW.opMode.opModeIsActive()) {
                 return;
             }
         }
@@ -104,19 +98,19 @@ public class ExtendHW
         extenderMotor.setPower(-EXTEND_POWER);
         ElapsedTime runtime = new ElapsedTime();
         runtime.reset();
-        while (runtime.seconds() < 0.7){
-            if (!opMode.opModeIsActive()) {
-                return;
-            }
-        }
     }
+
+    @Override
+    public boolean isDone() {
+        return !(runtime.seconds() < 0.7);
+    }
+
+
 
     /**
      * ---   __________________   ---
      * ---   End of our methods   ---
      * ---   \/ \/ \/ \/ \/ \/    ---
      */
-    public void stuffishable() {
-        /* Placeholder... */
-    }
+
 }// End of class bracket
