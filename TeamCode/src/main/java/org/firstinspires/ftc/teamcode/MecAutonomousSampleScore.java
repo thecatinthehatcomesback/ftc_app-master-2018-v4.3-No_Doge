@@ -23,8 +23,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@Autonomous(name="Async Autonomous", group="CatAuto")
-public class MecAutonomousAsync extends LinearOpMode {
+@Autonomous(name="Score Autonomous", group="CatAuto")
+public class MecAutonomousSampleScore extends LinearOpMode {
 
     /* Declare OpMode members. */
     CatAsyncHardware robot = new CatAsyncHardware();  // Use our mecanum hardware
@@ -360,6 +360,8 @@ public class MecAutonomousAsync extends LinearOpMode {
         // Drive ahead to deploy marker
         robot.drive.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED, 10, 2, DriveHW.DRIVE_MODE.driveTilDistance);
         HWSubsystem.waitUntillDone(robot.arm,robot.drive,robot.extend);
+        //drop down tail
+        robot.tail.retractTail();
         //Finish lower arm
         robot.arm.rotateArm(CatMecanumHardware.ARM_DEPOT_DROPOFF);
         //Spit out team marker
@@ -372,6 +374,7 @@ public class MecAutonomousAsync extends LinearOpMode {
         robot.extend.retractArm();
         HWSubsystem.waitUntillDone(robot.extend,robot.arm);
         // Drive back to hit gold
+        robot.tail.waitUntillDone();
         robot.drive.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED, -10, 4, DriveHW.DRIVE_MODE.driveTilDistance);
         robot.drive.waitUntillDone();
         robot.arm.rotateArm(CatMecanumHardware.ARM_FLOOR);
@@ -392,9 +395,24 @@ public class MecAutonomousAsync extends LinearOpMode {
         robot.extend.waitUntillDone();
         // Pull the arm back in
         //Pick up arm
-        robot.arm.rotateArm(CatMecanumHardware.ARM_STRAIGHT_UP);
+        robot.arm.rotateArm(CatMecanumHardware.ARM_TUCKED_IN);
         robot.extend.retractArm();
         robot.arm.intakeServo.setPower(0.0);
+        robot.drive.mecTurn(DriveHW.TURN_SPEED,0,2);
+        HWSubsystem.waitUntillDone(robot.drive,robot.arm);
+        robot.drive.mecDriveVertical(DriveHW.DRIVE_SPEED,-13,3,DriveHW.DRIVE_MODE.driveTilDistance);
+        robot.extend.extendArm();
+        HWSubsystem.waitUntillDone(robot.drive,robot.extend);
+        robot.arm.gateOpen();
+        robot.robotWait(.3);
+        robot.extend.extendArm();
+        robot.drive.mecDriveVertical(DriveHW.DRIVE_SPEED,3,2,DriveHW.DRIVE_MODE.driveTilDistance);
+        HWSubsystem.waitUntillDone(robot.drive,robot.extend);
+        robot.extend.retractArm();
+        robot.extend.waitUntillDone();
+
+
+
 
         //sets LEDs to color of the alliance
         if (isRedAlliance) {
@@ -407,7 +425,7 @@ public class MecAutonomousAsync extends LinearOpMode {
         if (parkInOurCrater) {
             // Drive to crater nearest the audience
             robot.drive.mecTurn(CatMecanumHardware.TURN_SPEED ,27,3.5);
-            HWSubsystem.waitUntillDone(robot.drive,robot.arm,robot.extend);
+            HWSubsystem.waitUntillDone(robot.drive,robot.extend);
             robot.drive.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED,12,3.0,DriveHW.DRIVE_MODE.driveTilDistance);
             robot.drive.waitUntillDone();
             if (closeToWall)
@@ -434,7 +452,7 @@ public class MecAutonomousAsync extends LinearOpMode {
         } else {
             // Drive to farther crater
             robot.drive.mecTurn(CatMecanumHardware.TURN_SPEED ,-27,3.5);
-            HWSubsystem.waitUntillDone(robot.drive,robot.arm,robot.extend);
+            HWSubsystem.waitUntillDone(robot.drive,robot.extend);
             robot.drive.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED,10,3.0,DriveHW.DRIVE_MODE.driveTilDistance);
             robot.drive.waitUntillDone();
             robot.drive.mecTurn(CatMecanumHardware.TURN_SPEED ,-85,3.5);
