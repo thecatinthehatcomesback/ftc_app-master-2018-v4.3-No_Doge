@@ -19,10 +19,11 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-
+@Disabled
 @Autonomous(name="State Autonomous", group="CatAuto")
 public class MecAutonomousState extends LinearOpMode {
 
@@ -166,34 +167,40 @@ public class MecAutonomousState extends LinearOpMode {
             } else {
                 telemetry.addData("End position is:", "Away from wall");
             }
+
+            /**
+             * Find and store the values of the sampling right away
+             * while we are hanging to maximize our camera's PoV
+             * (Point of View)
+             */
+            eyes.findGoldPos();
+            // Tell driver which is seen...
+            telemetry.addData("Find Gold:", samplingPos);
             telemetry.update();
+
 
             /**
              * We don't need a "waitForStart()" since we've been running our own
              * loop all this time so that we can make some changes.
              */
-
         }
         /**
          * Runs after hit start:
          * DO STUFF FOR the OPMODE!!!
-          */
+         */
 
+
+        // Close down the vision to reduce RAM usage
+        eyes.tfod.deactivate();
+        // Give the sampling position
+        samplingPos = eyes.giveSamplePos();
 
         /**
          * Init the IMU after play so that it is not offset after
          * remaining idle for a minute or two...
-          */
+         */
         robot.IMUinit();
 
-        /**
-         * Find and store the values of the sampling right away
-         * while we are hanging to maximize our camera's PoV
-         * (Point of View)
-          */
-        samplingPos = eyes.findGoldPos();
-        // Close down the vision to reduce RAM usage
-        eyes.tfod.deactivate();
 
         // Lower the robot and begin!
         robot.lowerRobot();
@@ -228,9 +235,6 @@ public class MecAutonomousState extends LinearOpMode {
                 }
 
                 break;
-            case UNKNOWN:
-                robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.WHITE);
-                break;
         }
 
         // Delay the rest of the autonomous for the number of seconds we chose
@@ -264,7 +268,6 @@ public class MecAutonomousState extends LinearOpMode {
                 robot.mecTurn(robot.TURN_SPEED,-12,2.5);
                 break;
             case RIGHT:
-            case UNKNOWN:
                 robot.mecTurn(robot.TURN_SPEED,19,2.5);
                 break;
         }
@@ -361,7 +364,6 @@ public class MecAutonomousState extends LinearOpMode {
                 robot.mecTurn(robot.TURN_SPEED,-19,2.5);
                 break;
             case RIGHT:
-            case UNKNOWN:
                 robot.mecTurn(robot.TURN_SPEED,19,2.5);
                 break;
         }
@@ -381,7 +383,6 @@ public class MecAutonomousState extends LinearOpMode {
             robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SINELON_OCEAN_PALETTE);
         }
 
-        /// TODO: 2/4/2019 Maybe a center versus wall option so that we don't hit alliance partner
         if (parkInOurCrater) {
             // Drive to crater nearest the audience
             robot.mecTurn(CatMecanumHardware.TURN_SPEED ,27,3.5);

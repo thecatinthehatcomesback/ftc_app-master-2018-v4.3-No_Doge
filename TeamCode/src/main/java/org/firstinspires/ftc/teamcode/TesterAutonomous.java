@@ -15,6 +15,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import java.util.Deque;
+
 
 @Autonomous(name="Testing Autonomous", group="CatAuto")
 public class TesterAutonomous extends LinearOpMode {
@@ -34,7 +36,9 @@ public class TesterAutonomous extends LinearOpMode {
          */
         robot.init(hardwareMap, this);
         robot.IMUinit();
-        //eyes.initDogeforia(hardwareMap, this);
+        Deque<CatVisionHardware.samplingPos> samplingValues;
+
+
 
         // Send telemetry message to signify robot is waiting
         telemetry.addData("Status: ", "Resetting Encoders...");
@@ -59,13 +63,26 @@ public class TesterAutonomous extends LinearOpMode {
          *
          \*/
 
-        double intakeTIMING = 0;
 
         /*robot.advMecDrive(CatMecanumHardware.DRIVE_SPEED, 20, 0+45, 3);
         robot.advMecDrive(CatMecanumHardware.DRIVE_SPEED, 20, 90+45, 3);
         robot.advMecDrive(CatMecanumHardware.DRIVE_SPEED, 20, 180+45, 3);
         robot.advMecDrive(CatMecanumHardware.DRIVE_SPEED, 20, 270+45, 3);*/
 
+
+        int numTimes = 0;
+
+        delayTimer.reset();
+        while (delayTimer.seconds() < 3) {
+            eyes.findGoldPos();
+            numTimes++;
+        }
+
+        delayTimer.reset();
+        while (delayTimer.seconds() < 4) {
+            telemetry.addData("Num Times", numTimes);
+            telemetry.update();
+        }
 
 
         /**

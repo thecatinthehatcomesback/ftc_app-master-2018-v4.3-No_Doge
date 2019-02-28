@@ -166,16 +166,16 @@ public class MecAutonomousSampleScore extends LinearOpMode {
             } else {
                 telemetry.addData("End position is:", "Away from wall");
             }
-            telemetry.update();
 
             /**
              * Find and store the values of the sampling right away
              * while we are hanging to maximize our camera's PoV
              * (Point of View)
              */
-            samplingPos = eyes.findGoldPos();
+            eyes.findGoldPos();
             // Tell driver which is seen...
             telemetry.addData("Find Gold:", samplingPos);
+            telemetry.update();
 
 
             /**
@@ -191,6 +191,8 @@ public class MecAutonomousSampleScore extends LinearOpMode {
 
         // Close down the vision to reduce RAM usage
         eyes.tfod.deactivate();
+        // Give the sampling position
+        samplingPos = eyes.giveSamplePos();
 
         /**
          * Init the IMU after play so that it is not offset after
@@ -237,9 +239,6 @@ public class MecAutonomousSampleScore extends LinearOpMode {
                 }
 
                 break;
-            case UNKNOWN:
-                robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.WHITE);
-                break;
         }
 
         // Delay the rest of the autonomous for the number of seconds we chose
@@ -271,7 +270,6 @@ public class MecAutonomousSampleScore extends LinearOpMode {
                 robot.drive.mecTurn(robot.TURN_SPEED,-12,2.5);
                 break;
             case RIGHT:
-            case UNKNOWN:
                 robot.drive.mecTurn(robot.TURN_SPEED,19,2.5);
                 break;
         }
@@ -388,7 +386,6 @@ public class MecAutonomousSampleScore extends LinearOpMode {
                 robot.drive.mecTurn(robot.TURN_SPEED,-19,2.5);
                 break;
             case RIGHT:
-            case UNKNOWN:
                 robot.drive.mecTurn(robot.TURN_SPEED,19,2.5);
                 break;
         }
@@ -408,6 +405,7 @@ public class MecAutonomousSampleScore extends LinearOpMode {
         robot.extend.extendArm();
         HWSubsystem.waitUntillDone(robot.drive,robot.extend);
         robot.extend.extenderMotor.setPower(robot.extend.EXTEND_POWER);
+        robot.robotWait(1);
         robot.arm.gateOpen();
         robot.robotWait(1.5);
         robot.drive.mecDriveVertical(DriveHW.DRIVE_SPEED,3,2,DriveHW.DRIVE_MODE.driveTilDistance);

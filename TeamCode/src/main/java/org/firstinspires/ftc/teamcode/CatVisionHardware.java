@@ -10,8 +10,9 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -19,6 +20,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
+import java.util.ArrayDeque;
+import java.util.Collections;
+import java.util.Deque;
 import java.util.List;
 
 import static org.firstinspires.ftc.robotcore.external.tfod.TfodRoverRuckus.LABEL_GOLD_MINERAL;
@@ -41,11 +45,12 @@ public class CatVisionHardware
     HardwareMap hwMap           = null;
 
     enum samplingPos {
-        UNKNOWN,
         LEFT,
         CENTER,
         RIGHT
     }
+
+    Deque<samplingPos> samplingValues;
 
     // Objects and Detectors
     private VuforiaLocalizer vuforia;
@@ -55,6 +60,7 @@ public class CatVisionHardware
 
     public void initVision(HardwareMap ahwMap) {
         hwMap = ahwMap;
+        samplingValues = new ArrayDeque<samplingPos>(30);
 
         /*
          * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
@@ -80,37 +86,67 @@ public class CatVisionHardware
         tfod.activate();
     }
 
-    public samplingPos findGoldPos() {
+    public void findGoldPos() {
         /**
          *
          */
-        ElapsedTime timer = new ElapsedTime();
 
-        timer.reset();
+        /// TODO: 2/27/2019 ADD A CHECK TO KEEP THE LAST 5-10 CHECKS AND TAKE THE MAJORITY FROM THERE...
 
-        while (timer.seconds() < 0.5) {
-            // getUpdatedRecognitions() will return null if no new information is available since
-            // the last time that call was made.
-            List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
-            if (updatedRecognitions != null) {
-                for (Recognition recognition : updatedRecognitions) {
-                    if (recognition.getLabel().equals(LABEL_GOLD_MINERAL) && recognition.getConfidence() > 0.5) {
-                        int goldMineralX = (int) recognition.getLeft();
-                        // Look for the Gold Pos and decide which side of the sampling field the gold lies
-                        if (goldMineralX < 250) {
-                            return samplingPos.RIGHT;
-                        }  //***Inverted these since the camera was recently placed upside down***//
-                        if (goldMineralX > 550) {
-                            return samplingPos.LEFT;
-                        }
-                        return samplingPos.CENTER;
+        // Make sure we keep the size of the list of values to 30
+        if (samplingValues.size() > 29) {
+            //
+            samplingValues.removeFirst();
+        }
+        // getUpdatedRecognitions() will return null if no new information is available since
+        // the last time that call was made.
+        List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+        if (updatedRecognitions != null) {
+            for (Recognition recognition : updatedRecognitions) {
+                if (recognition.getLabel().equals(LABEL_GOLD_MINERAL) && recognition.getConfidence() > 0.5) {
+                    int goldMineralX = (int) recognition.getLeft();
+                    // Look for the Gold Pos and decide which side of the sampling field the gold lies
+                    if (goldMineralX > 450) {
+                        //***Inverted this since the camera was recently placed upside down***//
+                        samplingValues.add(samplingPos.LEFT);
+                        return;
                     }
-
+                    samplingValues.add(samplingPos.CENTER);
+                    return;
                 }
             }
         }
-        return samplingPos.UNKNOWN;
+        // Since camera is only looking at the LEFT and CENTER values, it will return RIGHT
+        // if is doesn't see the gold (just basic logic)
+        samplingValues.add(samplingPos.RIGHT);
+        return;
     }
+
+    public samplingPos giveSamplePos() {
+        /**
+         *
+         */
+
+        Log.d("catbot", String.format("giveSamplePos   LEFT: %d, CENTER: %d, RIGHT: &d",
+                Collections.frequency(samplingValues, samplingPos.LEFT),
+                Collections.frequency(samplingValues, samplingPos.CENTER),
+                Collections.frequency(samplingValues, samplingPos.RIGHT)));
+
+        // Check to see which value has the most occurrences in the deque
+        if (Collections.frequency(samplingValues, samplingPos.LEFT) > Collections.frequency(samplingValues, samplingPos.CENTER) &&
+                Collections.frequency(samplingValues, samplingPos.LEFT) > Collections.frequency(samplingValues, samplingPos.RIGHT)) {
+            // If the amount of LEFT readings is the most in the past 30 readings, return LEFT
+            return samplingPos.LEFT;
+        } else if (Collections.frequency(samplingValues, samplingPos.CENTER) > Collections.frequency(samplingValues, samplingPos.LEFT) &&
+                Collections.frequency(samplingValues, samplingPos.CENTER) > Collections.frequency(samplingValues, samplingPos.RIGHT)) {
+            // If the amount of CENTER readings is the most in the past 30 readings, return CENTER
+            return samplingPos.CENTER;
+        } else {
+            // Just return back RIGHT since it is the last possible value
+            return samplingPos.RIGHT;
+        }
+    }
+
     /**
      * ---   __________________   ---
      * ---   End of our methods   ---

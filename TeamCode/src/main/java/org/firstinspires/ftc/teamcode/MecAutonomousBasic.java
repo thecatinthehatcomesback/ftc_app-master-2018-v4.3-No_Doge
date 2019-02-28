@@ -25,8 +25,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@Autonomous(name="Basic Autonomous", group="CatAuto")
 @Disabled
+@Autonomous(name="Basic Autonomous", group="CatAuto")
 public class MecAutonomousBasic extends LinearOpMode {
 
     /* Declare OpMode members. */
@@ -155,14 +155,33 @@ public class MecAutonomousBasic extends LinearOpMode {
             } else {
                 telemetry.addData("Parking Crater: ", "Far");
             }
-            telemetry.update();
 
             /**
-             * We don't need to "waitForStart()" here since we've been
-             * looping all this time and waiting for opMode to be enabled.
+             * Find and store the values of the sampling right away
+             * while we are hanging to maximize our camera's PoV
+             * (Point of View)
              */
+            eyes.findGoldPos();
+            // Tell driver which is seen...
+            telemetry.addData("Find Gold:", samplingPos);
+            telemetry.update();
 
+
+            /**
+             * We don't need a "waitForStart()" since we've been running our own
+             * loop all this time so that we can make some changes.
+             */
         }
+        /**
+         * Runs after hit start:
+         * DO STUFF FOR the OPMODE!!!
+         */
+
+
+        // Close down the vision to reduce RAM usage
+        eyes.tfod.deactivate();
+        // Give the sampling position
+        samplingPos = eyes.giveSamplePos();
 
         /**
          * Init the IMU after play so that it is not offset after
@@ -182,10 +201,6 @@ public class MecAutonomousBasic extends LinearOpMode {
         robot.mecDriveHorizontal(robot.DRIVE_SPEED,3.0,2.0);
         robot.mecDriveVertical(robot.DRIVE_SPEED,3.0,2.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
         robot.mecDriveHorizontal(robot.DRIVE_SPEED,-3.0,2.0);
-
-        // Find and store the values of the sampling
-        samplingPos = eyes.findGoldPos();
-        eyes.tfod.deactivate();
 
         switch(samplingPos) {
             case LEFT:
@@ -212,11 +227,6 @@ public class MecAutonomousBasic extends LinearOpMode {
                 }
 
                 break;
-            case UNKNOWN:
-                robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.WHITE);
-                break;
-
-
         }
         //Delay the amount we selected
         robot.robotWait(timeDelay);
@@ -248,7 +258,6 @@ public class MecAutonomousBasic extends LinearOpMode {
                 robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED, 14, 4.0);
                 break;
             case RIGHT:
-            case UNKNOWN:
                 robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED, -20, 4.0);
                 break;
         }
@@ -261,7 +270,6 @@ public class MecAutonomousBasic extends LinearOpMode {
                 robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED, -14, 4.0);
                 break;
             case RIGHT:
-            case UNKNOWN:
                 robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED, 20, 4.0);
                 break;
         }
@@ -308,7 +316,6 @@ public class MecAutonomousBasic extends LinearOpMode {
                 robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED, 14, 4.0);
                 break;
             case RIGHT:
-            case UNKNOWN:
                 robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED, -22, 4.0);
                 break;
         }
@@ -321,7 +328,6 @@ public class MecAutonomousBasic extends LinearOpMode {
                 robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED, -14, 4.0);
                 break;
             case RIGHT:
-            case UNKNOWN:
                 robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED, 22, 4.0);
                 break;
         }
