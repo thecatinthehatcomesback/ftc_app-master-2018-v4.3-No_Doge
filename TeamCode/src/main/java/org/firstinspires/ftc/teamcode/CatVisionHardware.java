@@ -91,7 +91,6 @@ public class CatVisionHardware
          *
          */
 
-        /// TODO: 2/27/2019 ADD A CHECK TO KEEP THE LAST 5-10 CHECKS AND TAKE THE MAJORITY FROM THERE...
 
         // Make sure we keep the size of the list of values to 30
         if (samplingValues.size() > 29) {
