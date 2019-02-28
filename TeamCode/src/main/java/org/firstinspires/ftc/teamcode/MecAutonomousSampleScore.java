@@ -173,7 +173,8 @@ public class MecAutonomousSampleScore extends LinearOpMode {
              * (Point of View)
              */
             eyes.findGoldPos();
-            // Tell driver which is seen...
+            // Tell driver which is seen
+            /// TODO: 2/27/2019 TAKE THE LAST KNOWN OUT OF THE DEQUE
             telemetry.addData("Find Gold:", samplingPos);
             telemetry.update();
 
@@ -407,6 +408,11 @@ public class MecAutonomousSampleScore extends LinearOpMode {
         robot.extend.extenderMotor.setPower(robot.extend.EXTEND_POWER);
         robot.robotWait(1);
         robot.arm.gateOpen();
+        robot.robotWait(.5);
+        robot.arm.rotateArm(CatMecanumHardware.ARM_TUCKED_IN);
+        robot.robotWait(.1);
+        robot.arm.rotateArm(CatMecanumHardware.ARM_SCORE);
+        robot.arm.waitUntillDone();
         robot.robotWait(1.5);
         robot.drive.mecDriveVertical(DriveHW.DRIVE_SPEED,3,2,DriveHW.DRIVE_MODE.driveTilDistance);
         robot.drive.waitUntillDone();

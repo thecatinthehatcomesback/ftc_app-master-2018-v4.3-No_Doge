@@ -35,7 +35,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class ExtendHW extends HWSubsystem
 {
 
-    static final double     EXTEND_POWER            = -0.7;
+    static final double     EXTEND_POWER            = -0.95;
+    static final double     RETRACT_POWER            = 0.7;
 
     /* Public OpMode members. */
     // Motors
@@ -95,7 +96,7 @@ public class ExtendHW extends HWSubsystem
          * Simply pull back the intake on the
          * end of the arm outwards.
          */
-        extenderMotor.setPower(-EXTEND_POWER);
+        extenderMotor.setPower(RETRACT_POWER);
         ElapsedTime runtime = new ElapsedTime();
         runtime.reset();
     }

@@ -15,8 +15,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import java.util.Deque;
-
 
 @Autonomous(name="Testing Autonomous", group="CatAuto")
 public class TesterAutonomous extends LinearOpMode {
@@ -36,7 +34,7 @@ public class TesterAutonomous extends LinearOpMode {
          */
         robot.init(hardwareMap, this);
         robot.IMUinit();
-        Deque<CatVisionHardware.samplingPos> samplingValues;
+        eyes.initVision(hardwareMap);
 
 
 
