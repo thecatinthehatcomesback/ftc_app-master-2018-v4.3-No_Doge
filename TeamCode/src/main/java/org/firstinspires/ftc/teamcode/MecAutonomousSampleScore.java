@@ -52,7 +52,7 @@ public class MecAutonomousSampleScore extends LinearOpMode {
         eyes.initVision(hardwareMap);
 
         // Send telemetry message to signify robot waiting
-        telemetry.addData("Status: ", "Initializing: (Resetting Encoders...)");
+        telemetry.addData("Status:", "Initializing: (Resetting Encoders...)");
         telemetry.update();
 
         robot.drive.resetEncoders();
@@ -169,10 +169,19 @@ public class MecAutonomousSampleScore extends LinearOpMode {
             telemetry.update();
 
             /**
+             * Find and store the values of the sampling right away
+             * while we are hanging to maximize our camera's PoV
+             * (Point of View)
+             */
+            samplingPos = eyes.findGoldPos();
+            // Tell driver which is seen...
+            telemetry.addData("Find Gold:", samplingPos);
+
+
+            /**
              * We don't need a "waitForStart()" since we've been running our own
              * loop all this time so that we can make some changes.
              */
-
         }
         /**
          * Runs after hit start:
@@ -180,20 +189,15 @@ public class MecAutonomousSampleScore extends LinearOpMode {
           */
 
 
+        // Close down the vision to reduce RAM usage
+        eyes.tfod.deactivate();
+
         /**
          * Init the IMU after play so that it is not offset after
          * remaining idle for a minute or two...
           */
         robot.drive.IMUinit();
 
-        /**
-         * Find and store the values of the sampling right away
-         * while we are hanging to maximize our camera's PoV
-         * (Point of View)
-          */
-        samplingPos = eyes.findGoldPos();
-        // Close down the vision to reduce RAM usage
-        eyes.tfod.deactivate();
 
         // Lower the robot and begin!
         robot.tail.lowerRobot();
@@ -403,11 +407,11 @@ public class MecAutonomousSampleScore extends LinearOpMode {
         robot.drive.mecDriveVertical(DriveHW.DRIVE_SPEED,-13,3,DriveHW.DRIVE_MODE.driveTilDistance);
         robot.extend.extendArm();
         HWSubsystem.waitUntillDone(robot.drive,robot.extend);
+        robot.extend.extenderMotor.setPower(robot.extend.EXTEND_POWER);
         robot.arm.gateOpen();
-        robot.robotWait(.3);
-        robot.extend.extendArm();
+        robot.robotWait(1.5);
         robot.drive.mecDriveVertical(DriveHW.DRIVE_SPEED,3,2,DriveHW.DRIVE_MODE.driveTilDistance);
-        HWSubsystem.waitUntillDone(robot.drive,robot.extend);
+        robot.drive.waitUntillDone();
         robot.extend.retractArm();
         robot.extend.waitUntillDone();
 

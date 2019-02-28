@@ -88,7 +88,7 @@ public class CatVisionHardware
 
         timer.reset();
 
-        while (timer.seconds() < 1.5) {
+        while (timer.seconds() < 0.5) {
             // getUpdatedRecognitions() will return null if no new information is available since
             // the last time that call was made.
             List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
