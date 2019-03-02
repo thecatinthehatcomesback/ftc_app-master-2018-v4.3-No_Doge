@@ -44,7 +44,7 @@ public class ArmHW extends HWSubsystem
     static final double     GATE_OPEN               = 0.80;
     static final double     GATE_CLOSE              = 0.20;
 
-    static final double     ARM_POWER               = 0.9;
+    static final double     ARM_POWER               = 1;
 
     // Motors
     public DcMotor  armMotor         = null;
@@ -136,6 +136,24 @@ public class ArmHW extends HWSubsystem
         runtime.reset();
 
     }
+
+    public void rotateArm(int targetPos, double armPowerIn){
+        /**
+         * A simple method to move the
+         */
+
+        // Set the mode to use encoder
+        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        // Start moving to the target position with the correct power
+        armMotor.setTargetPosition(targetPos);
+        armMotor.setPower(armPowerIn);
+
+        // Use the timer as a fail-safe in case the
+
+        runtime.reset();
+
+    }
+
     public void hungryHungryHippo() {
         /**
          * During autonomous, we use this to turn on the
@@ -150,6 +168,15 @@ public class ArmHW extends HWSubsystem
 
         return !(armMotor.isBusy() && (runtime.seconds() < 3.0));
     }
+
+    @Override
+    public boolean pastPosGoingUp(double pos) {
+        Log.d("catbot", String.format(" Arm rotate target %d, current %d ", armMotor.getTargetPosition(),armMotor.getCurrentPosition()));
+
+        return !(armMotor.getCurrentPosition() > pos && (runtime.seconds() < 3.0));
+
+    }
+
 
     /**
      * ---   __________________   ---

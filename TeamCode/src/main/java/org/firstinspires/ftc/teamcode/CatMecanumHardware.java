@@ -74,7 +74,7 @@ public class CatMecanumHardware
     static final int        ARM_OVER_SAMPLING       = 5215;
     static final int        ARM_STRAIGHT_UP         = 2550;
     static final int        ARM_TUCKED_IN           = 1800;
-    static final int        ARM_SCORE               = 1300;
+    static final int        ARM_SCORE               = 1200;
     static final int        ARM_STOWED              = 0;
     static final double     EXTEND_POWER            = -0.7;
 

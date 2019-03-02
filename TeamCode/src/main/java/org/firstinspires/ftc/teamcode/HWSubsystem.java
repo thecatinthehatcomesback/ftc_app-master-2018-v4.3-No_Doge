@@ -68,6 +68,19 @@ public class HWSubsystem
 
     }
 
+
+    public boolean pastPosGoingUp(double posIn){return true;}
+
+    public void pastPosGoingUpLoop(double posIn){
+        while (!pastPosGoingUp(posIn)) {
+            if (!(mainHW.opMode.opModeIsActive())){
+                return;
+            }
+
+        }
+
+    }
+
     public static void waitUntillDone(HWSubsystem subOne, HWSubsystem subTwo){
         boolean subOneBusy = subOne.isBusy();
         boolean subTwoBusy = subTwo.isBusy();
