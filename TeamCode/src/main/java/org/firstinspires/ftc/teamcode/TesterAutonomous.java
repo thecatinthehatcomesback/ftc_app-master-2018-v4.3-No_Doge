@@ -20,8 +20,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class TesterAutonomous extends LinearOpMode {
 
     /* Declare OpMode members. */
-    CatMecanumHardware robot = new CatMecanumHardware();   // Use the mecanum hardware
-    CatVisionHardware eyes = new CatVisionHardware();   // Use the mecanum hardware
+    CatMecanumHW robot = new CatMecanumHW();   // Use the mecanum hardware
+    CatVisionHW eyes = new CatVisionHW();   // Use the mecanum hardware
     private ElapsedTime runtime = new ElapsedTime();
     private ElapsedTime delayTimer = new ElapsedTime();
 
@@ -62,10 +62,10 @@ public class TesterAutonomous extends LinearOpMode {
          \*/
 
 
-        /*robot.advMecDrive(CatMecanumHardware.DRIVE_SPEED, 20, 0+45, 3);
-        robot.advMecDrive(CatMecanumHardware.DRIVE_SPEED, 20, 90+45, 3);
-        robot.advMecDrive(CatMecanumHardware.DRIVE_SPEED, 20, 180+45, 3);
-        robot.advMecDrive(CatMecanumHardware.DRIVE_SPEED, 20, 270+45, 3);*/
+        /*robot.advMecDrive(CatMecanumHW.DRIVE_SPEED, 20, 0+45, 3);
+        robot.advMecDrive(CatMecanumHW.DRIVE_SPEED, 20, 90+45, 3);
+        robot.advMecDrive(CatMecanumHW.DRIVE_SPEED, 20, 180+45, 3);
+        robot.advMecDrive(CatMecanumHW.DRIVE_SPEED, 20, 270+45, 3);*/
 
 
         int numTimes = 0;

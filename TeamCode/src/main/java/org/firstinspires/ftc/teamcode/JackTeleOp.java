@@ -1,12 +1,12 @@
 /*
-    MechanumTeleOp.java
+        JackTeleOp.java
 
-    A Linear opmode class to be our the TeleOp method
-    to use for the driver controlled period.
+    A Linear opmode class that is used as our
+    TeleOp method for the driver controlled period.
+
 
     This file is a modified version from the FTC SDK.
-
-    Heavy Modifications by FTC Team #10273 Cat in the Hat Comes Back
+    Modifications by FTC Team #10273, The Cat in the Hat Comes Back.
 */
 
 package org.firstinspires.ftc.teamcode;
@@ -17,20 +17,20 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@TeleOp(name="Mechanum TeleOp", group="CatTeleOp")
+@TeleOp(name="Jack TeleOp", group="CatTeleOp")
 
-public class MecanumTeleOp extends LinearOpMode {
+public class JackTeleOp extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime elapsedGameTime = new ElapsedTime();
 
     /* Declare OpMode members. */
-    CatMecanumHardware robot;  // Use the mecanum class created for the hardware
+    CatMecanumHW robot;  // Use the mecanum class created for the hardware
     boolean inReverse = true;
     boolean autoArm = false;
     // Our constructor for this class
-    public MecanumTeleOp() {
-        robot = new CatMecanumHardware();
+    public JackTeleOp() {
+        robot = new CatMecanumHW();
     }
 
     @Override
@@ -151,10 +151,10 @@ public class MecanumTeleOp extends LinearOpMode {
                 if (Math.abs(gamepad2.right_stick_y)>.55) {
                     autoArm = false;
                 }
-                if (robot.armMotor.getCurrentPosition()<CatMecanumHardware.ARM_EXTEND){
+                if (robot.armMotor.getCurrentPosition()<CatMecanumHW.ARM_EXTEND){
                     robot.extenderMotor.setPower(-1);
                 }
-                if (robot.armMotor.getCurrentPosition()<CatMecanumHardware.ARM_TELEOP){
+                if (robot.armMotor.getCurrentPosition()<CatMecanumHW.ARM_TELEOP){
                     robot.armMotor.setPower(0);
                     autoArm = false;
                 }

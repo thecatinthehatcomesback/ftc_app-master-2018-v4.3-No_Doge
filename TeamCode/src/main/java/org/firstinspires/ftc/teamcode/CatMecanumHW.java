@@ -48,7 +48,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
  * Motor channel:  Right drive motor:        "right_rear" & "right_front"
  * And so on...
  */
-public class CatMecanumHardware
+public class CatMecanumHW
 {
     // Wheel measurements
     static final double     COUNTS_PER_MOTOR_REV    = 537.6;    // Accurate for a NeveRest Orbital 20
@@ -133,7 +133,7 @@ public class CatMecanumHardware
     LinearOpMode opMode         = null;
 
     /* Constructor */
-    public CatMecanumHardware(){
+    public CatMecanumHW(){
 
     }
 

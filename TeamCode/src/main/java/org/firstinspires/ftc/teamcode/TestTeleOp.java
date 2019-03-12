@@ -33,13 +33,13 @@ public class TestTeleOp extends LinearOpMode {
     private ElapsedTime elapsedGameTime = new ElapsedTime();
 
     /* Declare OpMode members. */
-    CatMecanumHardware robot; // use the class created for the hardware
-    CatVisionHardware eyes = new CatVisionHardware();   // Use the mecanum hardware
+    CatMecanumHW robot; // use the class created for the hardware
+    CatVisionHW eyes = new CatVisionHW();   // Use the mecanum hardware
     boolean inReverse = true;
 
     // constructor for class
     public TestTeleOp() {
-        robot = new CatMecanumHardware();
+        robot = new CatMecanumHW();
     }
 
     @Override

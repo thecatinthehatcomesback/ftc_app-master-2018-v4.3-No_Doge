@@ -1,5 +1,5 @@
 /**
- MecAutonomousIntermediate.java
+ MecAutonomousLevel2_Intermediate.java
 
  A Linear OpMode class to be an autonomous method for both Blue & Red where
  we pick which side of the lander we are hanging off of with gamepad1 and
@@ -7,12 +7,13 @@
  in our depot and park in either crater according to what we say using gamepad1
  at the beginning of the match.
 
- MecAutonomousIntermediate is a more advanced version of the MecBasic we started
+ MecAutonomousLevel2_Intermediate is a more advanced version of the MecBasic we started
  with.  This autonomous is used for our 2nd qualifier this year (Dec 8, 2018).
 
- This file is a modified version from the FTC SDK.
 
- Modifications by FTC Team #10273 Cat in the Hat Comes Back
+
+ This file is a modified version from the FTC SDK.
+ Modifications by FTC Team #10273, The Cat in the Hat Comes Back.
  */
 package org.firstinspires.ftc.teamcode;
 
@@ -25,11 +26,11 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Disabled
 @Autonomous(name="Intermediate Autonomous", group="CatAuto")
-public class MecAutonomousIntermediate extends LinearOpMode {
+public class MecAutonomousLevel2_Intermediate extends LinearOpMode {
 
     /* Declare OpMode members. */
-    CatMecanumHardware robot = new CatMecanumHardware();      // Use our mecanum hardware
-    CatVisionHardware eyes = new CatVisionHardware();   // Doge and vision init
+    CatMecanumHW robot = new CatMecanumHW();      // Use our mecanum hardware
+    CatVisionHW eyes = new CatVisionHW();   // Doge and vision init
     private ElapsedTime runTime = new ElapsedTime();
     private ElapsedTime delayTimer = new ElapsedTime();
     private double timeDelay;
@@ -37,7 +38,7 @@ public class MecAutonomousIntermediate extends LinearOpMode {
     private boolean isCraterSide = true;
     private boolean isParkNearCrater = true;
 
-    private CatVisionHardware.samplingPos samplingPos = CatVisionHardware.samplingPos.RIGHT;
+    private CatVisionHW.samplingPos samplingPos = CatVisionHW.samplingPos.RIGHT;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -197,7 +198,7 @@ public class MecAutonomousIntermediate extends LinearOpMode {
         // Lower robot here
         robot.lowerRobot();
         robot.mecDriveHorizontal(robot.DRIVE_SPEED,3.0,2.0);
-        robot.mecDriveVertical(robot.DRIVE_SPEED,3.0,2.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
+        robot.mecDriveVertical(robot.DRIVE_SPEED,3.0,2.0, CatMecanumHW.DRIVE_MODE.driveTilDistance);
         robot.mecDriveHorizontal(robot.DRIVE_SPEED,-3.0,2.0);
 
         switch(samplingPos) {
@@ -250,25 +251,25 @@ public class MecAutonomousIntermediate extends LinearOpMode {
     }
     public void driveCrater()  throws InterruptedException {
         // Slide if left or right
-        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED, 10, 3.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
+        robot.mecDriveVertical(CatMecanumHW.DRIVE_SPEED, 10, 3.0, CatMecanumHW.DRIVE_MODE.driveTilDistance);
         switch (samplingPos) {
             case LEFT:
-                robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED, 14, 4.0);
+                robot.mecDriveHorizontal(CatMecanumHW.DRIVE_SPEED, 14, 4.0);
                 break;
             case RIGHT:
-                robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED, -20, 4.0);
+                robot.mecDriveHorizontal(CatMecanumHW.DRIVE_SPEED, -20, 4.0);
                 break;
         }
         // Drive forward
-        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED, 12, 4.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
-        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED, -10.5, 4.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
+        robot.mecDriveVertical(CatMecanumHW.DRIVE_SPEED, 12, 4.0, CatMecanumHW.DRIVE_MODE.driveTilDistance);
+        robot.mecDriveVertical(CatMecanumHW.DRIVE_SPEED, -10.5, 4.0, CatMecanumHW.DRIVE_MODE.driveTilDistance);
         // Switch back to the center
         switch (samplingPos) {
             case LEFT:
-                robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED, -14, 4.0);
+                robot.mecDriveHorizontal(CatMecanumHW.DRIVE_SPEED, -14, 4.0);
                 break;
             case RIGHT:
-                robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED, 20, 4.0);
+                robot.mecDriveHorizontal(CatMecanumHW.DRIVE_SPEED, 20, 4.0);
                 break;
         }
         if (isRedAlliance) {
@@ -280,19 +281,19 @@ public class MecAutonomousIntermediate extends LinearOpMode {
         robot.mecTurn(robot.TURN_SPEED, -75, 3.0);
 
         // Drive Forward about 4 foot (To wall)
-        robot.mecDriveVertical(robot.DRIVE_SPEED, 49.0, 3.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
+        robot.mecDriveVertical(robot.DRIVE_SPEED, 49.0, 3.0, CatMecanumHW.DRIVE_MODE.driveTilDistance);
         robot.mecTurn(robot.TURN_SPEED, -127, 3.0);
         // Slides right against the wall
-        robot.mecDriveHorizontal(CatMecanumHardware.HYPER_SPEED,-5,2);
+        robot.mecDriveHorizontal(CatMecanumHW.HYPER_SPEED,-5,2);
         // Drive into depot
-        robot.mecDriveVertical(robot.DRIVE_SPEED, 45, 3.5, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
-        robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED,3, 2);
+        robot.mecDriveVertical(robot.DRIVE_SPEED, 45, 3.5, CatMecanumHW.DRIVE_MODE.driveTilDistance);
+        robot.mecDriveHorizontal(CatMecanumHW.DRIVE_SPEED,3, 2);
         //robot.markerRelease();
-        robot.mecDriveHorizontal(CatMecanumHardware.HYPER_SPEED,3, 2);
+        robot.mecDriveHorizontal(CatMecanumHW.HYPER_SPEED,3, 2);
         robot.robotWait (0.7);
-        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED,-10,3, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
+        robot.mecDriveVertical(CatMecanumHW.DRIVE_SPEED,-10,3, CatMecanumHW.DRIVE_MODE.driveTilDistance);
         //robot.markerIn();
-        robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED,-6,2);
+        robot.mecDriveHorizontal(CatMecanumHW.DRIVE_SPEED,-6,2);
         // Turn 45 towards the right crater
         if (isParkNearCrater) {
             robot.mecTurn(robot.TURN_SPEED, -134, 3.0);
@@ -301,32 +302,32 @@ public class MecAutonomousIntermediate extends LinearOpMode {
         }
 
         // Drive Backwards 6 feet (To crater)
-        robot.mecDriveVertical(robot.DRIVE_SPEED, -64.0, 8.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
+        robot.mecDriveVertical(robot.DRIVE_SPEED, -64.0, 8.0, CatMecanumHW.DRIVE_MODE.driveTilDistance);
         robot.robotWait( 0.5);
-        robot.mecDriveVertical(robot.CREEP_SPEED, -4,3.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
+        robot.mecDriveVertical(robot.CREEP_SPEED, -4,3.0, CatMecanumHW.DRIVE_MODE.driveTilDistance);
     }
     public void driveDepot() throws InterruptedException {
 
         // Slide if left or right
-        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED, 12, 3.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
+        robot.mecDriveVertical(CatMecanumHW.DRIVE_SPEED, 12, 3.0, CatMecanumHW.DRIVE_MODE.driveTilDistance);
         switch (samplingPos) {
             case LEFT:
-                robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED, 14, 4.0);
+                robot.mecDriveHorizontal(CatMecanumHW.DRIVE_SPEED, 14, 4.0);
                 break;
             case RIGHT:
-                robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED, -22, 4.0);
+                robot.mecDriveHorizontal(CatMecanumHW.DRIVE_SPEED, -22, 4.0);
                 break;
         }
         // Drive forward
-        robot.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED, 32, 4.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
+        robot.mecDriveVertical(CatMecanumHW.DRIVE_SPEED, 32, 4.0, CatMecanumHW.DRIVE_MODE.driveTilDistance);
 
         // Switch back to the center
         switch (samplingPos) {
             case LEFT:
-                robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED, -14, 4.0);
+                robot.mecDriveHorizontal(CatMecanumHW.DRIVE_SPEED, -14, 4.0);
                 break;
             case RIGHT:
-                robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED, 22, 4.0);
+                robot.mecDriveHorizontal(CatMecanumHW.DRIVE_SPEED, 22, 4.0);
                 break;
         }
 
@@ -336,7 +337,7 @@ public class MecAutonomousIntermediate extends LinearOpMode {
             robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SINELON_OCEAN_PALETTE);
         }
         // Drive 4 foot and drop mineral off
-        robot.mecDriveVertical(robot.DRIVE_SPEED, 13, 3.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
+        robot.mecDriveVertical(robot.DRIVE_SPEED, 13, 3.0, CatMecanumHW.DRIVE_MODE.driveTilDistance);
 
         // Turn 45 towards the right crater
         if (isParkNearCrater) {
@@ -349,10 +350,10 @@ public class MecAutonomousIntermediate extends LinearOpMode {
         robot.robotWait(1.0);
         //robot.markerIn();
         // Drive Backwards 6 feet (To crater)
-        robot.mecDriveVertical(robot.DRIVE_SPEED, -15.0, 3.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
-        robot.mecDriveHorizontal(CatMecanumHardware.DRIVE_SPEED,-9,3.0);
-        robot.mecDriveVertical(robot.DRIVE_SPEED, -72.0, 8.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
+        robot.mecDriveVertical(robot.DRIVE_SPEED, -15.0, 3.0, CatMecanumHW.DRIVE_MODE.driveTilDistance);
+        robot.mecDriveHorizontal(CatMecanumHW.DRIVE_SPEED,-9,3.0);
+        robot.mecDriveVertical(robot.DRIVE_SPEED, -72.0, 8.0, CatMecanumHW.DRIVE_MODE.driveTilDistance);
         robot.robotWait( 0.5);
-        robot.mecDriveVertical(robot.CREEP_SPEED, -4,3.0, CatMecanumHardware.DRIVE_MODE.driveTilDistance);
+        robot.mecDriveVertical(robot.CREEP_SPEED, -4,3.0, CatMecanumHW.DRIVE_MODE.driveTilDistance);
     }
 }

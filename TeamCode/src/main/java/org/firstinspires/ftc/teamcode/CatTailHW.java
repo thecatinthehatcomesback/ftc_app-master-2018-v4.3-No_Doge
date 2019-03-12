@@ -1,16 +1,15 @@
 /*
-      TailHW.java
+        CatTailHW.java
 
-        An "hardware" class intended to contain common code for accessing the
-        hardware specific to moving the tail of the robot.
-        This is a modified (stripped down) version of CatMechanumHardware to
-        contain only movement for the tail of the robot.
+    A "hardware" class containing common code accessing hardware specific
+    to the movement and extension of Jack's tail.  This is a modified/
+    stripped  down version of CatMecanumHW to run all of arm extending
+    movements.  This file is used by the new autonomous OpModes to run
+    multiple operations at once.
 
-        This file is used by CatAsyncHardware to run multiple motors at once
 
-        This file is a HEAVILY modified version from the FTC SDK.
-
-        Modifications by FTC Team #10273 Cat in the Hat Comes Back
+    This file is a modified version from the FTC SDK.
+    Modifications by FTC Team #10273, The Cat in the Hat Comes Back.
 */
 
 package org.firstinspires.ftc.teamcode;
@@ -19,19 +18,23 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
- * This is NOT an opmode.
+ * This is NOT an OpMode.
  *
- * This class can be used to define all the specific hardware for a single robot.
- * In this case that robot is the Cat in the Hat robot for 2018-2019
+ * This class is used to define all the arm specific hardware for the robot to
+ * allow for multiple operations during autonomous.  In this case, that robot is
+ * Jack from the Cat in the Hat Comes Back team during the 2018-2019 season.
  *
- * This hardware class assumes the following device names have been configured on the robot:
- * Note:  All names are lower case and some have underscores between words.
+ * This hardware class assumes the following device names have been configured on the robot.
+ *
+ *
+ * Note:  All names are lower case and have underscores between words.
  *
  * Motor channel:  Left  drive motor:        "left_rear"  & "left_front"
  * Motor channel:  Right drive motor:        "right_rear" & "right_front"
  * And so on...
  */
-public class TailHW extends HWSubsystem
+
+public class CatTailHW extends CatSubsystemHW
 {
 
 
@@ -43,7 +46,7 @@ public class TailHW extends HWSubsystem
     ElapsedTime runtime = new ElapsedTime();
 
     /* Constructor */
-    public TailHW(CatAsyncHardware mainHardware){
+    public CatTailHW(CatAsyncHW mainHardware){
 
     super(mainHardware);
 

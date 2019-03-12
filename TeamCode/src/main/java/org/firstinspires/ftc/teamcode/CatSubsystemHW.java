@@ -1,15 +1,14 @@
 /*
-      HWSubsystem.java
+        CatSubsystemHW.java
 
-        An "hardware" class intended to contain common code for accessing the hardware
-        This contains code that detects if the subclasses are busy or can / should continue
-         to the next segment of code.
+    A "hardware" class containing common code accessing hardware objects
+    and processes.  It detects if the subclasses are busy and can/should
+    continue to the next step/segment of code.  This file is used by
+    CatAsyncHW to run multiple motors at once.
 
-        This file is used by CatAsyncHardware to run multiple motors at once
 
-        This file is a HEAVILY modified version from the FTC SDK.
-
-        Modifications by FTC Team #10273 Cat in the Hat Comes Back
+    This file is a modified version from the FTC SDK.
+    Modifications by FTC Team #10273, The Cat in the Hat Comes Back.
 */
 
 package org.firstinspires.ftc.teamcode;
@@ -17,27 +16,30 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 /**
- * This is NOT an opmode.
+ * This is NOT an OpMode.
  *
- * This class can be used to define all the specific hardware for a single robot.
- * In this case that robot is the Cat in the Hat robot for 2018-2019
+ * This class is used to define all the arm specific hardware for the robot to
+ * allow for multiple operations during autonomous.  In this case, that robot is
+ * Jack from the Cat in the Hat Comes Back team during the 2018-2019 season.
  *
- * This hardware class assumes the following device names have been configured on the robot:
- * Note:  All names are lower case and some have underscores between words.
+ * This hardware class assumes the following device names have been configured on the robot.
+ *
+ *
+ * Note:  All names are lower case and have underscores between words.
  *
  * Motor channel:  Left  drive motor:        "left_rear"  & "left_front"
  * Motor channel:  Right drive motor:        "right_rear" & "right_front"
  * And so on...
  */
-public class HWSubsystem
+public class CatSubsystemHW
 {
 
     /* local OpMode members. */
     public HardwareMap hwMap           = null;
-    public CatAsyncHardware mainHW     = null;
+    public CatAsyncHW mainHW     = null;
 
     /* Constructor */
-    public HWSubsystem(CatAsyncHardware mainHardware){
+    public CatSubsystemHW(CatAsyncHW mainHardware){
 
         mainHW = mainHardware;
         hwMap = mainHW.hwMap;
@@ -66,7 +68,7 @@ public class HWSubsystem
     }
 
 
-    public static void waitUntillDone(HWSubsystem subOne, HWSubsystem subTwo){
+    public static void waitUntillDone(CatSubsystemHW subOne, CatSubsystemHW subTwo){
         boolean subOneBusy = subOne.isBusy();
         boolean subTwoBusy = subTwo.isBusy();
         while (subOneBusy || subTwoBusy) {
@@ -78,7 +80,7 @@ public class HWSubsystem
         }
     }
 
-    public static void waitUntillDone(HWSubsystem subOne, HWSubsystem subTwo, HWSubsystem subThree){
+    public static void waitUntillDone(CatSubsystemHW subOne, CatSubsystemHW subTwo, CatSubsystemHW subThree){
         boolean subOneBusy = subOne.isBusy();
         boolean subTwoBusy = subTwo.isBusy();
         boolean subThreeBusy = subThree.isBusy();

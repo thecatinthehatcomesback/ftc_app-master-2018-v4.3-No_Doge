@@ -1,14 +1,13 @@
 /*
-      CatAsyncHardware.java
+        CatAsyncHW.java
 
-        An "hardware" class intended to contain common code for accessing the hardware
-        This is a modified version of CatMecanumHardware to
-        be  able to have multiple asynchronous movements at the same time aka move
-        the arm to straight up and extend it at the same time.
+    An "hardware" class containing common code accessing hardware specific
+    to make our Autonomous routines "asynchronous".  This file is used by
+    the new autonomous OpModes to run multiple operations at once.
 
-        This file is a HEAVILY modified version from the FTC SDK.
 
-        Modifications by FTC Team #10273 Cat in the Hat Comes Back
+    This file is a modified version from the FTC SDK.
+    Modifications by FTC Team #10273, The Cat in the Hat Comes Back.
 */
 
 package org.firstinspires.ftc.teamcode;
@@ -21,19 +20,22 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
- * This is NOT an opmode.
+ * This is NOT an OpMode.
  *
- * This class can be used to define all the specific hardware for a single robot.
- * In this case that robot is the Cat in the Hat robot for 2018-2019
+ * This class is used to define all the arm specific hardware for the robot to
+ * allow for multiple operations during autonomous.  In this case, that robot is
+ * Jack from the Cat in the Hat Comes Back team during the 2018-2019 season.
  *
- * This hardware class assumes the following device names have been configured on the robot:
- * Note:  All names are lower case and some have underscores between words.
+ * This hardware class assumes the following device names have been configured on the robot.
+ *
+ *
+ * Note:  All names are lower case and have underscores between words.
  *
  * Motor channel:  Left  drive motor:        "left_rear"  & "left_front"
  * Motor channel:  Right drive motor:        "right_rear" & "right_front"
  * And so on...
  */
-public class CatAsyncHardware
+public class CatAsyncHW
 {
     // Wheel measurements
     static final double     COUNTS_PER_MOTOR_REV    = 537.6;    // Accurate for a NeveRest Orbital 20
@@ -79,13 +81,13 @@ public class CatAsyncHardware
 
 
     //other Hardware subSystems
-    ArmHW arm = null;
-    DriveHW drive = null;
-    TailHW tail = null;
-    ExtendHW extend = null;
+    CatArmHW arm = null;
+    CatDriveHW drive = null;
+    CatTailHW tail = null;
+    CatExtendHW extend = null;
 
     /* Constructor */
-    public CatAsyncHardware(){
+    public CatAsyncHW(){
 
     }
 
@@ -97,13 +99,13 @@ public class CatAsyncHardware
         hwMap = ahwMap;
         opMode = theOpMode;
 
-        arm = new ArmHW(this);
+        arm = new CatArmHW(this);
         arm.init();
-        drive = new DriveHW(this);
+        drive = new CatDriveHW(this);
         drive.init();
-        extend = new ExtendHW(this);
+        extend = new CatExtendHW(this);
         extend.init();
-        tail = new TailHW(this);
+        tail = new CatTailHW(this);
         tail.init();
 
 

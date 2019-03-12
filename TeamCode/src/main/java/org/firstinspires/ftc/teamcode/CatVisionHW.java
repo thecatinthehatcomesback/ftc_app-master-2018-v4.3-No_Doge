@@ -1,11 +1,16 @@
 /*
-      CatVisionHardware.java
+        CatVisionHW.java
 
-        An "hardware" class intended to contain common code for accessing the camera
-        This is mostly to test the machine vision.
-        This version uses the Tensor Flow system from the FTC SDK.
-        Pervious versions used the DogeCV library (which uses OpenCV)
+    An "hardware" class intended to contain common code for accessing
+    camera and vision related problems.  While previous versions were
+    made to mostly to test various forms of machine vision, this version
+    uses the Tensor Flow system from the FTC SDK to detect the Gold
+    mineral during init in our Autonomous routines. Previous versions
+    also used the DogeCV library which uses OpenCV.
 
+
+    This file is a modified version from the FTC SDK.
+    Modifications by FTC Team #10273, The Cat in the Hat Comes Back.
 */
 
 package org.firstinspires.ftc.teamcode;
@@ -33,10 +38,9 @@ import static org.firstinspires.ftc.robotcore.external.tfod.TfodRoverRuckus.TFOD
  * This is NOT an opmode.
  *
  * This class can be used to define all vision coding we use.
- * In this case that robot is the Cat in the Hat robot for 2018-2019
  *
  */
-public class CatVisionHardware
+public class CatVisionHW
 {
     private static final float mmPerInch        = 25.4f;
     private static final float mmFTCFieldWidth  = (12*6) * mmPerInch;       // the width of the FTC field (from the center point to the outer panels)
