@@ -48,7 +48,6 @@ public class HWSubsystem
     }
 
     public boolean isBusy (){
-
         return !isDone();
     }
 
@@ -63,23 +62,9 @@ public class HWSubsystem
             if (!(mainHW.opMode.opModeIsActive())){
                 return;
             }
-
         }
-
     }
 
-
-    public boolean pastPosGoingUp(double posIn){return true;}
-
-    public void pastPosGoingUpLoop(double posIn){
-        while (!pastPosGoingUp(posIn)) {
-            if (!(mainHW.opMode.opModeIsActive())){
-                return;
-            }
-
-        }
-
-    }
 
     public static void waitUntillDone(HWSubsystem subOne, HWSubsystem subTwo){
         boolean subOneBusy = subOne.isBusy();
@@ -91,7 +76,6 @@ public class HWSubsystem
             subOneBusy = subOne.isBusy();
             subTwoBusy = subTwo.isBusy();
         }
-
     }
 
     public static void waitUntillDone(HWSubsystem subOne, HWSubsystem subTwo, HWSubsystem subThree){
@@ -106,7 +90,6 @@ public class HWSubsystem
             subTwoBusy = subTwo.isBusy();
             subThreeBusy = subThree.isBusy();
         }
-
     }
 
     /**

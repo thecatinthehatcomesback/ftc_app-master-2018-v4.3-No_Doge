@@ -216,7 +216,6 @@ public class DriveHW extends HWSubsystem
         int newRightFrontTarget;
         int newLeftBackTarget;
         int newRightBackTarget;
-        ElapsedTime runtime = new ElapsedTime();
         boolean keepDriving = true;
         baseDelta = 0;
         if (driveMode == DRIVE_MODE.findLine) {
@@ -323,7 +322,6 @@ public class DriveHW extends HWSubsystem
         int newRightFrontTarget;
         int newLeftBackTarget;
         int newRightBackTarget;
-        ElapsedTime runtime = new ElapsedTime();
         boolean keepDriving = true;
 
         if (mainHW.opMode.opModeIsActive()) {
@@ -487,11 +485,17 @@ public class DriveHW extends HWSubsystem
             case vertical:
                 // One drive mode that drives blindly straight
                 if (currentMode == DRIVE_MODE.driveTilDistance) {
+
                     //  Exit the method once robot stops
                     if (!leftFrontMotor.isBusy() || !rightFrontMotor.isBusy() ||
                             !leftRearMotor.isBusy() || !rightRearMotor.isBusy()) {
                         keepDriving = false;
                     }
+                    Log.d("catbot", String.format("LF: %d, %d, RF: %d, %d, LB: %d, %d, RB %d,%d",
+                            leftFrontMotor.getTargetPosition(),leftFrontMotor.getCurrentPosition(),
+                            rightFrontMotor.getTargetPosition(), rightFrontMotor.getCurrentPosition(),
+                            leftRearMotor.getTargetPosition(), leftRearMotor.getCurrentPosition(),
+                            rightRearMotor.getTargetPosition(), rightRearMotor.getCurrentPosition()));
                 }
 
                 // The other drive mode using color sensors to fine lines

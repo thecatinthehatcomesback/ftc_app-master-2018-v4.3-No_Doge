@@ -52,6 +52,8 @@ public class CatVisionHardware
 
     Deque<samplingPos> samplingValues;
 
+    public int loopCount = 0;
+
     // Objects and Detectors
     private VuforiaLocalizer vuforia;
     public TFObjectDetector tfod;
@@ -62,7 +64,7 @@ public class CatVisionHardware
         hwMap = ahwMap;
         samplingValues = new ArrayDeque<samplingPos>(30);
 
-        /*
+        /**
          * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
          */
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
@@ -88,7 +90,10 @@ public class CatVisionHardware
 
     public void findGoldPos() {
         /**
-         *
+         * Newer way to continuously look for the gold
+         * while looping inside the autonomous init mode
+         * but limits the amount of occurrences we keep
+         * using a Deque.
          */
 
 
@@ -101,6 +106,7 @@ public class CatVisionHardware
         // the last time that call was made.
         List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
         if (updatedRecognitions != null) {
+            loopCount++;
             for (Recognition recognition : updatedRecognitions) {
                 if (recognition.getLabel().equals(LABEL_GOLD_MINERAL) && recognition.getConfidence() > 0.5) {
                     int goldMineralX = (int) recognition.getLeft();
@@ -114,19 +120,21 @@ public class CatVisionHardware
                     return;
                 }
             }
+            samplingValues.add(samplingPos.RIGHT);
         }
         // Since camera is only looking at the LEFT and CENTER values, it will return RIGHT
         // if is doesn't see the gold (just basic logic)
-        samplingValues.add(samplingPos.RIGHT);
         return;
     }
 
     public samplingPos giveSamplePos() {
         /**
-         *
+         * A new way to take the all the values during the init
+         * and choosing the value in the deque that has the most
+         * occurrences.
          */
 
-        Log.d("catbot", String.format("giveSamplePos   LEFT: %d, CENTER: %d, RIGHT: &d",
+        Log.d("catbot", String.format("giveSamplePos amounts:  LEFT: %d, CENTER: %d, RIGHT: &d",
                 Collections.frequency(samplingValues, samplingPos.LEFT),
                 Collections.frequency(samplingValues, samplingPos.CENTER),
                 Collections.frequency(samplingValues, samplingPos.RIGHT)));

@@ -45,6 +45,8 @@ public class ArmHW extends HWSubsystem
     static final double     GATE_CLOSE              = 0.20;
 
     static final double     ARM_POWER               = 1;
+    boolean shouldStartExtend = false;
+    int posStartExtend = 3000;
 
     // Motors
     public DcMotor  armMotor         = null;
@@ -125,6 +127,7 @@ public class ArmHW extends HWSubsystem
          * A simple method to move the
          */
 
+        shouldStartExtend = false;
         // Set the mode to use encoder
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         // Start moving to the target position with the correct power
@@ -136,6 +139,14 @@ public class ArmHW extends HWSubsystem
         runtime.reset();
 
     }
+
+    public void setExtenderValue(int newValue){
+        posStartExtend = newValue;
+        shouldStartExtend = true;
+    }
+
+
+
 
     public void rotateArm(int targetPos, double armPowerIn){
         /**
@@ -165,15 +176,19 @@ public class ArmHW extends HWSubsystem
     @Override
     public boolean isDone() {
         Log.d("catbot", String.format(" Arm rotate target %d, current %d ", armMotor.getTargetPosition(),armMotor.getCurrentPosition()));
+        if (shouldStartExtend&&pastPosGoingUp(posStartExtend))
+        {
+         mainHW.extend.extendArm();
+         shouldStartExtend = false;
+        }
 
         return !(armMotor.isBusy() && (runtime.seconds() < 3.0));
     }
 
-    @Override
-    public boolean pastPosGoingUp(double pos) {
+    public boolean pastPosGoingUp(int pos) {
         Log.d("catbot", String.format(" Arm rotate target %d, current %d ", armMotor.getTargetPosition(),armMotor.getCurrentPosition()));
 
-        return !(armMotor.getCurrentPosition() > pos && (runtime.seconds() < 3.0));
+        return !(armMotor.getCurrentPosition() > pos);
 
     }
 

@@ -17,6 +17,8 @@
  */
 package org.firstinspires.ftc.teamcode;
 
+import android.util.Log;
+
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -174,8 +176,7 @@ public class MecAutonomousSampleScore extends LinearOpMode {
              */
             eyes.findGoldPos();
             // Tell driver which is seen
-            /// TODO: 2/27/2019 TAKE THE LAST KNOWN OUT OF THE DEQUE
-            telemetry.addData("Find Gold:", samplingPos);
+            telemetry.addData("Find Gold:", eyes.samplingValues.getLast());
             telemetry.update();
 
 
@@ -189,17 +190,24 @@ public class MecAutonomousSampleScore extends LinearOpMode {
          * DO STUFF FOR the OPMODE!!!
           */
 
+        Log.d("catbot", String.format(" Hit Start"));
 
         // Close down the vision to reduce RAM usage
         eyes.tfod.deactivate();
+        Log.d("catbot", String.format("Tensor Flow deactivated"));
+
         // Give the sampling position
         samplingPos = eyes.giveSamplePos();
+        /// TODO: 3/4/2019 GET THE AMOUNT OF LOOPS IT ACTUALLY HAPPENS
+        telemetry.addData("LoopCount:", eyes.loopCount);
+        telemetry.update();
 
         /**
          * Init the IMU after play so that it is not offset after
          * remaining idle for a minute or two...
           */
         robot.drive.IMUinit();
+        Log.d("catbot", String.format("IMU initialized - starting lower"));
 
 
         // Lower the robot and begin!
@@ -271,7 +279,7 @@ public class MecAutonomousSampleScore extends LinearOpMode {
                 robot.drive.mecTurn(robot.TURN_SPEED,-12,2.5);
                 break;
             case RIGHT:
-                robot.drive.mecTurn(robot.TURN_SPEED,19,2.5);
+                robot.drive.mecTurn(robot.TURN_SPEED,15,2.5);
                 break;
         }
 
@@ -387,7 +395,7 @@ public class MecAutonomousSampleScore extends LinearOpMode {
                 robot.drive.mecTurn(robot.TURN_SPEED,-19,2.5);
                 break;
             case RIGHT:
-                robot.drive.mecTurn(robot.TURN_SPEED,25,2.5);
+                robot.drive.mecTurn(robot.TURN_SPEED,19,2.5);
                 break;
         }
         HWSubsystem.waitUntillDone(robot.drive,robot.arm);
@@ -401,11 +409,14 @@ public class MecAutonomousSampleScore extends LinearOpMode {
         robot.extend.retractArm();
         robot.arm.intakeServo.setPower(0.0);
         robot.drive.mecTurn(.35,0,2);
+        robot.arm.setExtenderValue(3000);
         HWSubsystem.waitUntillDone(robot.drive,robot.arm);
-        robot.drive.mecDriveVertical(DriveHW.DRIVE_SPEED,-13,3,DriveHW.DRIVE_MODE.driveTilDistance);
-        //robot.extend.extenderMotor.setPower(.7);
-        robot.robotWait(.2);
         robot.extend.extenderMotor.setPower(robot.extend.EXTEND_POWER);
+        robot.drive.mecDriveVertical(DriveHW.DRIVE_SPEED,-14,3,DriveHW.DRIVE_MODE.driveTilDistance);
+
+        //robot.extend.extenderMotor.setPower(.7);
+        //robot.robotWait(.4);
+        //robot.extend.extenderMotor.setPower(robot.extend.EXTEND_POWER);
         robot.drive.waitUntillDone();
         robot.arm.gateOpen();
         robot.arm.rotateArm(CatMecanumHardware.ARM_SCORE);
@@ -413,7 +424,7 @@ public class MecAutonomousSampleScore extends LinearOpMode {
         //robot.robotWait(.1);
         //robot.arm.rotateArm(CatMecanumHardware.ARM_SCORE,.65);
         robot.arm.waitUntillDone();
-        robot.arm.rotateArm(CatMecanumHardware.ARM_TUCKED_IN);
+        robot.arm.rotateArm(CatMecanumHardware.ARM_STRAIGHT_UP);
         robot.arm.waitUntillDone();
         robot.drive.mecDriveVertical(DriveHW.DRIVE_SPEED,3,2,DriveHW.DRIVE_MODE.driveTilDistance);
         robot.drive.waitUntillDone();
@@ -499,29 +510,32 @@ public class MecAutonomousSampleScore extends LinearOpMode {
             robot.drive.waitUntillDone();
             HWSubsystem.waitUntillDone(robot.extend, robot.arm);
             robot.drive.mecTurn(CatMecanumHardware.TURN_SPEED ,6,2);
-            robot.robotWait(.3);
+            robot.robotWait(.4);
             robot.drive.mecTurn(.4,0,2);
             robot.drive.waitUntillDone();
             //scores the minerals
+            robot.drive.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED,-3,2.0,DriveHW.DRIVE_MODE.driveTilDistance);
             robot.extend.extenderMotor.setPower(robot.extend.EXTEND_POWER);
-            robot.drive.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED,-3.5,3.0,DriveHW.DRIVE_MODE.driveTilDistance);
             robot.robotWait(.4);
-            robot.extend.extenderMotor.setPower(robot.extend.EXTEND_POWER);
-            robot.drive.waitUntillDone();
             robot.arm.gateOpen();
-            robot.arm.rotateArm(CatMecanumHardware.ARM_SCORE);
+            robot.drive.waitUntillDone();
+            robot.arm.rotateArm(CatMecanumHardware.ARM_SCORE,.45);
             //robot.arm.rotateArm(CatMecanumHardware.ARM_TUCKED_IN,.8);
             //robot.robotWait(.1);
             //robot.arm.rotateArm(CatMecanumHardware.ARM_SCORE,.65);
             robot.arm.waitUntillDone();
-            robot.arm.rotateArm(CatMecanumHardware.ARM_TUCKED_IN);
+            robot.arm.rotateArm(CatMecanumHardware.ARM_STRAIGHT_UP);
             robot.arm.waitUntillDone();
-            robot.robotWait(1.25);
-            robot.drive.mecDriveVertical(DriveHW.DRIVE_SPEED,3,2,DriveHW.DRIVE_MODE.driveTilDistance);
+            robot.drive.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED,30,2,DriveHW.DRIVE_MODE.driveTilDistance);
             robot.drive.waitUntillDone();
-            robot.extend.retractArm();
-            robot.extend.waitUntillDone();
             robot.arm.gateClose();
+            robot.arm.rotateArm(CatMecanumHardware.ARM_OVER_SAMPLING);
+            robot.drive.mecTurn(CatMecanumHardware.TURN_SPEED ,-74,3.5);
+            robot.drive.waitUntillDone();
+            robot.drive.mecDriveVertical(CatMecanumHardware.DRIVE_SPEED, 16, 2, DriveHW.DRIVE_MODE.driveTilDistance);
+            robot.extend.extendArm();
+            robot.drive.waitUntillDone();
+
 
         } else {
             robot.arm.intakeServo.setPower(0.0);

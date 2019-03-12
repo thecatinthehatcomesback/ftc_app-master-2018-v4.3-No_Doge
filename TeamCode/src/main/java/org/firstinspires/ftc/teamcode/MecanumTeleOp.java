@@ -27,7 +27,7 @@ public class MecanumTeleOp extends LinearOpMode {
     /* Declare OpMode members. */
     CatMecanumHardware robot;  // Use the mecanum class created for the hardware
     boolean inReverse = true;
-
+    boolean autoArm = false;
     // Our constructor for this class
     public MecanumTeleOp() {
         robot = new CatMecanumHardware();
@@ -141,9 +141,34 @@ public class MecanumTeleOp extends LinearOpMode {
 
             //**  Arm controls **//
             // Lower/Raise arm
-            robot.armMotor.setPower(gamepad2.right_stick_y);
-            // Extend/Retract arm
-            robot.extenderMotor.setPower(gamepad2.left_stick_x * 0.8);
+            if (gamepad2.a){
+                robot.armMotor.setPower(-1);
+                autoArm = true;
+            }
+
+
+            if (autoArm){
+                if (Math.abs(gamepad2.right_stick_y)>.55) {
+                    autoArm = false;
+                }
+                if (robot.armMotor.getCurrentPosition()<CatMecanumHardware.ARM_EXTEND){
+                    robot.extenderMotor.setPower(-1);
+                }
+                if (robot.armMotor.getCurrentPosition()<CatMecanumHardware.ARM_TELEOP){
+                    robot.armMotor.setPower(0);
+                    autoArm = false;
+                }
+
+            }else {
+                robot.armMotor.setPower(gamepad2.right_stick_y);
+
+                // Extend/Retract arm
+                robot.extenderMotor.setPower(gamepad2.left_stick_x * 0.8);
+            }
+
+
+
+
             // Open/Close gate
             if(gamepad2.left_bumper) {
                 robot.gateClose();

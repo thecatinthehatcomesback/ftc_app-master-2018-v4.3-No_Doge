@@ -57,7 +57,7 @@ public class CatMecanumHardware
 
     // Autonomous Drive Speeds
     static final double     DRIVE_SPEED             = 0.6;
-    static final double     HYPER_SPEED             = 0.6;
+    static final double     HYPER_SPEED             = 0.8;
     static final double     CHILL_SPEED             = 0.25;
     static final double     CREEP_SPEED             = 0.10;
     static final double     TURN_SPEED              = 0.6;
@@ -72,9 +72,11 @@ public class CatMecanumHardware
     static final int        ARM_FLOOR               = 6500; // was 6680
     static final int        ARM_DEPOT_DROPOFF       = 5700;
     static final int        ARM_OVER_SAMPLING       = 5215;
+    static final int        ARM_EXTEND              = 3750;
     static final int        ARM_STRAIGHT_UP         = 2550;
     static final int        ARM_TUCKED_IN           = 1800;
-    static final int        ARM_SCORE               = 1200;
+    static final int        ARM_TELEOP              = 1450;
+    static final int        ARM_SCORE               = 1250;
     static final int        ARM_STOWED              = 0;
     static final double     EXTEND_POWER            = -0.7;
 
