@@ -416,9 +416,12 @@ public class CatDriveHW extends CatSubsystemHW
         // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
         // and named "imu".
         imu = hwMap.get(BNO055IMU.class, "imu");
+        Log.d("catbot", String.format("IMU initialized - starting init"));
+        //the initialize method is taking a whole second
         imu.initialize(parameters);
-
+        Log.d("catbot", String.format("IMU initialized - finishing init starting integration"));
         imu.startAccelerationIntegration(new Position(), new Velocity(), 250);
+        Log.d("catbot", String.format("IMU initialized - finished integration"));
     }
     public int getCurrentAngle() {
         angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);

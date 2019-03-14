@@ -75,7 +75,7 @@ public class CatMecanumHW
     static final int        ARM_EXTEND              = 3750;
     static final int        ARM_STRAIGHT_UP         = 2550;
     static final int        ARM_TUCKED_IN           = 1800;
-    static final int        ARM_TELEOP              = 1450;
+    static final int        ARM_TELEOP              = 1650;
     static final int        ARM_SCORE               = 1250;
     static final int        ARM_STOWED              = 0;
     static final double     EXTEND_POWER            = -0.7;
