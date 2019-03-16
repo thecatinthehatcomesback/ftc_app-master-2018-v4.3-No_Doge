@@ -16,6 +16,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
@@ -28,9 +29,11 @@ public class JackTeleOp___2 extends LinearOpMode {
 
     /* Declare OpMode members. */
     CatAsyncHW robot = new CatAsyncHW();  // Use our new mecanum async hardware
-    boolean inReverse = true;
-    boolean autoArm = false;
-    boolean slowArm = false;
+    boolean inReverse           = true;
+    boolean autoArm             = false;
+    boolean slowArm             = false;
+    boolean liftingTail         = false;
+    boolean overodeLiftTail     = false;
 
     // Our constructor for this class
     public JackTeleOp___2() {
@@ -129,8 +132,28 @@ public class JackTeleOp___2 extends LinearOpMode {
             // DRIVE!!!
             robot.drive.drive(leftFront, rightFront, leftBack, rightBack);
 
-            // Tail Control
-            robot.tail.tailMotor.setPower(gamepad1.left_trigger - gamepad1.right_trigger);
+
+            /** Tail Control **/
+            // Once we hit endgame and we haven't been overridden, tell Jack
+            if ((elapsedGameTime.seconds() > 105.0) && !overodeLiftTail) {
+                liftingTail = true;
+            }
+            // Exit the auto lift Tail if the driver touches it
+            if (liftingTail && ((Math.abs(gamepad1.left_trigger - gamepad1.right_trigger)) > 0.2)) {
+                // Tell code that we overrode its DREAMS to avoid unwanted repeats!
+                overodeLiftTail = true;
+                // Set the encoder back to normal for TeleOp
+                robot.tail.tailMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            }
+            // Raise Tail during endgame automatically
+            if (liftingTail && !overodeLiftTail) {
+                // Driver enhancement help for Tail during TeleOp
+                robot.tail.lowerRobot();
+                telemetry.addData("Tail Test", "After extend");
+            } else {
+                // Move normally
+                robot.tail.tailMotor.setPower(gamepad1.left_trigger - gamepad1.right_trigger);
+            }
 
 
 
@@ -142,7 +165,7 @@ public class JackTeleOp___2 extends LinearOpMode {
              * ---   \/ \/ \/ \/ \/ \/   ---
              */
 
-            // Intake Spinning Controls
+            // Intake Spinning Controls  (For whatever reason, 0.87 is the magic number)
             robot.arm.intakeServo.setPower(gamepad2.right_trigger*0.87 - gamepad2.left_trigger*0.87);
 
             //**  Arm controls **//
@@ -184,11 +207,11 @@ public class JackTeleOp___2 extends LinearOpMode {
                  * Otherwise run the normal Driver 2 code
                  */
 
-                // Lower and raise the arm
+                // Lower and raise the arm by rotations
                 robot.arm.armMotor.setPower(gamepad2.right_stick_y);
 
                 // Extend and retract the arm
-                robot.extend.extenderMotor.setPower(gamepad2.left_stick_x * 0.8);
+                robot.extend.extenderMotor.setPower(gamepad2.left_stick_y * 0.8);
             }
 
 
@@ -200,10 +223,6 @@ public class JackTeleOp___2 extends LinearOpMode {
             }
 
 
-            // Driver help
-            if (elapsedGameTime.seconds() > 100) {
-                robot.tail.extendTail();
-            }
 
             /**
              * ---   _________   ---

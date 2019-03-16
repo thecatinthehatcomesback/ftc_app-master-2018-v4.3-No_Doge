@@ -243,6 +243,9 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
         robot.drive.mecTurn(.4,2,1);
         robot.drive.waitUntillDone();
 
+        robot.tail.resetTail();
+        robot.spawnWait(robot.tail);
+
         // LED feedback for the sampling field
         switch(samplingPos) {
             case LEFT:
@@ -307,7 +310,7 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
         //Pick up gold
         robot.arm.rotateArm(CatMecanumHW.ARM_FLOOR);
         //wait untill both the arm is lowered and the has driven to the correct position to sample
-        CatSubsystemHW.waitUntillDone(robot.arm,robot.drive);
+        CatSubsystemHW.waitUntillDone(robot.arm, robot.drive);
         robot.extend.extendArm();
         robot.extend.waitUntillDone();
         robot.extend.retractArm();
@@ -317,7 +320,7 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
         //drives forward to avoid hitting the lander's leg
         robot.robotWait(.5);
         robot.drive.mecTurn(CatMecanumHW.TURN_SPEED,-26,3);
-        CatSubsystemHW.waitUntillDone(robot.arm,robot.extend,robot.drive);
+        CatSubsystemHW.waitUntillDone(robot.arm, robot.extend, robot.drive);
         robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED,10,3.0,CatDriveHW.DRIVE_MODE.driveTilDistance);
         robot.drive.waitUntillDone();
         robot.drive.mecTurn(CatMecanumHW.TURN_SPEED ,-84,3.5);

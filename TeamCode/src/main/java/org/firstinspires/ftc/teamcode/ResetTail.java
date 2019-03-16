@@ -18,7 +18,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
@@ -26,7 +25,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class ResetTail extends LinearOpMode {
 
     /* Declare OpMode members. */
-    CatMecanumHW robot = new CatMecanumHW();   // Use the mecanum hardware
+    CatAsyncHW robot = new CatAsyncHW();  // Use our new mecanum async hardware
     private ElapsedTime runtime = new ElapsedTime();
 
     @Override
@@ -52,48 +51,9 @@ public class ResetTail extends LinearOpMode {
          * DO STUFF FOR MODE!!!!!!!!!!!
          *
          \*/
-        int newEncTicks;
-        int oldEncTicks = 40;
 
-        runtime.reset();
-        robot.tailMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        // Run the method
+        robot.tail.resetTail();
 
-        while (opModeIsActive()) {
-            // Get the current encoder value
-            newEncTicks = robot.tailMotor.getCurrentPosition();
-            // Set tail to retract slowly at quarter power
-            robot.tailMotor.setPower(-0.4);
-
-            // Every so often, check the values
-            if (runtime.milliseconds() > 750) {
-                // Once the encoder ticks slows down or stops
-                if ((newEncTicks - oldEncTicks) > -80) {
-                    // Cut power to tail
-                    robot.tailMotor.setPower(0.0);
-                    // Tell EVERYONE!!!
-                    telemetry.addData("Status: ", "Success!!!");
-                    telemetry.update();
-                    robot.robotWait(3.0);
-                    // End OpMode
-                    stop();
-                }
-
-                // Otherwise continue as normal and reset timer
-                telemetry.addData("Status: ", "Still going...");
-                runtime.reset();
-                oldEncTicks = newEncTicks;
-            }
-            telemetry.addData("Current Enc Ticks: ", newEncTicks);
-            telemetry.addData("Old Enc Ticks: ", oldEncTicks);
-            telemetry.update();
-        }
-
-        /**
-         * Keep the motor running at a low power until the
-         * tail is completely inside the robot.  Have the
-         * robot watch the encoder values and stop the motor
-         * after the encoder values change is under a certain
-         * amount of ticks per half second.
-         */
     }
 }

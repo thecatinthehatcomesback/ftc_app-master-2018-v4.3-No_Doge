@@ -16,6 +16,7 @@ package org.firstinspires.ftc.teamcode;
 
 import android.util.Log;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -43,10 +44,15 @@ public class CatTailHW extends CatSubsystemHW
     /* Public OpMode members. */
     // Motors
 
-    public DcMotor  tailMotor        = null;
+    public DcMotor  tailMotor   = null;
 
-    ElapsedTime runtime = new ElapsedTime();
+    ElapsedTime runtime         = new ElapsedTime();
+    boolean isResettingTail     = false;
+    int oldEncTicks             = 0;
 
+
+    /* local OpMode members. */
+    LinearOpMode opMode         = null;
     /* Constructor */
     public CatTailHW(CatAsyncHW mainHardware){
 
@@ -113,7 +119,7 @@ public class CatTailHW extends CatSubsystemHW
          * Pull tail in all the way
          */
 
-
+        isResettingTail = false;
 
         runtime.reset();
         tailMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -124,22 +130,86 @@ public class CatTailHW extends CatSubsystemHW
         // Pull tail back into the robot (not there yet...)
     }
 
+    /**
+     * Made this public to use during autonomous routines.
+     */
+    public void resetTail() {
+        /**
+         * Keep the motor running at a low power until the
+         * tail is completely inside the robot.  Have the
+         * robot watch the encoder values and stop the motor
+         * after the encoder values change is under a certain
+         * amount of ticks per half second.
+         */
+
+
+        oldEncTicks = -1;
+        isResettingTail = true;
+
+        runtime.reset();
+        tailMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        tailMotor.setPower(-0.4);
+
+
+
+
+        /*while (opMode.opModeIsActive()) {
+            // Get the current encoder value
+            newEncTicks = tailMotor.getCurrentPosition();
+            // Set tail to retract slowly at quarter power
+            tailMotor.setPower(-0.4);
+
+            // Every so often, check the values
+            if (runtime.milliseconds() > 750) {
+                // Once the encoder ticks slows down or stops
+                if ((newEncTicks - oldEncTicks) > -80) {
+                    // Cut power to tail
+                    tailMotor.setPower(0.0);
+                    // Tell EVERYONE!!!
+                    opMode.telemetry.addData("Status: ", "Success!!!");
+                    opMode.telemetry.update();
+                    return;
+                }
+
+                // Otherwise continue as normal and reset timer
+                opMode.telemetry.addData("Status: ", "Still going...");
+                runtime.reset();
+                oldEncTicks = newEncTicks;
+            }
+            opMode.telemetry.addData("Current Enc Ticks: ", newEncTicks);
+            opMode.telemetry.addData("Old Enc Ticks: ", oldEncTicks);
+            opMode.telemetry.update();
+        }*/
+    }
+
 
     @Override
     public boolean isDone() {
         Log.d("catbot", String.format(" Tail Target %d, current %d, , Time Left %f ",
                 tailMotor.getTargetPosition(), tailMotor.getCurrentPosition(), 4.5 - runtime.seconds()));
-        if (runtime.seconds() > 4.5) {
-            // Turn off the encoders to just back out hard
-            tailMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            tailMotor.setPower(-1.0);
-            mainHW.robotWait(0.3);
-            tailMotor.setPower(0.0);
-            return true;
 
+        if (isResettingTail) {
+            int newEncTicks = tailMotor.getCurrentPosition();
+
+            if (Math.abs(newEncTicks - oldEncTicks) < 10) {
+                tailMotor.setPower(0.0);
+                isResettingTail = false;
+                return true;
+            }
+            oldEncTicks = newEncTicks;
+            return false;
+        } else {
+            if (runtime.seconds() > 4.5) {
+                // Turn off the encoders to just back out hard
+                tailMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                tailMotor.setPower(-1.0);
+                mainHW.robotWait(0.3);
+                tailMotor.setPower(0.0);
+                return true;
+            }
+            return !tailMotor.isBusy();
         }
-        return !(tailMotor.isBusy());
-
     }
 
 

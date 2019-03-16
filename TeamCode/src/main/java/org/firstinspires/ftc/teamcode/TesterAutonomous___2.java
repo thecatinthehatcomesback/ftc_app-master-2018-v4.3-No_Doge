@@ -66,10 +66,20 @@ public class TesterAutonomous___2 extends LinearOpMode {
         Log.d("catbot", String.format(" Hit Start"));
 
 
+        robot.tail.lowerRobot();
+        robot.tail.isDone();
+        robot.tail.resetTail();
+        robot.tail.isDone();
+
+
         robot.drive.advMecDrive(CatMecanumHW.DRIVE_SPEED, 20, 0  +45, 3);
+        robot.drive.isDone();
         robot.drive.advMecDrive(CatMecanumHW.DRIVE_SPEED, 20, 90 +45, 3);
+        robot.drive.isDone();
         robot.drive.advMecDrive(CatMecanumHW.DRIVE_SPEED, 20, 180+45, 3);
+        robot.drive.isDone();
         robot.drive.advMecDrive(CatMecanumHW.DRIVE_SPEED, 20, 270+45, 3);
+        robot.drive.isDone();
 
 
 

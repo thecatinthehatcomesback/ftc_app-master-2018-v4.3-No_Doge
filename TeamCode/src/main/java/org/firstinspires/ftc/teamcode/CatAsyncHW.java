@@ -187,6 +187,11 @@ public class CatAsyncHW
         return lineFound;
     }
 
+    public void spawnWait(CatSubsystemHW subsystem) {
+        CatAsyncThread theThread = new CatAsyncThread(subsystem);
+        theThread.start();
+    }
+
     /**
      * ---   __________________   ---
      * ---   End of our methods   ---
