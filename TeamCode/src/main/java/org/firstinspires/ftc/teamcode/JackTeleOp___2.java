@@ -14,28 +14,27 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Disabled
+
 @TeleOp(name="Jack TeleOp", group="CatTeleOp")
 
-public class JackTeleOp extends LinearOpMode {
+public class JackTeleOp___2 extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime elapsedGameTime = new ElapsedTime();
 
     /* Declare OpMode members. */
-    CatMecanumHW robot;  // Use the mecanum class created for the hardware
+    CatAsyncHW robot = new CatAsyncHW();  // Use our new mecanum async hardware
     boolean inReverse = true;
     boolean autoArm = false;
     boolean slowArm = false;
 
     // Our constructor for this class
-    public JackTeleOp() {
-        robot = new CatMecanumHW();
+    public JackTeleOp___2() {
+        robot = new CatAsyncHW();
     }
 
     @Override
@@ -119,7 +118,7 @@ public class JackTeleOp extends LinearOpMode {
 
 
             // Calculate the scale factor
-            SF = robot.findScalor(leftFront, rightFront, leftBack, rightBack);
+            SF = robot.drive.findScalor(leftFront, rightFront, leftBack, rightBack);
             // Set powers to each drive motor
             leftFront  = leftFront  * SF * driveSpeed;
             rightFront = rightFront * SF * driveSpeed;
@@ -128,10 +127,10 @@ public class JackTeleOp extends LinearOpMode {
 
 
             // DRIVE!!!
-            robot.drive(leftFront, rightFront, leftBack, rightBack);
+            robot.drive.drive(leftFront, rightFront, leftBack, rightBack);
 
             // Tail Control
-            robot.tailMotor.setPower(gamepad1.left_trigger - gamepad1.right_trigger);
+            robot.tail.tailMotor.setPower(gamepad1.left_trigger - gamepad1.right_trigger);
 
 
 
@@ -144,7 +143,7 @@ public class JackTeleOp extends LinearOpMode {
              */
 
             // Intake Spinning Controls
-            robot.intakeServo.setPower(gamepad2.right_trigger*0.87 - gamepad2.left_trigger*0.87);
+            robot.arm.intakeServo.setPower(gamepad2.right_trigger*0.87 - gamepad2.left_trigger*0.87);
 
             //**  Arm controls **//
 
@@ -154,7 +153,7 @@ public class JackTeleOp extends LinearOpMode {
              * extend at an optimal time to score minerals autonomously in TeleOp.
              */
             if (gamepad2.a){
-                robot.armMotor.setPower(-1);
+                robot.arm.armMotor.setPower(-1);
                 autoArm = true;
             }
 
@@ -165,17 +164,17 @@ public class JackTeleOp extends LinearOpMode {
                     autoArm = false;
                 }
                 // Starts extending at the right time
-                if (robot.armMotor.getCurrentPosition() < CatMecanumHW.ARM_EXTEND) {
-                    robot.extenderMotor.setPower(-1.0);
+                if (robot.arm.armMotor.getCurrentPosition() < CatMecanumHW.ARM_EXTEND) {
+                    robot.extend.extenderMotor.setPower(-1.0);
                 }
                 // Slows down the arm's movement when closing in on the target to not overshoot
-                if ((robot.armMotor.getCurrentPosition() < CatMecanumHW.ARM_SLOW) && !slowArm) {
-                    robot.armMotor.setPower(-0.7);
+                if ((robot.arm.armMotor.getCurrentPosition() < CatMecanumHW.ARM_SLOW) && !slowArm) {
+                    robot.arm.armMotor.setPower(-0.7);
                     slowArm = true;
                 }
                 // Stops arm movement once done and resets the variables
-                if (robot.armMotor.getCurrentPosition() < CatMecanumHW.ARM_TELEOP) {
-                    robot.armMotor.setPower(0.0);
+                if (robot.arm.armMotor.getCurrentPosition() < CatMecanumHW.ARM_TELEOP) {
+                    robot.arm.armMotor.setPower(0.0);
                     autoArm = false;
                     slowArm = false;
                 }
@@ -186,24 +185,24 @@ public class JackTeleOp extends LinearOpMode {
                  */
 
                 // Lower and raise the arm
-                robot.armMotor.setPower(gamepad2.right_stick_y);
+                robot.arm.armMotor.setPower(gamepad2.right_stick_y);
 
                 // Extend and retract the arm
-                robot.extenderMotor.setPower(gamepad2.left_stick_x * 0.8);
+                robot.extend.extenderMotor.setPower(gamepad2.left_stick_x * 0.8);
             }
 
 
             // Open/Close gate
             if(gamepad2.left_bumper) {
-                robot.gateClose();
+                robot.arm.gateClose();
             } else if (gamepad2.right_bumper) {
-                robot.gateOpen();
+                robot.arm.gateOpen();
             }
 
 
             // Driver help
             if (elapsedGameTime.seconds() > 100) {
-                robot.extendTail();
+                robot.tail.extendTail();
             }
 
             /**
@@ -215,8 +214,8 @@ public class JackTeleOp extends LinearOpMode {
             telemetry.addData("Right Front Power:", "%.2f", rightFront);
             telemetry.addData("Left Back Power:", "%.2f", leftBack);
             telemetry.addData("Right Back Power:", "%.2f", rightBack);
-            telemetry.addData("Tail Encoder Position:", robot.tailMotor.getCurrentPosition());
-            telemetry.addData("Intake Speed:", robot.intakeServo.getPower());
+            telemetry.addData("Tail Encoder Position:", robot.tail.tailMotor.getCurrentPosition());
+            telemetry.addData("Intake Speed:", robot.arm.intakeServo.getPower());
             telemetry.update();
         }
     }

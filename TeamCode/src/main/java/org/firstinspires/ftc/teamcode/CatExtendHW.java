@@ -105,7 +105,17 @@ public class CatExtendHW extends CatSubsystemHW
 
     @Override
     public boolean isDone() {
-        return !(runtime.seconds() < 0.7);
+        /**
+         * Checking to see when the extends and
+         * retracts have finished.
+         */
+        if (runtime.seconds() > 0.7) {
+            if (extenderMotor.getPower() == RETRACT_POWER) {
+                extenderMotor.setPower(0.0);
+            }
+            return true;
+        }
+        return false;
     }
 
 

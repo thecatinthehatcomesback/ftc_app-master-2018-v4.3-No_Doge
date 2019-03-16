@@ -19,6 +19,7 @@ import android.util.Log;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -56,7 +57,7 @@ public class CatDriveHW extends CatSubsystemHW
 
     // Autonomous Drive Speeds
     static final double     DRIVE_SPEED             = 0.6;
-    static final double     HYPER_SPEED             = 0.6;
+    static final double     HYPER_SPEED             = 0.9;
     static final double     CHILL_SPEED             = 0.25;
     static final double     CREEP_SPEED             = 0.10;
     static final double     TURN_SPEED              = 0.6;
@@ -104,9 +105,10 @@ public class CatDriveHW extends CatSubsystemHW
     //LED stuff
     public RevBlinkinLedDriver lights = null;
     public RevBlinkinLedDriver.BlinkinPattern pattern;
-    public static boolean isRedAlliance = true;
 
 
+    /* local OpMode members. */
+    LinearOpMode opMode         = null;
     /* Constructor */
     public CatDriveHW(CatAsyncHW mainHardware){
         super(mainHardware);
@@ -311,7 +313,7 @@ public class CatDriveHW extends CatSubsystemHW
          * powers for \ side of motors while we subtract Sin from Cos
          * for the / side of motors.
          */
-// TODO: 1/20/2018 Continue work on this....
+// TODO: 3/20/2018 Continue work on this....
 
         double leftFrontMod  = Math.sin(Math.toRadians(vectorAng))  + Math.cos(Math.toRadians(vectorAng));
         double rightFrontMod = -Math.sin(Math.toRadians(vectorAng)) + Math.cos(Math.toRadians(vectorAng));
@@ -359,6 +361,35 @@ public class CatDriveHW extends CatSubsystemHW
             // Drive
             drive(leftFrontMod, rightFrontMod, leftBackMod, rightBackMod);
 
+            while (opMode.opModeIsActive() &&
+                    (runtime.seconds() < timeoutS) &&
+                    keepDriving) {
+
+                // Find the current positions so that we can display it later
+                int leftFrontPosition  = leftFrontMotor.getCurrentPosition();
+                int rightFrontPosition = rightFrontMotor.getCurrentPosition();
+                int leftBackPosition   = leftRearMotor.getCurrentPosition();
+                int rightBackPosition  = rightRearMotor.getCurrentPosition();
+
+                //  Exit the method once robot stops
+                if (!leftFrontMotor.isBusy() && !rightFrontMotor.isBusy() &&
+                        !leftRearMotor.isBusy() && !rightRearMotor.isBusy()) {
+                    keepDriving = false;
+                }
+
+                // Display it for the driver
+                opMode.telemetry.addData("New Path",  "Running to :%7d :%7d :%7d :%7d",
+                        newLeftFrontTarget,  newRightFrontTarget, newLeftBackTarget, newRightBackTarget);
+                opMode.telemetry.addData("Current Path",  "Running at :%7d :%7d :%7d :%7d",
+                        leftFrontPosition, rightFrontPosition, leftBackPosition, rightBackPosition);
+                opMode.telemetry.addData("Power: ", "%.3f", power);
+                opMode.telemetry.addData("Time: ","%.4f seconds", runtime.seconds());
+                opMode.telemetry.update();
+            }
+
+
+            // Stop all motion
+            drive(0, 0, 0, 0);
         }
     }
     public void mecTurn(double power, int degrees, double timeoutS) throws InterruptedException {
@@ -431,14 +462,14 @@ public class CatDriveHW extends CatSubsystemHW
     }
     public double findScalor(double leftFrontValue, double rightFrontValue,
                              double leftBackValue, double rightBackValue) {
-        /*
+        /**
          * Will scale down our power numbers if they are
          * greater than 1.0 so that we continue the set
          * course and don't just limit to the highest
          * possible value...
          */
 
-        /****
+        /**
          * Look at all motor values
          * Find the highest absolute value (the "scalor")
          * If the highest value is not more than 1.0, we don't need to change the values
@@ -492,7 +523,7 @@ public class CatDriveHW extends CatSubsystemHW
                             !leftRearMotor.isBusy() || !rightRearMotor.isBusy()) {
                         keepDriving = false;
                     }
-                    Log.d("catbot", String.format("LF: %d, %d, RF: %d, %d, LB: %d, %d, RB %d,%d",
+                    Log.d("catbot", String.format("LF: %d, %d;  RF: %d, %d;  LB: %d, %d;  RB %d,%d",
                             leftFrontMotor.getTargetPosition(),leftFrontMotor.getCurrentPosition(),
                             rightFrontMotor.getTargetPosition(), rightFrontMotor.getCurrentPosition(),
                             leftRearMotor.getTargetPosition(), leftRearMotor.getCurrentPosition(),

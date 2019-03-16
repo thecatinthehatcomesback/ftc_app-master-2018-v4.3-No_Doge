@@ -1,9 +1,11 @@
-/**
+/***
  TesterAutonomous.java
 
  A Linear OpMode class to be place to test code both old
  and new.  We constantly edit this, taking out and adding
  in code.  This is never the same at any given time.
+
+ This file uses the old CatMecanumHW.java file...
 
  This file is a modified version from the FTC SDK.
  Modifications by FTC Team #10273, The Cat in the Hat Comes Back.
@@ -11,10 +13,11 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-
+@Disabled
 @Autonomous(name="Testing Autonomous", group="CatAuto")
 public class TesterAutonomous extends LinearOpMode {
 
@@ -61,13 +64,13 @@ public class TesterAutonomous extends LinearOpMode {
          \*/
 
 
-        /*robot.advMecDrive(CatMecanumHW.DRIVE_SPEED, 20, 0+45, 3);
-        robot.advMecDrive(CatMecanumHW.DRIVE_SPEED, 20, 90+45, 3);
-        robot.advMecDrive(CatMecanumHW.DRIVE_SPEED, 20, 180+45, 3);
-        robot.advMecDrive(CatMecanumHW.DRIVE_SPEED, 20, 270+45, 3);*/
+        robot.advMecDrive(CatMecanumHW.DRIVE_SPEED, 20, 0+65, 3);
+        robot.advMecDrive(CatMecanumHW.DRIVE_SPEED, 20, 90+25, 3);
+        robot.advMecDrive(CatMecanumHW.DRIVE_SPEED, 20, 180+65, 3);
+        robot.advMecDrive(CatMecanumHW.DRIVE_SPEED, 20, 270+25, 3);
 
 
-        int numTimes = 0;
+        /*int numTimes = 0;
 
         delayTimer.reset();
         while (delayTimer.seconds() < 3) {
@@ -79,7 +82,7 @@ public class TesterAutonomous extends LinearOpMode {
         while (delayTimer.seconds() < 4) {
             telemetry.addData("Num Times", numTimes);
             telemetry.update();
-        }
+        }*/
 
 
         /**

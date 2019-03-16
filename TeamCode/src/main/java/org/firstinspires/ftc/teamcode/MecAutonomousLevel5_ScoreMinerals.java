@@ -40,7 +40,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
 
     /* Declare OpMode members. */
-    CatAsyncHW robot = new CatAsyncHW();  // Use our mecanum hardware
+    CatAsyncHW robot = new CatAsyncHW();  // Use our new mecanum async hardware
     CatVisionHW eyes = new CatVisionHW();     // Doge and vision init
     private ElapsedTime delayTimer = new ElapsedTime();
     private double timeDelay;

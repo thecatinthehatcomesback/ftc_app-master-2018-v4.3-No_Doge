@@ -59,7 +59,7 @@ public class CatTailHW extends CatSubsystemHW
     public void init()  throws InterruptedException  {
 
         // Define and Initialize Motors //
-        tailMotor        = hwMap.dcMotor.get("tail_motor");
+        tailMotor       = hwMap.dcMotor.get("tail_motor");
 
 
         // Define motor directions //
@@ -85,7 +85,7 @@ public class CatTailHW extends CatSubsystemHW
 
         //  All the way down
         tailPos[0] = 0;
-        //  Out of hook at Eagan competition
+        //  Out of hook at Egan competition
         tailPos[1] = 6150;
         //  Way high out of hook at our own field
         tailPos[2] = 8500;
