@@ -1,13 +1,12 @@
 /**
  TesterAutonomous.java
 
- A Linear OpMode class to be place to test code
- both old and new.  We constantly edit this, taking
- out and adding in code.  This is never the same.
+ A Linear OpMode class to be place to test code both old
+ and new.  We constantly edit this, taking out and adding
+ in code.  This is never the same at any given time.
 
  This file is a modified version from the FTC SDK.
-
- Modifications by FTC Team #10273 Cat in the Hat Comes Back
+ Modifications by FTC Team #10273, The Cat in the Hat Comes Back.
  */
 package org.firstinspires.ftc.teamcode;
 

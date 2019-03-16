@@ -74,6 +74,7 @@ public class CatMecanumHW
     static final int        ARM_OVER_SAMPLING       = 5215;
     static final int        ARM_EXTEND              = 3750;
     static final int        ARM_STRAIGHT_UP         = 2550;
+    static final int        ARM_SLOW                = 1900;
     static final int        ARM_TUCKED_IN           = 1800;
     static final int        ARM_TELEOP              = 1650;
     static final int        ARM_SCORE               = 1250;

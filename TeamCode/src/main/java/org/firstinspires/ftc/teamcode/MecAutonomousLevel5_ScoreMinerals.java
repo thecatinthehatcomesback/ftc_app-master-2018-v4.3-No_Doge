@@ -65,6 +65,12 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
         // Init our Machine Vision right away
         eyes.initVision(hardwareMap);
 
+        /**
+         * Init the IMU after play so that it is not offset after
+         * remaining idle for a minute or two...
+         */
+        robot.drive.IMUinit();
+
         // Send telemetry message to signify robot waiting
         telemetry.addData("Status:", "Initializing: (Resetting Encoders...)");
         telemetry.update();
@@ -141,6 +147,14 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
                 delayTimer.reset();
             }
 
+            if (Math.abs(robot.drive.getCurrentAngle())>1){
+                robot.drive.IMUinit();
+                Log.d("catbot", String.format("IMU re-initialized"));
+            }
+
+
+
+
             // Cool LED code:
             if (isRedAlliance) {
                 if(isCraterSide){
@@ -214,13 +228,7 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
         telemetry.addData("LoopCount:", eyes.loopCount);
         telemetry.update();
 
-        /**
-         * Init the IMU after play so that it is not offset after
-         * remaining idle for a minute or two...
-          */
-        ///TODO: 3/13/2019 SPEED UP THE IMU INIT TO SAVE A SECOND IN AUTO
-        robot.drive.IMUinit();
-        Log.d("catbot", String.format("IMU initialized - starting lower"));
+
 
 
         // Lower the robot and begin!
@@ -435,7 +443,7 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
         robot.drive.waitUntillDone();
         //opens the gate and tries to score the minerals by wiggling them out
         robot.arm.gateOpen();
-        robot.arm.rotateArm(CatMecanumHW.ARM_SCORE);
+        robot.arm.rotateArm(CatMecanumHW.ARM_SCORE,.65);
         //robot.arm.rotateArm(CatMecanumHW.ARM_TUCKED_IN,.8);
         //robot.robotWait(.1);
         //robot.arm.rotateArm(CatMecanumHW.ARM_SCORE,.65);

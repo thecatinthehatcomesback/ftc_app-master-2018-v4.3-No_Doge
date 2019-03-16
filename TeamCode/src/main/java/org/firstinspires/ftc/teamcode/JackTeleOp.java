@@ -28,6 +28,7 @@ public class JackTeleOp extends LinearOpMode {
     CatMecanumHW robot;  // Use the mecanum class created for the hardware
     boolean inReverse = true;
     boolean autoArm = false;
+    boolean slowArm = false;
     // Our constructor for this class
     public JackTeleOp() {
         robot = new CatMecanumHW();
@@ -140,26 +141,41 @@ public class JackTeleOp extends LinearOpMode {
             robot.intakeServo.setPower(gamepad2.right_trigger*0.87 - gamepad2.left_trigger*0.87);
 
             //**  Arm controls **//
-            // Lower/Raise arm
+
+            // If the driver presses A it enters auto-mode where it
+            // automatically rotates to the correct position and
+            // extends at the optimal time.
             if (gamepad2.a){
                 robot.armMotor.setPower(-1);
                 autoArm = true;
             }
 
-
+            // tests if it is in auto-mode
             if (autoArm){
+                //cancels the automatic if the driver tries to move the arm themselves
                 if (Math.abs(gamepad2.right_stick_y)>.55) {
                     autoArm = false;
                 }
+                //starts extending at the right time
                 if (robot.armMotor.getCurrentPosition()<CatMecanumHW.ARM_EXTEND){
                     robot.extenderMotor.setPower(-1);
                 }
+                //slows down the arms movement when close to the target to not overshoot
+                if (robot.armMotor.getCurrentPosition()<CatMecanumHW.ARM_SLOW&&!slowArm)
+                {
+                    robot.armMotor.setPower(-.7);
+                    slowArm = true;
+                }
+                //stops arm movement if done and resets the vars
                 if (robot.armMotor.getCurrentPosition()<CatMecanumHW.ARM_TELEOP){
                     robot.armMotor.setPower(0);
                     autoArm = false;
+                    slowArm = false;
                 }
 
+                //if the driver isn't in auto mode it uses these methods
             }else {
+                // Lower/Raise arm
                 robot.armMotor.setPower(gamepad2.right_stick_y);
 
                 // Extend/Retract arm

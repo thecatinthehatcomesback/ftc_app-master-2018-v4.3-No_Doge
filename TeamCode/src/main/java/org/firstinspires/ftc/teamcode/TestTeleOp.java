@@ -1,15 +1,14 @@
 /*
-    TestTeleOp.java
+        TestTeleOp.java
 
-    A Linear opMode class to be our teleOp testing
-    method to try and solve our problems throughout
-    the year.
+    A Linear opMode class to be our TeleOp testing method to try
+    and solve our problems throughout the year without having to
+    modify the main TeleOp.
+
 
     This file is a modified version from the FTC SDK.
-
-    Modifications by FTC Team #10273 Cat in the Hat Comes Back
+    Modifications by FTC Team #10273, The Cat in the Hat Comes Back.
 */
-
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;

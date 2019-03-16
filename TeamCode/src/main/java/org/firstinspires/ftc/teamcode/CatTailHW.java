@@ -14,6 +14,8 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -125,13 +127,16 @@ public class CatTailHW extends CatSubsystemHW
 
     @Override
     public boolean isDone() {
+        Log.d("catbot", String.format(" Tail Target %d, current %d, , Time Left %f ",
+                tailMotor.getTargetPosition(), tailMotor.getCurrentPosition(), 4.5 - runtime.seconds()));
         if (runtime.seconds() > 4.5) {
             // Turn off the encoders to just back out hard
             tailMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             tailMotor.setPower(-1.0);
-            mainHW.robotWait(.3);
+            mainHW.robotWait(0.3);
             tailMotor.setPower(0.0);
             return true;
+
         }
         return !(tailMotor.isBusy());
 
