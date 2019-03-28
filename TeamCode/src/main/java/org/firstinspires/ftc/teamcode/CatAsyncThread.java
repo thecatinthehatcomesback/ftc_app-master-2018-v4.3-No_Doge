@@ -29,8 +29,7 @@ package org.firstinspires.ftc.teamcode;
  * Motor channel:  Right drive motor:        "right_rear" & "right_front"
  * And so on...
  */
-public class CatAsyncThread extends Thread
-{
+public class CatAsyncThread extends Thread {
     CatSubsystemHW subsystem;
 
     /* Constructor */

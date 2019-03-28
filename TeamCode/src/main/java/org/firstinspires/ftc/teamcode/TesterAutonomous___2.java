@@ -78,10 +78,25 @@ public class TesterAutonomous___2 extends LinearOpMode {
         robot.drive.isDone();
         robot.drive.advMecDrive(CatMecanumHW.DRIVE_SPEED, 20, 180+45, 3);
         robot.drive.isDone();
+
         robot.drive.advMecDrive(CatMecanumHW.DRIVE_SPEED, 20, 270+45, 3);
         robot.drive.isDone();
+robot.robotWait();
+        //TODO Try to test out the grabbing of gold in this autonomous!!!
 
+        /*robot.arm.rotateArm(robot.ARM_OVER_SAMPLING);
+        robot.arm.waitUntillDone();
+        robot.extend.extendArm();
+        robot.robotWait(0.4);
+        //tries to pick up minerals from the crater
+        robot.arm.rotateArm(CatMecanumHW.ARM_FLOOR);
+        robot.arm.intakeServo.setPower(0.87);
+        robot.arm.waitUntillDone();
+        robot.robotWait(1.0);
 
+        robot.arm.rotateArm(robot.ARM_STRAIGHT_UP);
+        robot.robotWait(6.0);
+        robot.arm.rotateArm(robot.ARM_STOWED);*/
 
     }
 }
