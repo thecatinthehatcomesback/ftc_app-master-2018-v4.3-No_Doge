@@ -23,6 +23,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -127,6 +128,7 @@ public class CatMecanumHW
     public ColorSensor frontRightColor              = null;
     public ColorSensor rearLeftColor                = null;
     public ColorSensor rearRightColor               = null;
+    public DigitalChannel armLimit              = null;
 
 
     /* local OpMode members. */
@@ -170,6 +172,7 @@ public class CatMecanumHW
         frontRightColor  = hwMap.get(ColorSensor.class, "front_right_color");
         rearLeftColor    = hwMap.get(ColorSensor.class, "rear_left_color");
         rearRightColor   = hwMap.get(ColorSensor.class, "rear_right_color");
+        armLimit         = hwMap.get(DigitalChannel.class,"arm_limit");
 
         // Define motor directions //
         leftFrontMotor.setDirection(DcMotor.Direction.FORWARD);

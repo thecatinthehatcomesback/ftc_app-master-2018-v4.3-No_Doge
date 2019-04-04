@@ -16,6 +16,7 @@ import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -73,7 +74,7 @@ public class CatAsyncHW
     public ColorSensor frontRightColor              = null;
     public ColorSensor rearLeftColor                = null;
     public ColorSensor rearRightColor               = null;
-
+    public DigitalChannel armLimit              = null;
 
     /* local OpMode members. */
     HardwareMap hwMap           = null;
@@ -120,7 +121,7 @@ public class CatAsyncHW
         frontRightColor  = hwMap.get(ColorSensor.class, "front_right_color");
         rearLeftColor    = hwMap.get(ColorSensor.class, "rear_left_color");
         rearRightColor   = hwMap.get(ColorSensor.class, "rear_right_color");
-
+        armLimit         = hwMap.get(DigitalChannel.class,"arm_limit");
 
         }
 

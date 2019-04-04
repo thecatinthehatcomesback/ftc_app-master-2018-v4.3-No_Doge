@@ -143,13 +143,14 @@ public class CatTailHW extends CatSubsystemHW
          */
 
 
-        oldEncTicks = -1;
+        oldEncTicks = -10;
         isResettingTail = true;
 
         runtime.reset();
         tailMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        tailMotor.setPower(-0.4);
+        Log.d("catbot", String.format(" Setting Tail to: -0.4"));
+        tailMotor.setPower(-0.8);
 
 
 
@@ -186,13 +187,13 @@ public class CatTailHW extends CatSubsystemHW
 
     @Override
     public boolean isDone() {
-        Log.d("catbot", String.format(" Tail Target %d, current %d, , Time Left %f ",
+        Log.d("catbot", String.format(" Tail Target: %d, current: %d, Time Left: %f ",
                 tailMotor.getTargetPosition(), tailMotor.getCurrentPosition(), 4.5 - runtime.seconds()));
 
         if (isResettingTail) {
             int newEncTicks = tailMotor.getCurrentPosition();
 
-            if (Math.abs(newEncTicks - oldEncTicks) < 10) {
+            if (Math.abs(newEncTicks - oldEncTicks) < 5) {
                 tailMotor.setPower(0.0);
                 isResettingTail = false;
                 return true;

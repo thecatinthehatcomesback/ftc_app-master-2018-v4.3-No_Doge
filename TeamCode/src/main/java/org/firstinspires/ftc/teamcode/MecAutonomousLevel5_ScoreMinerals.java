@@ -397,22 +397,18 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
         // Drive ahead to deploy marker
         robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED, 10, 2, CatDriveHW.DRIVE_MODE.driveTilDistance);
         CatSubsystemHW.waitUntillDone(robot.arm, robot.drive, robot.extend);
-        //drop down tail
-        robot.tail.retractTail();
         //Finish lower arm
         robot.arm.rotateArm(CatMecanumHW.ARM_DEPOT_DROPOFF);
         //Spit out team marker
         robot.arm.intakeServo.setPower(-0.87);
         robot.arm.waitUntillDone();
-        robot.robotWait(0.5);
+        robot.robotWait(0.25);
         //Bring back arm
         robot.arm.rotateArm(CatMecanumHW.ARM_OVER_SAMPLING);
         robot.arm.intakeServo.setPower(0.0);
         // Pull arm in
         robot.extend.retractArm();
         CatSubsystemHW.waitUntillDone(robot.extend, robot.arm);
-        //Make sure tail is all the way down
-        robot.tail.waitUntillDone();
 
         /**
          * Pick up gold mineral and drop it off in the lander

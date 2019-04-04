@@ -237,7 +237,7 @@ public class TestTeleOp extends LinearOpMode {
 
             telemetry.addData("Pattern", "%s",robot.pattern.toString());
 
-            telemetry.addData("Arm Encoder","%d",robot.armMotor.getCurrentPosition());
+            telemetry.addData("Arm Encoder","%d,  %b",robot.armMotor.getCurrentPosition(),robot.armLimit.getState());
             telemetry.addData("Extend Encoder","%d",robot.extenderMotor.getCurrentPosition());
             telemetry.update();
         }

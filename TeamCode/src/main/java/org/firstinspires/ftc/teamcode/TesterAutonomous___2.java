@@ -81,7 +81,7 @@ public class TesterAutonomous___2 extends LinearOpMode {
 
         robot.drive.advMecDrive(CatMecanumHW.DRIVE_SPEED, 20, 270+45, 3);
         robot.drive.isDone();
-robot.robotWait();
+//robot.robotWait();
         //TODO Try to test out the grabbing of gold in this autonomous!!!
 
         /*robot.arm.rotateArm(robot.ARM_OVER_SAMPLING);
