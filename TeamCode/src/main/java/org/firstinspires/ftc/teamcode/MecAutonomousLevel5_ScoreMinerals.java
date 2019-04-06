@@ -393,6 +393,7 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
          * Depot/marker dropoff code
          */
         //Extend arm to depot
+        Log.d("catbot", String.format(" Start extending to depot"));
         robot.extend.extendArm();
         // Drive ahead to deploy marker
         robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED, 10, 2, CatDriveHW.DRIVE_MODE.driveTilDistance);
@@ -414,6 +415,7 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
          * Pick up gold mineral and drop it off in the lander
          */
         // Drive back to hit gold
+        Log.d("catbot", String.format(" back up to hit gold"));
         robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED, -10, 4, CatDriveHW.DRIVE_MODE.driveTilDistance);
         robot.drive.waitUntillDone();
         robot.arm.rotateArm(CatMecanumHW.ARM_FLOOR);
@@ -432,6 +434,7 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
         robot.extend.extendArm();
         robot.extend.waitUntillDone();
         // Pull the arm back in and rotate the arm to the scoring position
+        Log.d("catbot", String.format(" pull back in and rotate it to score"));
         robot.arm.rotateArm(CatMecanumHW.ARM_TUCKED_IN);
         robot.extend.retractArm();
         robot.arm.intakeServo.setPower(0.0);

@@ -27,11 +27,10 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Disabled
+
 @Autonomous(name="Async Autonomous", group="CatAuto")
 public class MecAutonomousLevel4_Async extends LinearOpMode {
 
@@ -220,6 +219,10 @@ public class MecAutonomousLevel4_Async extends LinearOpMode {
         robot.drive.waitUntillDone();
         robot.drive.mecTurn(.4,0,1);
         robot.drive.waitUntillDone();
+
+        // Reset the tube in a separate Thread
+        robot.tail.resetTail();
+        robot.spawnWait(robot.tail);
 
         // LED feedback for the sampling field
         switch(samplingPos) {

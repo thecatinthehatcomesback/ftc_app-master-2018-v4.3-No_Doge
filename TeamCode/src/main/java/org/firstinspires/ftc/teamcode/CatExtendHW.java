@@ -14,6 +14,8 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -99,7 +101,6 @@ public class CatExtendHW extends CatSubsystemHW
          * end of the arm outwards.
          */
         extenderMotor.setPower(RETRACT_POWER);
-        ElapsedTime runtime = new ElapsedTime();
         runtime.reset();
     }
 
@@ -112,6 +113,7 @@ public class CatExtendHW extends CatSubsystemHW
         if (runtime.seconds() > 0.7) {
             if (extenderMotor.getPower() == RETRACT_POWER) {
                 extenderMotor.setPower(0.0);
+                Log.d("catbot", String.format(" Arm extend/retract finished TIMEOUT %.2f ", runtime.seconds()));
             }
             return true;
         }

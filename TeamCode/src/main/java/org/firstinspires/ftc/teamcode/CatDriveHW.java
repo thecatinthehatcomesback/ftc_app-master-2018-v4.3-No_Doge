@@ -209,6 +209,7 @@ public class CatDriveHW extends CatSubsystemHW
          * line.
          */
 
+            Log.d("catbot", String.format(" Started drive vert pow: %.2f, dist: %.2f, time:%.2f ",power,distance, timeoutS));
         currentMethod = DRIVE_METHOD.vertical;
         currentMode = driveMode;
         timeout = timeoutS;
