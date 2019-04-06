@@ -176,7 +176,6 @@ public class TestTeleOp extends LinearOpMode {
             }// IMU Sensor
             Orientation angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
-            /// TODO: 2/4/2019 TEST THIS!!!
             if (tailRetracted && needsToBeRetracted) {
                 // Get the current encoder value
                 newEncTicks = robot.tailMotor.getCurrentPosition();
@@ -208,7 +207,6 @@ public class TestTeleOp extends LinearOpMode {
                 telemetry.update();
             }
 
-            /// TODO: 2/4/2019 After so much time pull the arm back in
 
 
             /**

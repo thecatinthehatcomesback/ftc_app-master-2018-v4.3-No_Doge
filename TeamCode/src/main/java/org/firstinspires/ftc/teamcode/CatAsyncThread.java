@@ -12,7 +12,6 @@
 
 package org.firstinspires.ftc.teamcode;
 
-//TODO FIX THIS!
 /**
  * This is NOT an OpMode.
  *
@@ -39,7 +38,6 @@ public class CatAsyncThread extends Thread {
 
 
     public void run() {
-        /* Placeholder... */
         subsystem.waitUntillDone();
     }
 }// End of class bracket

@@ -128,7 +128,7 @@ public class CatMecanumHW
     public ColorSensor frontRightColor              = null;
     public ColorSensor rearLeftColor                = null;
     public ColorSensor rearRightColor               = null;
-    public DigitalChannel armLimit              = null;
+    public DigitalChannel armLimit                  = null;
 
 
     /* local OpMode members. */

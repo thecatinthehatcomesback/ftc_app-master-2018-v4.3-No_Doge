@@ -50,8 +50,9 @@ public class ResetArm extends LinearOpMode {
         // Go!
         runTime.reset();
         elapsedGameTime.reset();
+
         boolean resetMode = false;
-        boolean reseted = false;
+        boolean hasReset = false;
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
@@ -64,46 +65,43 @@ public class ResetArm extends LinearOpMode {
 
             if (gamepad2.y) {
                 if (robot.armLimit.getState()) {
-                    robot.armMotor.setPower(-.7);
+                    robot.armMotor.setPower(-0.70);
                 } else {
-                    robot.armMotor.setPower(-.55);
-                    reseted = true;
+                    robot.armMotor.setPower(-0.55);
+                    hasReset = true;
                 }
 
                 resetMode = true;
-
             }
 
             if (resetMode) {
 
-                if (!reseted) {
+                if (!hasReset) {
                     if (!robot.armLimit.getState()) {
-                        robot.armMotor.setPower(.4);
-                        reseted = true;
+                        robot.armMotor.setPower(0.40);
+                        hasReset = true;
                     }
-                }else {
+                } else {
                     if (robot.armLimit.getState()) {
-                        robot.armMotor.setPower(0);
+                        robot.armMotor.setPower(0.00);
                         resetMode = false;
                         robot.armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                        robot.robotWait(.5);
+                        robot.robotWait(0.5);
                         robot.armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                         robot.armMotor.setTargetPosition(-825);
-                        robot.armMotor.setPower(.5);
-                        while (robot.armMotor.isBusy()){
-                        }
+                        robot.armMotor.setPower(0.50);
+                        while (robot.armMotor.isBusy()){ }
                         robot.armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
                     }
                 }
-            }else{
+            } else {
                     //**  Arm controls **//
                     // Lower/Raise arm
                     robot.armMotor.setPower(gamepad2.right_stick_y);
                     // Extend/Retract arm
                     robot.extenderMotor.setPower(gamepad2.left_stick_x * 0.8);
-
-                }
+            }
             /**
              * ---   _________   ---
              * ---   TELEMETRY   ---

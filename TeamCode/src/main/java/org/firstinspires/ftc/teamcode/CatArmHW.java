@@ -20,6 +20,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -45,15 +46,14 @@ public class CatArmHW extends CatSubsystemHW
     /* Public OpMode members. */
 
     // Gate Servo Constants
-    static final double     GATE_OPEN               = 0.80;
-    static final double     GATE_CLOSE              = 0.20;
-
-    static final double     ARM_POWER               = 1;
-    boolean shouldStartExtend = false;
-    int posStartExtend = 3000;
+    static final double GATE_OPEN       = 0.80;
+    static final double GATE_CLOSE      = 0.20;
+    static final double ARM_POWER       = 1.00;
+    boolean shouldStartExtend           = false;
+    int posStartExtend                  = 3000;
 
     // Motors
-    public DcMotor  armMotor         = null;
+    public DcMotor   armMotor        = null;
     public DcMotorEx armMotorEx      = null;
 
     // The servo keeping the minerals inside the intake
@@ -61,6 +61,10 @@ public class CatArmHW extends CatSubsystemHW
 
     // Two Vex motors = Continuous Servos
     public CRServo  intakeServo      = null;
+
+    // Sensors
+    public DigitalChannel armLimit   = null;
+
 
     //creates runtime to tell how long the moters were running
     ElapsedTime runtime = new ElapsedTime();
@@ -83,28 +87,27 @@ public class CatArmHW extends CatSubsystemHW
         // Define and Initialize Motors //
         armMotor         = hwMap.dcMotor.get("arm_motor");
 
-
-
         // Define and Initialize Servos //
         intakeServo      = hwMap.crservo.get("intakey");
         gateServo        = hwMap.servo.get("gate");
 
-        intakeServo.setDirection(DcMotorSimple.Direction.FORWARD);
+        // Define and Initialize Sensors //
+        armLimit         = hwMap.get(DigitalChannel.class,"arm_limit");
 
-        // Set motor modes //
+        // Set motor and servo modes //
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        intakeServo.setDirection(DcMotorSimple.Direction.FORWARD);
 
         armMotorEx =(DcMotorEx) armMotor;
 
         armMotorEx.setTargetPositionTolerance(60);
         // Set all motors to run at no power so that the robot doesn't move during init //
-        intakeServo.setPower(0);
+        intakeServo.setPower(0.0);
 
         // Set Servos to init positions //
         gateServo.setPosition(GATE_CLOSE);
     }
-
 
 
     /**
@@ -198,14 +201,39 @@ public class CatArmHW extends CatSubsystemHW
         Log.d("catbot", String.format(" Arm rotate target %d, current %d ", armMotor.getTargetPosition(),armMotor.getCurrentPosition()));
 
         return !(armMotor.getCurrentPosition() > pos);
-
     }
 
+    public void autoResetArm() {
+        /**
+         * A algorithm that resets the intake arm rotational
+         * encoders while the robot lands.
+         */
+        boolean hasReset = false;
+        //TODO  THIS MUST BE FINISHED!!!
+        if (armLimit.getState()) {
+            armMotor.setPower(-0.70);
+        } else {
+            armMotor.setPower(-0.55);
+            hasReset = true;
+        }
 
-    /**
-     * ---   __________________   ---
-     * ---   End of our methods   ---
-     * ---   \/ \/ \/ \/ \/ \/    ---
-     */
+        if (!hasReset) {
+            if (!armLimit.getState()) {
+                armMotor.setPower(0.40);
+                hasReset = true;
+            }
+        } else {
+            if (armLimit.getState()) {
+                armMotor.setPower(0.00);
+                armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                //CatAsyncHW.robotWait(0.5);
+                armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                armMotor.setTargetPosition(-825);
+                armMotor.setPower(0.50);
+                while (armMotor.isBusy()){ }
+                armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
+            }
+        }
+    }
 }// End of class bracket

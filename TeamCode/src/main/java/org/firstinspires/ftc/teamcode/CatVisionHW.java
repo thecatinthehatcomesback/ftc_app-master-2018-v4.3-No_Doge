@@ -94,16 +94,15 @@ public class CatVisionHW
 
     public void findGoldPos() {
         /**
-         * Newer way to continuously look for the gold
+         * Newest way to continuously look for the gold
          * while looping inside the autonomous init mode
          * but limits the amount of occurrences we keep
          * using a Deque.
          */
 
 
-        // Make sure we keep the size of the list of values to 30
-        if (samplingValues.size() > 29) {
-            //
+        if (samplingValues.size() > 99) {
+            // Make sure we keep the size at a reasonable level
             samplingValues.removeFirst();
         }
         // getUpdatedRecognitions() will return null if no new information is available since
@@ -156,14 +155,5 @@ public class CatVisionHW
             // Just return back RIGHT since it is the last possible value
             return samplingPos.RIGHT;
         }
-    }
-
-    /**
-     * ---   __________________   ---
-     * ---   End of our methods   ---
-     * ---   \/ \/ \/ \/ \/ \/    ---
-     */
-    public void stuffishable() {
-        /* Placeholder... */
     }
 }// End of class bracket

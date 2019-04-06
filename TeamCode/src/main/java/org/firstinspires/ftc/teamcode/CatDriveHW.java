@@ -314,7 +314,6 @@ public class CatDriveHW extends CatSubsystemHW
          * powers for \ side of motors while we subtract Sin from Cos
          * for the / side of motors.
          */
-// TODO: 3/20/2018 Continue work on this....
 
         double leftFrontMod  = Math.sin(Math.toRadians(vectorAng))  + Math.cos(Math.toRadians(vectorAng));
         double rightFrontMod = -Math.sin(Math.toRadians(vectorAng)) + Math.cos(Math.toRadians(vectorAng));
@@ -339,7 +338,6 @@ public class CatDriveHW extends CatSubsystemHW
             // Set the motors to travel towards their desired targets
             resetEncoders();
             runToPosition();
-            // TODO: 11/19/2018 DO WE WANT TO USE RUN TO POSITION????
             leftFrontMotor.setTargetPosition(newLeftFrontTarget);
             rightFrontMotor.setTargetPosition(newRightFrontTarget);
             leftRearMotor.setTargetPosition(newLeftBackTarget);
