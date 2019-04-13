@@ -14,6 +14,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -32,13 +33,13 @@ public class TestTeleOp extends LinearOpMode {
     private ElapsedTime elapsedGameTime = new ElapsedTime();
 
     /* Declare OpMode members. */
-    CatMecanumHW robot; // use the class created for the hardware
+    CatAsyncHW robot; // use the class created for the hardware
     CatVisionHW eyes = new CatVisionHW();   // Use the mecanum hardware
     boolean inReverse = true;
 
     // constructor for class
     public TestTeleOp() {
-        robot = new CatMecanumHW();
+        robot = new CatAsyncHW();
     }
 
     @Override
@@ -49,7 +50,8 @@ public class TestTeleOp extends LinearOpMode {
         telemetry.update();
         // Initialize the hardware
         robot.init(hardwareMap, this);
-        robot.IMUinit();
+        robot.drive.IMUinit();
+
         // Init our Machine Vision
         eyes.initVision(hardwareMap);
 
@@ -68,16 +70,16 @@ public class TestTeleOp extends LinearOpMode {
         // Go!
         runTime.reset();
         elapsedGameTime.reset();
-        boolean tailRetracted = false;
-        boolean needsToBeRetracted = true;
         double driveSpeed;
         double leftFront;
         double rightFront;
         double leftBack;
         double rightBack;
         double SF;
-        int newEncTicks = 0;
-        int oldEncTicks = 0;
+        boolean slowArm = false;
+        boolean autoArm = false;
+        boolean liftingTail = false;
+        boolean overrodeLiftTail = false;
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
@@ -97,7 +99,7 @@ public class TestTeleOp extends LinearOpMode {
                 driveSpeed = 0.6;
             }
 
-            // Direction Selection
+            // Robot Drive-Direction Selection
             if (gamepad1.dpad_up){
                 inReverse = false;
                 if(robot.isRedAlliance) {
@@ -130,7 +132,7 @@ public class TestTeleOp extends LinearOpMode {
 
 
             // Calculate the scale factor
-            SF = robot.findScalor(leftFront, rightFront, leftBack, rightBack);
+            SF = robot.drive.findScalor(leftFront, rightFront, leftBack, rightBack);
             // Set powers to each drive motor
             leftFront  = leftFront  * SF * driveSpeed;
             rightFront = rightFront * SF * driveSpeed;
@@ -139,10 +141,30 @@ public class TestTeleOp extends LinearOpMode {
 
 
             // DRIVE!!!
-            robot.drive(leftFront, rightFront, leftBack, rightBack);
+            robot.drive.drive(leftFront, rightFront, leftBack, rightBack);
 
-            // Tail Control
-            robot.tailMotor.setPower(gamepad1.left_trigger - gamepad1.right_trigger);
+
+            /** Tail Control **/
+            // Once we hit endgame and we haven't been overridden, tell Jack
+            if ((elapsedGameTime.seconds() > 105.0) && !overrodeLiftTail) {
+                liftingTail = true;
+            }
+            // Exit the auto lift Tail if the driver touches it
+            if (liftingTail && ((Math.abs(gamepad1.left_trigger - gamepad1.right_trigger)) > 0.2)) {
+                // Tell code that we overrode its DREAMS to avoid unwanted repeats!
+                overrodeLiftTail = true;
+                // Set the encoder back to normal for TeleOp
+                robot.tail.tailMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            }
+            // Raise Tail during endgame automatically
+            if (liftingTail && !overrodeLiftTail) {
+                // Driver enhancement help for Tail during TeleOp
+                robot.tail.lowerRobot();
+                telemetry.addData("Tail Test", "After extend");
+            } else {
+                // Move normally
+                robot.tail.tailMotor.setPower(gamepad1.left_trigger - gamepad1.right_trigger);
+            }
 
 
 
@@ -154,58 +176,73 @@ public class TestTeleOp extends LinearOpMode {
              * ---   \/ \/ \/ \/ \/ \/   ---
              */
 
-            // Intake Spinning Controls
-            robot.intakeServo.setPower(gamepad2.right_trigger*0.87 - gamepad2.left_trigger*0.87);
+            // Intake Spinning Controls  (For whatever reason, 0.87 is the magic number)
+            robot.arm.intakeServo.setPower(gamepad2.right_trigger*0.87 - gamepad2.left_trigger*0.87);
 
             //**  Arm controls **//
-            // Lower/Raise arm
-            robot.armMotor.setPower(gamepad2.right_stick_y);
-            // Extend/Retract arm
-            robot.extenderMotor.setPower(gamepad2.left_stick_x * 0.8);
-            // Open/Close gate
-            if(gamepad2.left_bumper) {
-                robot.gateClose();
-            } else if (gamepad2.right_bumper) {
-                robot.gateOpen();
+
+            /**
+             * If the driver presses A, Jack enters his "auto-mode" where he
+             * automatically rotates his arm to the correct position and will
+             * extend at an optimal time to score minerals autonomously in TeleOp.
+             */
+            if (gamepad2.a){
+                robot.arm.armMotor.setPower(-1);
+                autoArm = true;
             }
 
+            // Tests if it is in auto-mode
+            if (autoArm){
+                // Exits auto-mode if the driver tries to move the arm themselves
+                if (Math.abs(gamepad2.right_stick_y) > 0.55) {
+                    autoArm = false;
+                }
+                // Starts extending at the right time
+                if (robot.arm.armMotor.getCurrentPosition() < CatMecanumHW.ARM_EXTEND) {
+                    robot.extend.extenderMotor.setPower(-1.0);
+                }
+                // Slows down the arm's movement when closing in on the target to not overshoot
+                if ((robot.arm.armMotor.getCurrentPosition() < CatMecanumHW.ARM_SLOW) && !slowArm) {
+                    robot.arm.armMotor.setPower(-0.7);
+                    slowArm = true;
+                }
+                // Stops arm movement once done and resets the variables
+                if (robot.arm.armMotor.getCurrentPosition() < CatMecanumHW.ARM_TELEOP) {
+                    robot.arm.armMotor.setPower(0.0);
+                    autoArm = false;
+                    slowArm = false;
+                }
+                //if the driver isn't in auto mode it uses these methods
+            } else {
+                /**
+                 * Otherwise run the normal Driver 2 code
+                 */
+
+                // Lower and raise the arm by rotations
+                robot.arm.armMotor.setPower(gamepad2.right_stick_y);
+
+                // Extend and retract the arm
+                robot.extend.extenderMotor.setPower(gamepad2.left_stick_y * 0.8);
+            }
+
+
+            // Open/Close gate
+            if(gamepad2.left_bumper) {
+                robot.arm.gateClose();
+            } else if (gamepad2.right_bumper) {
+                robot.arm.gateOpen();
+            }
 
             // Driver help
             if (elapsedGameTime.seconds() > 100) {
-                robot.extendTail();
-            }// IMU Sensor
-            Orientation angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-
-            if (tailRetracted && needsToBeRetracted) {
-                // Get the current encoder value
-                newEncTicks = robot.tailMotor.getCurrentPosition();
-                // Set tail to retract slowly at quarter power
-                robot.tailMotor.setPower(-0.4);
-
-                // Every so often, check the values
-                if (runTime.milliseconds() > 750) {
-                    // Once the encoder ticks slows down or stops
-                    if ((newEncTicks - oldEncTicks) > -80) {
-                        // Cut power to tail
-                        robot.tailMotor.setPower(0.0);
-                        // Tell EVERYONE!!!
-                        telemetry.addData("Status: ", "Success!!!");
-                        telemetry.update();
-                        robot.robotWait(3.0);
-                        // End this
-                        tailRetracted = true;
-                        needsToBeRetracted = false;
-                    }
-
-                    // Otherwise continue as normal and reset timer
-                    telemetry.addData("Status: ", "Still going...");
-                    runTime.reset();
-                    oldEncTicks = newEncTicks;
-                }
-                telemetry.addData("Current Enc Ticks: ", newEncTicks);
-                telemetry.addData("Old Enc Ticks: ", oldEncTicks);
-                telemetry.update();
+                robot.tail.extendTail();
             }
+            // Reset Arm
+            if (gamepad1.x) {
+                robot.arm.autoResetArm();
+            }
+            // IMU Sensor
+            Orientation angles = robot.drive.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
 
 
@@ -215,7 +252,7 @@ public class TestTeleOp extends LinearOpMode {
              * ---   \/ \/ \/    ---
              */
             // Tail Motor Pos
-            telemetry.addData("Tail Motor Position: ", robot.tailMotor.getCurrentPosition());
+            telemetry.addData("Tail Motor Position: ", robot.tail.tailMotor.getCurrentPosition());
             // IMU Sensor
             telemetry.addData("Z Y X: ", "%.1f, %.1f, %.1f", angles.firstAngle, angles.secondAngle, angles.thirdAngle);
             // Sensors
@@ -235,8 +272,8 @@ public class TestTeleOp extends LinearOpMode {
 
             telemetry.addData("Pattern", "%s",robot.pattern.toString());
 
-            telemetry.addData("Arm Encoder","%d,  %b",robot.armMotor.getCurrentPosition(),robot.armLimit.getState());
-            telemetry.addData("Extend Encoder","%d",robot.extenderMotor.getCurrentPosition());
+            telemetry.addData("Arm Encoder","%d,  %b",robot.arm.armMotor.getCurrentPosition(), robot.arm.isRotateLimit());
+            telemetry.addData("Extend Arm Encoder","%d",robot.extend.extenderMotor.getCurrentPosition());
             telemetry.update();
         }
     }

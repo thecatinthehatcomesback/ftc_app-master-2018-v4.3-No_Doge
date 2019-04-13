@@ -96,7 +96,6 @@ public class CatArmHW extends CatSubsystemHW
         armRotateLimit = hwMap.get(DigitalChannel.class,"arm_rotate_limit");
         armExtendLimit = hwMap.get(DigitalChannel.class,"arm_extend_limit");
 
-
         // Set motor and servo modes //
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -127,6 +126,9 @@ public class CatArmHW extends CatSubsystemHW
         gateServo.setPosition(GATE_CLOSE);
     }
 
+    boolean isRotateLimit() {
+        return (!armRotateLimit.getState());
+    }
     /**
      * ---   _____________________   ---
      * ---   Arm Movement Patterns   ---
@@ -214,31 +216,30 @@ public class CatArmHW extends CatSubsystemHW
         boolean hasReset = false;
 
 
-        while (true) {
-            if (armRotateLimit.getState()) {
-                armMotor.setPower(-0.70);
-            } else {
-                armMotor.setPower(-0.55);
-                hasReset = true;
-            }
+        if (!isRotateLimit()) {
+            armMotor.setPower(-0.70);
+        }
+
+        while (mainHW.opMode.opModeIsActive()) {
 
             if (!hasReset) {
-                if (!armRotateLimit.getState()) {
+                if (isRotateLimit()) {
                     armMotor.setPower(0.40);
                     hasReset = true;
                 }
             } else {
-                if (armRotateLimit.getState()) {
+                if (!isRotateLimit()) {
                     armMotor.setPower(0.00);
                     armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     mainHW.robotWait(0.5);
                     armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    armMotor.setTargetPosition(-825);
+                    armMotor.setTargetPosition(-725);
                     armMotor.setPower(0.50);
                     while (armMotor.isBusy()) {
                     }
+                    armMotor.setPower(0.00);
                     armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    return;
+                    break;
                 }
             }
         }

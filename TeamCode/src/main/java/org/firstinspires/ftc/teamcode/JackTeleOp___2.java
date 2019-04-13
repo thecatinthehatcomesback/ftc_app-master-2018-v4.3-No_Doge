@@ -33,7 +33,7 @@ public class JackTeleOp___2 extends LinearOpMode {
     boolean autoArm             = false;
     boolean slowArm             = false;
     boolean liftingTail         = false;
-    boolean overodeLiftTail     = false;
+    boolean overrodeLiftTail = false;
 
     // Our constructor for this class
     public JackTeleOp___2() {
@@ -135,18 +135,18 @@ public class JackTeleOp___2 extends LinearOpMode {
 
             /** Tail Control **/
             // Once we hit endgame and we haven't been overridden, tell Jack
-            if ((elapsedGameTime.seconds() > 105.0) && !overodeLiftTail) {
+            if ((elapsedGameTime.seconds() > 105.0) && !overrodeLiftTail) {
                 liftingTail = true;
             }
             // Exit the auto lift Tail if the driver touches it
             if (liftingTail && ((Math.abs(gamepad1.left_trigger - gamepad1.right_trigger)) > 0.2)) {
                 // Tell code that we overrode its DREAMS to avoid unwanted repeats!
-                overodeLiftTail = true;
+                overrodeLiftTail = true;
                 // Set the encoder back to normal for TeleOp
                 robot.tail.tailMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             }
             // Raise Tail during endgame automatically
-            if (liftingTail && !overodeLiftTail) {
+            if (liftingTail && !overrodeLiftTail) {
                 // Driver enhancement help for Tail during TeleOp
                 robot.tail.lowerRobot();
                 telemetry.addData("Tail Test", "After extend");
