@@ -147,7 +147,14 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
                 delayTimer.reset();
             }
 
-            if (Math.abs(robot.drive.getCurrentAngle())>1){
+            // Auto reset the arm
+            if (((gamepad1.x) && delayTimer.seconds() > 0.8)) {
+                robot.arm.autoResetArm();
+                delayTimer.reset();
+            }
+
+            // Re-Init the IMU if it starts to drift
+            if (Math.abs(robot.drive.getCurrentAngle()) > 1){
                 robot.drive.IMUinit();
                 Log.d("catbot", String.format("IMU re-initialized"));
             }
@@ -170,7 +177,8 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
                 }
             }
 
-            telemetry.addData("Delay Timer: ", timeDelay);
+            /* Show the Telemetry: */
+            telemetry.addData("Delay Timer:", timeDelay);
 
             if (isRedAlliance) {
                 telemetry.addData("Alliance:", "Red");
@@ -190,9 +198,9 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
                 telemetry.addData("Parking in the Crater:", "Of the other alliance's side...");
             }
             if (closeToWall) {
-                telemetry.addData("End position is:", "Close to the wall");
+                telemetry.addData("End position is:", "Next to wall");
             } else {
-                telemetry.addData("End position is:", "Away from wall");
+                telemetry.addData("End position is:", "Next to Lander Leg");
             }
 
             /**
@@ -243,7 +251,7 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
         robot.drive.mecTurn(.4,2,1);
         robot.drive.waitUntillDone();
 
-        robot.tail.resetTail();
+        robot.tail.autoResetTail();
         robot.spawnWait(robot.tail);
 
         // LED feedback for the sampling field

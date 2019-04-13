@@ -69,7 +69,7 @@ public class TesterAutonomous___2 extends LinearOpMode {
 
         robot.tail.lowerRobot();
         robot.tail.isDone();
-        robot.tail.resetTail();
+        robot.tail.autoResetTail();
         robot.tail.isDone();
 
 

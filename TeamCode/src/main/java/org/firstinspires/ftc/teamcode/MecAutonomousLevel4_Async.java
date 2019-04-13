@@ -221,7 +221,7 @@ public class MecAutonomousLevel4_Async extends LinearOpMode {
         robot.drive.waitUntillDone();
 
         // Reset the tube in a separate Thread
-        robot.tail.resetTail();
+        robot.tail.autoResetTail();
         robot.spawnWait(robot.tail);
 
         // LED feedback for the sampling field

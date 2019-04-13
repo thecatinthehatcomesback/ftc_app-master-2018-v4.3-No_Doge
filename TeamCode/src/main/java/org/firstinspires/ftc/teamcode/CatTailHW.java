@@ -133,7 +133,7 @@ public class CatTailHW extends CatSubsystemHW
     /**
      * Made this public to use during autonomous routines.
      */
-    public void resetTail() {
+    public void autoResetTail() {
         /**
          * Keep the motor running at a low power until the
          * tail is completely inside the robot.  Have the

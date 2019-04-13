@@ -26,7 +26,7 @@ public class ResetTail extends LinearOpMode {
 
     /* Declare OpMode members. */
     CatAsyncHW robot = new CatAsyncHW();  // Use our new mecanum async hardware
-    private ElapsedTime runtime = new ElapsedTime();
+    private ElapsedTime delayTimer = new ElapsedTime();
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -51,9 +51,22 @@ public class ResetTail extends LinearOpMode {
          * DO STUFF FOR MODE!!!!!!!!!!!
          *
          \*/
+        delayTimer.reset();
+        telemetry.addData("Press", "gamepad1 X");
+        telemetry.update();
 
-        // Run the method
-        robot.tail.resetTail();
-
+        while (opModeIsActive()) {
+            // Auto reset the arm
+            if (((gamepad1.x) && delayTimer.seconds() > 0.8)) {
+                robot.tail.autoResetTail();
+                delayTimer.reset();
+            }
+        }
+        /**
+         * This used to be an entire autonomous routine that would reset
+         * the tail after play until we decided to put it into a method
+         * so that we could call it during the autonomous runs using a
+         * separate thread.
+         */
     }
 }

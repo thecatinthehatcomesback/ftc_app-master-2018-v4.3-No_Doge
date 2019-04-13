@@ -63,7 +63,8 @@ public class CatArmHW extends CatSubsystemHW
     public CRServo  intakeServo      = null;
 
     // Sensors
-    public DigitalChannel armLimit   = null;
+    public DigitalChannel armRotateLimit = null;
+    public DigitalChannel armExtendLimit = null;
 
 
     //creates runtime to tell how long the moters were running
@@ -92,7 +93,9 @@ public class CatArmHW extends CatSubsystemHW
         gateServo        = hwMap.servo.get("gate");
 
         // Define and Initialize Sensors //
-        armLimit         = hwMap.get(DigitalChannel.class,"arm_limit");
+        armRotateLimit = hwMap.get(DigitalChannel.class,"arm_rotate_limit");
+        armExtendLimit = hwMap.get(DigitalChannel.class,"arm_extend_limit");
+
 
         // Set motor and servo modes //
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -212,7 +215,7 @@ public class CatArmHW extends CatSubsystemHW
 
 
         while (true) {
-            if (armLimit.getState()) {
+            if (armRotateLimit.getState()) {
                 armMotor.setPower(-0.70);
             } else {
                 armMotor.setPower(-0.55);
@@ -220,12 +223,12 @@ public class CatArmHW extends CatSubsystemHW
             }
 
             if (!hasReset) {
-                if (!armLimit.getState()) {
+                if (!armRotateLimit.getState()) {
                     armMotor.setPower(0.40);
                     hasReset = true;
                 }
             } else {
-                if (armLimit.getState()) {
+                if (armRotateLimit.getState()) {
                     armMotor.setPower(0.00);
                     armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     mainHW.robotWait(0.5);
