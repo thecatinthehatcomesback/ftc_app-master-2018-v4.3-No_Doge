@@ -43,10 +43,10 @@ public class CatAsyncHW
     static final double     COUNTS_PER_INCH         = COUNTS_PER_MOTOR_REV / (WHEEL_DIAMETER_INCHES * 3.1415);
 
     // Autonomous Drive Speeds
-    static final double     DRIVE_SPEED             = 0.6;
-    static final double     HYPER_SPEED             = 0.6;
-    static final double     CHILL_SPEED             = 0.25;
-    static final double     CREEP_SPEED             = 0.10;
+    static final double     DRIVE_SPEED             = 0.7;
+    static final double     HYPER_SPEED             = 0.95;
+    static final double     CHILL_SPEED             = 0.45;
+    static final double     CREEP_SPEED             = 0.25;
     static final double     TURN_SPEED              = 0.6;
 
 

@@ -34,7 +34,7 @@ public class TestTeleOp extends LinearOpMode {
 
     /* Declare OpMode members. */
     CatAsyncHW robot; // use the class created for the hardware
-    CatVisionHW eyes = new CatVisionHW();   // Use the mecanum hardware
+    //CatVisionHW eyes = new CatVisionHW();   // Use the mecanum hardware
     boolean inReverse = true;
 
     // constructor for class
@@ -53,7 +53,7 @@ public class TestTeleOp extends LinearOpMode {
         robot.drive.IMUinit();
 
         // Init our Machine Vision
-        eyes.initVision(hardwareMap);
+        //eyes.initVision(hardwareMap);
 
         // Finished!  Now tell the driver...
         telemetry.addData("Status: ", "Initialized...  BOOM!");
@@ -225,7 +225,6 @@ public class TestTeleOp extends LinearOpMode {
                 robot.extend.extenderMotor.setPower(gamepad2.left_stick_y * 0.8);
             }
 
-
             // Open/Close gate
             if(gamepad2.left_bumper) {
                 robot.arm.gateClose();
@@ -233,10 +232,10 @@ public class TestTeleOp extends LinearOpMode {
                 robot.arm.gateOpen();
             }
 
-            // Driver help
-            if (elapsedGameTime.seconds() > 100) {
-                robot.tail.extendTail();
-            }
+
+
+
+
             // Reset Arm
             if (gamepad1.x) {
                 robot.arm.autoResetArm();
@@ -252,7 +251,9 @@ public class TestTeleOp extends LinearOpMode {
              * ---   \/ \/ \/    ---
              */
             // Tail Motor Pos
-            telemetry.addData("Tail Motor Position: ", robot.tail.tailMotor.getCurrentPosition());
+            //telemetry.addData("Tail Motor Position: ", robot.tail.tailMotor.getCurrentPosition());
+            telemetry.addData("Arm Rotate Encoder # and Boolean","%d,  %b",robot.arm.armMotor.getCurrentPosition(), robot.arm.isRotateLimit());
+            telemetry.addData("Arm Extend Encoder","%d",robot.extend.extenderMotor.getCurrentPosition());
             // IMU Sensor
             telemetry.addData("Z Y X: ", "%.1f, %.1f, %.1f", angles.firstAngle, angles.secondAngle, angles.thirdAngle);
             // Sensors
@@ -269,11 +270,9 @@ public class TestTeleOp extends LinearOpMode {
             telemetry.addData("BackRight: ", "  A %3d,  R %3d,  G %3d,  B %3d,",
                     robot.rearRightColor.alpha(), robot.rearRightColor.red(),
                     robot.rearRightColor.green(), robot.rearRightColor.blue());
-
+            // LED Telemetry
             telemetry.addData("Pattern", "%s",robot.pattern.toString());
 
-            telemetry.addData("Arm Encoder","%d,  %b",robot.arm.armMotor.getCurrentPosition(), robot.arm.isRotateLimit());
-            telemetry.addData("Extend Arm Encoder","%d",robot.extend.extenderMotor.getCurrentPosition());
             telemetry.update();
         }
     }

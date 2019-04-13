@@ -1,5 +1,5 @@
 /***
- TesterAutonomous.java
+    TesterAutonomous.java
 
  A Linear OpMode class to be place to test code both old
  and new.  We constantly edit this, taking out and adding
@@ -12,83 +12,90 @@
  */
 package org.firstinspires.ftc.teamcode;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Disabled
-@Autonomous(name="Testing Autonomous", group="CatAuto")
+
+@Autonomous(name="Test Auto", group="CatAuto")
 public class TesterAutonomous extends LinearOpMode {
 
     /* Declare OpMode members. */
-    CatMecanumHW robot = new CatMecanumHW();   // Use the mecanum hardware
-    CatVisionHW eyes = new CatVisionHW();   // Use the mecanum hardware
-    private ElapsedTime runtime = new ElapsedTime();
+    CatAsyncHW robot = new CatAsyncHW();  // Use our new async mecanum hardware
     private ElapsedTime delayTimer = new ElapsedTime();
+
 
     @Override
     public void runOpMode() throws InterruptedException {
+
         /**
          * Initialize the drive system variables.  The init() method of
          * our hardware class does all the work instead of copying every
          * new programming...
          */
+
         robot.init(hardwareMap, this);
-        robot.IMUinit();
-        eyes.initVision(hardwareMap);
+        // Init IMU sensor later when the match starts
 
+        /**
+         * Init the IMU after play so that it is not offset after
+         * remaining idle for a minute or two...
+         */
+        robot.drive.IMUinit();
 
-
-        // Send telemetry message to signify robot is waiting
-        telemetry.addData("Status: ", "Resetting Encoders...");
+        // Send telemetry message to signify robot waiting
+        telemetry.addData("Status:", "Initializing: (Resetting Encoders...)");
         telemetry.update();
 
-        robot.resetEncoders();
+        robot.drive.resetEncoders();
         idle();
-        robot.runToPosition();
+        robot.drive.runToPosition();
 
-        // Send telemetry message to indicate successful Encoder reset
-        telemetry.addData("Path0", "Starting at :%7d  :%7d  :7d  :7d",
-                robot.leftFrontMotor.getCurrentPosition(),
-                robot.rightFrontMotor.getCurrentPosition(),
-                robot.leftRearMotor.getCurrentPosition(),
-                robot.rightRearMotor.getCurrentPosition());
-        telemetry.update();
+        /**
+         * After init is pushed but before Start.
+         */
+        robot.arm.autoResetArm();
 
         waitForStart();
         /**
-         * Runs after hit start
-         * DO STUFF FOR MODE!!!!!!!!!!!
-         *
-         \*/
+         * Runs after hit start:
+         * DO STUFF FOR the OPMODE!!!
+          */
+
+        Log.d("catbot", String.format(" Hit Start"));
 
 
-        robot.advMecDrive(CatMecanumHW.DRIVE_SPEED, 20, 0+65, 3);
-        robot.advMecDrive(CatMecanumHW.DRIVE_SPEED, 20, 90+25, 3);
-        robot.advMecDrive(CatMecanumHW.DRIVE_SPEED, 20, 180+65, 3);
-        robot.advMecDrive(CatMecanumHW.DRIVE_SPEED, 20, 270+25, 3);
+        robot.tail.lowerRobot();
+        robot.tail.isDone();
+        robot.tail.autoResetTail();
+        robot.tail.isDone();
 
 
-        /*int numTimes = 0;
+        robot.drive.advMecDrive(CatMecanumHW.DRIVE_SPEED, 20, 0  +45, 3);
+        robot.drive.isDone();
+        robot.drive.advMecDrive(CatMecanumHW.DRIVE_SPEED, 20, 90 +45, 3);
+        robot.drive.isDone();
+        robot.drive.advMecDrive(CatMecanumHW.DRIVE_SPEED, 20, 180+45, 3);
+        robot.drive.isDone();
 
-        delayTimer.reset();
-        while (delayTimer.seconds() < 3) {
-            eyes.findGoldPos();
-            numTimes++;
-        }
+        robot.drive.advMecDrive(CatMecanumHW.DRIVE_SPEED, 20, 270+45, 3);
+        robot.drive.isDone();
+//robot.robotWait();
+        /*robot.arm.rotateArm(robot.ARM_OVER_SAMPLING);
+        robot.arm.waitUntillDone();
+        robot.extend.extendArm();
+        robot.robotWait(0.4);
+        //tries to pick up minerals from the crater
+        robot.arm.rotateArm(CatMecanumHW.ARM_FLOOR);
+        robot.arm.intakeServo.setPower(0.87);
+        robot.arm.waitUntillDone();
+        robot.robotWait(1.0);
 
-        delayTimer.reset();
-        while (delayTimer.seconds() < 4) {
-            telemetry.addData("Num Times", numTimes);
-            telemetry.update();
-        }*/
+        robot.arm.rotateArm(robot.ARM_STRAIGHT_UP);
+        robot.robotWait(6.0);
+        robot.arm.rotateArm(robot.ARM_STOWED);*/
 
-
-        /**
-         * What we plan to test in this autonomous:
-         *
-         *
-         */
     }
 }

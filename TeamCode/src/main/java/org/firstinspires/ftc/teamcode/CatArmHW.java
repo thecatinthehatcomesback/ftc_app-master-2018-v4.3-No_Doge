@@ -216,6 +216,8 @@ public class CatArmHW extends CatSubsystemHW
         boolean hasReset = false;
 
 
+        // Close gate and set power to start the process
+        gateClose();
         if (!isRotateLimit()) {
             armMotor.setPower(-0.70);
         }
@@ -236,7 +238,11 @@ public class CatArmHW extends CatSubsystemHW
                     armMotor.setTargetPosition(-725);
                     armMotor.setPower(0.50);
                     while (armMotor.isBusy()) {
+                        mainHW.opMode.telemetry.addData("Inside LOOP", "Still here!");
+                        mainHW.opMode.telemetry.update();
                     }
+                    mainHW.opMode.telemetry.addData("ALL DONE!", "");
+                    mainHW.opMode.telemetry.update();
                     armMotor.setPower(0.00);
                     armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     break;

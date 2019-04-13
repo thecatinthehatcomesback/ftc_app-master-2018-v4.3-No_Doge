@@ -295,7 +295,7 @@ public class CatDriveHW extends CatSubsystemHW
             }
 
             // Due to weight diffence, we compensate by cutting the back wheels half power
-            drive(power, power, power*0.8, power*0.8);
+            drive(power, power, power, power);
 
         }
     }
