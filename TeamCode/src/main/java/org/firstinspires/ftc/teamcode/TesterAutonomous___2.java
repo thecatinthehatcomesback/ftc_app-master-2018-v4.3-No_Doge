@@ -56,6 +56,7 @@ public class TesterAutonomous___2 extends LinearOpMode {
         /**
          * After init is pushed but before Start.
          */
+        robot.arm.autoResetArm();
 
         waitForStart();
         /**

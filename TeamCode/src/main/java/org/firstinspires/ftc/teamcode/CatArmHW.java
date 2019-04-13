@@ -206,33 +206,37 @@ public class CatArmHW extends CatSubsystemHW
     public void autoResetArm() {
         /**
          * A algorithm that resets the intake arm rotational
-         * encoders while the robot lands.
+         * encoders during/before autonomous.
          */
         boolean hasReset = false;
-        //TODO  THIS MUST BE FINISHED!!!
-        if (armLimit.getState()) {
-            armMotor.setPower(-0.70);
-        } else {
-            armMotor.setPower(-0.55);
-            hasReset = true;
-        }
 
-        if (!hasReset) {
-            if (!armLimit.getState()) {
-                armMotor.setPower(0.40);
+
+        while (true) {
+            if (armLimit.getState()) {
+                armMotor.setPower(-0.70);
+            } else {
+                armMotor.setPower(-0.55);
                 hasReset = true;
             }
-        } else {
-            if (armLimit.getState()) {
-                armMotor.setPower(0.00);
-                armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                //CatAsyncHW.robotWait(0.5);
-                armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                armMotor.setTargetPosition(-825);
-                armMotor.setPower(0.50);
-                while (armMotor.isBusy()){ }
-                armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
+            if (!hasReset) {
+                if (!armLimit.getState()) {
+                    armMotor.setPower(0.40);
+                    hasReset = true;
+                }
+            } else {
+                if (armLimit.getState()) {
+                    armMotor.setPower(0.00);
+                    armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    mainHW.robotWait(0.5);
+                    armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    armMotor.setTargetPosition(-825);
+                    armMotor.setPower(0.50);
+                    while (armMotor.isBusy()) {
+                    }
+                    armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    return;
+                }
             }
         }
     }

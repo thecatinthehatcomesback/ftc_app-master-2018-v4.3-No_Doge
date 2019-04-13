@@ -35,8 +35,8 @@ public class CatSubsystemHW
 {
 
     /* local OpMode members. */
-    public HardwareMap hwMap           = null;
-    public CatAsyncHW mainHW     = null;
+    public HardwareMap hwMap        = null;
+    public CatAsyncHW mainHW        = null;
 
     /* Constructor */
     public CatSubsystemHW(CatAsyncHW mainHardware){
