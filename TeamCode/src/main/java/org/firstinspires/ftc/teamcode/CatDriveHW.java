@@ -70,6 +70,7 @@ public class CatDriveHW extends CatSubsystemHW
     ColorSensor leftColSen;
     ColorSensor rightColSen;
     int baseDelta;
+    static boolean isDone;
 
     // Enums!
     enum DRIVE_METHOD {
@@ -209,7 +210,7 @@ public class CatDriveHW extends CatSubsystemHW
          * line.
          */
 
-            Log.d("catbot", String.format(" Started drive vert pow: %.2f, dist: %.2f, time:%.2f ",power,distance, timeoutS));
+        Log.d("catbot", String.format(" Started drive vert pow: %.2f, dist: %.2f, time:%.2f ",power,distance, timeoutS));
         currentMethod = DRIVE_METHOD.vertical;
         currentMode = driveMode;
         timeout = timeoutS;
@@ -222,6 +223,7 @@ public class CatDriveHW extends CatSubsystemHW
         int newRightBackTarget;
         boolean keepDriving = true;
         baseDelta = 0;
+        isDone = false;
         if (driveMode == DRIVE_MODE.findLine) {
             // Turn on the color sensors we want and find the base alpha
             baseDelta = mainHW.findBaseDelta(rightColSen);
@@ -260,9 +262,11 @@ public class CatDriveHW extends CatSubsystemHW
          * This is a simpler mecanum drive method that drives blindly
          * straight horizontally (positive numbers should strafe left)
          */
+        Log.d("catbot", String.format(" Started drive horiizontal pow: %.2f, dist: %.2f, time:%.2f ",power,distance, timeoutS));
 
         currentMethod = DRIVE_METHOD.horizontal;
         timeout = timeoutS;
+        isDone = false;
 
         int newLeftFrontTarget;
         int newRightFrontTarget;
@@ -326,6 +330,7 @@ public class CatDriveHW extends CatSubsystemHW
         int newLeftBackTarget;
         int newRightBackTarget;
         boolean keepDriving = true;
+        isDone = false;
 
         if (mainHW.opMode.opModeIsActive()) {
 
@@ -399,6 +404,7 @@ public class CatDriveHW extends CatSubsystemHW
 
         currentMethod = DRIVE_METHOD.turn;
         timeout = timeoutS;
+        isDone = false;
 
         // Ensure that the opMode is still active
         if (mainHW.opMode.opModeIsActive()) {
@@ -522,7 +528,7 @@ public class CatDriveHW extends CatSubsystemHW
                             !leftRearMotor.isBusy() || !rightRearMotor.isBusy()) {
                         keepDriving = false;
                     }
-                    Log.d("catbot", String.format("LF: %d, %d;  RF: %d, %d;  LB: %d, %d;  RB %d,%d",
+                    Log.d("catbot", String.format("DriveVert LF: %d, %d;  RF: %d, %d;  LB: %d, %d;  RB %d,%d",
                             leftFrontMotor.getTargetPosition(),leftFrontMotor.getCurrentPosition(),
                             rightFrontMotor.getTargetPosition(), rightFrontMotor.getCurrentPosition(),
                             leftRearMotor.getTargetPosition(), leftRearMotor.getCurrentPosition(),
@@ -560,10 +566,11 @@ public class CatDriveHW extends CatSubsystemHW
 
                     keepDriving = false;
                 }
-
-                // Log Messages
-                //Log.d("catbot", String.format("encoderDrive targ[%5d,%5d], curr[%5d,%5d] power [%.3f,%.3f]",
-                //        newLeftTarget,  newRightTarget, leftPosition, rightPosition, leftSpeed, rightSpeed));
+                Log.d("catbot", String.format("DriveHor LF: %d, %d;  RF: %d, %d;  LB: %d, %d;  RB %d,%d",
+                        leftFrontMotor.getTargetPosition(),leftFrontMotor.getCurrentPosition(),
+                        rightFrontMotor.getTargetPosition(), rightFrontMotor.getCurrentPosition(),
+                        leftRearMotor.getTargetPosition(), leftRearMotor.getCurrentPosition(),
+                        rightRearMotor.getTargetPosition(), rightRearMotor.getCurrentPosition()));
 
                 break;
             case turn:
@@ -585,6 +592,10 @@ public class CatDriveHW extends CatSubsystemHW
         if (!(keepDriving)){
             // Stop all motion;
             drive(0, 0, 0, 0);
+            isDone = true;
+            return true;
+        }
+        if (isDone){
             return true;
         }
         return false;

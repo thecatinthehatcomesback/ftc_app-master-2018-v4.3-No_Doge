@@ -188,17 +188,21 @@ public class CatArmHW extends CatSubsystemHW
     static  double TIMEOUT = 3.0;
     @Override
     public boolean isDone() {
+        int target = armMotor.getTargetPosition();
+        int current = armMotor.getCurrentPosition();
 
-        Log.d("catbot", String.format(" Arm rotate target %d, current %d ", armMotor.getTargetPosition(),armMotor.getCurrentPosition()));
-        if (shouldStartExtend&&pastPosGoingUp(posStartExtend))
-        {
-         mainHW.extend.extendArm();
-         shouldStartExtend = false;
+        Log.d("catbot", String.format(" Arm rotate target %d, current %d ", target,current));
+        if (shouldStartExtend&&pastPosGoingUp(posStartExtend)) {
+            mainHW.extend.extendArm();
+            shouldStartExtend = false;
         }
         if (runtime.seconds() > TIMEOUT) {
             Log.d("catbot", String.format(" Arm rotate TIMEOUT %.2f ", runtime.seconds()));
         }
 
+        if (Math.abs(target - current) < 50) {
+            return true;
+        }
         return !(armMotor.isBusy() && (runtime.seconds() < TIMEOUT));
     }
 

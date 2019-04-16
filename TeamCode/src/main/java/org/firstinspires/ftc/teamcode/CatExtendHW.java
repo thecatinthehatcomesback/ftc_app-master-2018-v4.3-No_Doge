@@ -113,10 +113,11 @@ public class CatExtendHW extends CatSubsystemHW
         if (runtime.seconds() > 0.7) {
             if (extenderMotor.getPower() == RETRACT_POWER) {
                 extenderMotor.setPower(0.0);
-                Log.d("catbot", String.format(" Arm extend/retract finished TIMEOUT %.2f ", runtime.seconds()));
             }
+            Log.d("catbot", String.format(" Arm extend/retract finished TIMEOUT %.2f ", runtime.seconds()));
             return true;
         }
+        Log.d("catbot", String.format(" Arm extend/retract waiting %.2f ", runtime.seconds()));
         return false;
     }
 
