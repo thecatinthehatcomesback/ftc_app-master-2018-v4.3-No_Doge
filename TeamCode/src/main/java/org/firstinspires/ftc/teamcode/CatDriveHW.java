@@ -86,6 +86,11 @@ public class CatDriveHW extends CatSubsystemHW
         driveUsingGyroStraight
     }
 
+    enum TURN_MODE {
+        SPIN,
+        TANK
+    }
+
 
     // The IMU sensor object
     BNO055IMU imu;
@@ -397,6 +402,9 @@ public class CatDriveHW extends CatSubsystemHW
         }
     }
     public void mecTurn(double power, int degrees, double timeoutS) throws InterruptedException {
+        mecTurn(power, degrees, timeoutS, TURN_MODE.SPIN);
+    }
+    public void mecTurn(double power, int degrees, double timeoutS, TURN_MODE turnMode) throws InterruptedException {
         /**
          * Turns counterclockwise with a positive Z angle
          * Turns clockwise with a negative Z angle
@@ -419,15 +427,20 @@ public class CatDriveHW extends CatSubsystemHW
             // Change the power based on which angle we are turning to
             if (clockwiseTurn) {
                 leftFrontMotor.setPower(power);
-                rightFrontMotor.setPower(-power);
                 leftRearMotor.setPower(power);
-                rightRearMotor.setPower(-power);
+                if (turnMode == TURN_MODE.SPIN) {
+                    rightFrontMotor.setPower(-power);
+                    rightRearMotor.setPower(-power);
+                }
             } else {
-                leftFrontMotor.setPower(-power);
+                if (turnMode == TURN_MODE.SPIN) {
+                    leftFrontMotor.setPower(-power);
+                    leftRearMotor.setPower(-power);
+                }
                 rightFrontMotor.setPower(power);
-                leftRearMotor.setPower(-power);
                 rightRearMotor.setPower(power);
             }
+
          }
     }
 

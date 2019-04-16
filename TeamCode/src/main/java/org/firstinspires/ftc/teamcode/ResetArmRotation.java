@@ -57,13 +57,9 @@ public class ResetArmRotation extends LinearOpMode {
         telemetry.addData("Press", "gamepad1 X");
         telemetry.update();
 
-        while (opModeIsActive()) {
-            // Auto reset the arm
-            if (((gamepad1.x) && delayTimer.seconds() > 0.8)) {
-                robot.arm.autoResetArm();
-                delayTimer.reset();
-            }
-        }
+        // Auto reset the arm
+        robot.arm.autoResetArm();
+
         /**
          * This used to be an entire autonomous routine that would reset
          * the arm after play until we decided to put it into a method
@@ -72,44 +68,3 @@ public class ResetArmRotation extends LinearOpMode {
          */
     }
 }
-/*
-            if (gamepad2.y) {
-                if (robot.armLimit.getState()) {
-                    robot.armMotor.setPower(-0.70);
-                } else {
-                    robot.armMotor.setPower(-0.55);
-                    hasReset = true;
-                }
-
-                resetMode = true;
-            }
-
-            if (resetMode) {
-
-                if (!hasReset) {
-                    if (!robot.armLimit.getState()) {
-                        robot.armMotor.setPower(0.40);
-                        hasReset = true;
-                    }
-                } else {
-                    if (robot.armLimit.getState()) {
-                        robot.armMotor.setPower(0.00);
-                        resetMode = false;
-                        robot.armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                        robot.robotWait(0.5);
-                        robot.armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                        robot.armMotor.setTargetPosition(-825);
-                        robot.armMotor.setPower(0.50);
-                        while (robot.armMotor.isBusy()){ }
-                        robot.armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-                    }
-                }
-            } else {
-                    //  Arm controls
-        // Lower/Raise arm
-        robot.armMotor.setPower(gamepad2.right_stick_y);
-        // Extend/Retract arm
-        robot.extenderMotor.setPower(gamepad2.left_stick_x * 0.8);
-        }
- */

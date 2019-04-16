@@ -449,11 +449,10 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
         robot.drive.mecTurn(.35,0,2);
         //This will extend arm so that it reaches full extension and rotation at similar times.
         robot.arm.setExtenderValue(3000);
-        CatSubsystemHW.waitUntillDone(robot.drive,robot.arm);
+        CatSubsystemHW.waitUntillDone(robot.drive, robot.arm);
         robot.extend.extenderMotor.setPower(robot.extend.EXTEND_POWER);
         //finishes driving to the lander
         robot.drive.mecDriveVertical(CatDriveHW.DRIVE_SPEED,-2,3, CatDriveHW.DRIVE_MODE.driveTilDistance);
-        robot.drive.waitUntillDone();
         //opens the gate and scores the mineral, jiggling it out of the intake
         robot.arm.gateOpen();
         robot.arm.rotateArm(CatMecanumHW.ARM_SCORE,.65);
@@ -464,8 +463,8 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
         robot.arm.rotateArm(CatMecanumHW.ARM_STRAIGHT_UP);
         robot.arm.waitUntillDone();
         //starts to drive away from the lander and to the crater
-        robot.drive.mecDriveVertical(CatDriveHW.DRIVE_SPEED,3,2, CatDriveHW.DRIVE_MODE.driveTilDistance);
-        robot.drive.waitUntillDone();
+        //robot.drive.mecDriveVertical(CatDriveHW.DRIVE_SPEED, 4.5, 2, CatDriveHW.DRIVE_MODE.driveTilDistance);
+        //robot.drive.waitUntillDone();
         //Once far enough from lander we safely withdraw and rotate arm to crater height
         robot.extend.retractArm();
         robot.arm.gateClose();
@@ -534,7 +533,6 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
 
 
         //attempts to score minerals if we are set to go to the opposing alliance's crater
-        ///TODO: 3/13/2019 test to see if we have enough time to drop off and get back to the crater also get it to work with both craters
         if (!parkInOurCrater) {
             //starts bring the arm back in and rotates it to the scoring position
             robot.arm.rotateArm(CatMecanumHW.ARM_TUCKED_IN);
@@ -562,21 +560,18 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
             robot.arm.gateOpen();
             robot.drive.waitUntillDone();
             robot.arm.rotateArm(CatMecanumHW.ARM_SCORE,.45);
-            //robot.arm.rotateArm(CatMecanumHW.ARM_TUCKED_IN,.8);
-            //robot.robotWait(.1);
-            //robot.arm.rotateArm(CatMecanumHW.ARM_SCORE,.65);
             robot.arm.waitUntillDone();
             robot.arm.rotateArm(CatMecanumHW.ARM_STRAIGHT_UP);
             robot.arm.waitUntillDone();
             //drives away from the lander and reenters the crater
-            robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED,9,2,CatDriveHW.DRIVE_MODE.driveTilDistance);
+            robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED,10,2,CatDriveHW.DRIVE_MODE.driveTilDistance);
             robot.drive.waitUntillDone();
             //resets the gate and lowers the arm while driving
             robot.arm.gateClose();
-            robot.arm.rotateArm(CatMecanumHW.ARM_DEPOT_DROPOFF);
-            robot.drive.mecTurn(CatMecanumHW.TURN_SPEED ,-85,3.5);
+            robot.arm.rotateArm(CatMecanumHW.ARM_CRATER_SCORE);
+            robot.drive.mecTurn(CatMecanumHW.TURN_SPEED ,-83,3.5);
             robot.drive.waitUntillDone();
-            robot.drive.mecDriveVertical(CatMecanumHW.HYPER_SPEED, 16, 2, CatDriveHW.DRIVE_MODE.driveTilDistance);
+            robot.drive.mecDriveVertical(CatMecanumHW.HYPER_SPEED, 20, 2, CatDriveHW.DRIVE_MODE.driveTilDistance);
             robot.extend.extendArm();
             robot.drive.waitUntillDone();
             //Finishes with all autonomous goals completed and one extra cycle

@@ -72,6 +72,7 @@ public class CatMecanumHW
     // Arm positions
     static final int        ARM_FLOOR               = 6900; // was 6680
     static final int        ARM_CRATER_GRAB         = 6475;
+    static final int        ARM_CRATER_SCORE        = 5850;
     static final int        ARM_DEPOT_DROPOFF       = 5700;
     static final int        ARM_OVER_SAMPLING       = 5215;
     static final int        ARM_EXTEND              = 3750;
