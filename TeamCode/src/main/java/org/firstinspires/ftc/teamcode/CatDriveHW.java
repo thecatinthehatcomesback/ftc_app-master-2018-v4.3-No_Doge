@@ -203,8 +203,8 @@ public class CatDriveHW extends CatSubsystemHW
     // Driving Methods:
     public void mecDriveVertical(double power,
                                  double distance,
-                                 double timeoutS, DRIVE_MODE driveMode)  throws InterruptedException {
-        mecDriveVertical(power, distance, timeoutS, driveMode, null, null);
+                                 double timeoutS)  throws InterruptedException {
+        mecDriveVertical(power, distance, timeoutS, DRIVE_MODE.driveTilDistance, null, null);
     }
         public void mecDriveVertical(double power,
                                      double distance,
@@ -431,11 +431,17 @@ public class CatDriveHW extends CatSubsystemHW
                 if (turnMode == TURN_MODE.SPIN) {
                     rightFrontMotor.setPower(-power);
                     rightRearMotor.setPower(-power);
+                } else {
+                    rightFrontMotor.setPower(-power/4);
+                    rightRearMotor.setPower(-power/4);
                 }
             } else {
                 if (turnMode == TURN_MODE.SPIN) {
                     leftFrontMotor.setPower(-power);
                     leftRearMotor.setPower(-power);
+                }  else {
+                    leftFrontMotor.setPower(-power/4);
+                    leftRearMotor.setPower(-power/4);
                 }
                 rightFrontMotor.setPower(power);
                 rightRearMotor.setPower(power);

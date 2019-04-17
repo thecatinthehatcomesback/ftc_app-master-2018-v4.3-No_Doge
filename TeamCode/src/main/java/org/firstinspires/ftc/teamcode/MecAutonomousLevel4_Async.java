@@ -216,7 +216,7 @@ public class MecAutonomousLevel4_Async extends LinearOpMode {
         // Drive the robot out the hook
         robot.drive.mecDriveHorizontal(robot.DRIVE_SPEED,4.5,2.0);
         robot.drive.waitUntillDone();
-        robot.drive.mecDriveVertical(robot.DRIVE_SPEED,3.0,2.0, CatDriveHW.DRIVE_MODE.driveTilDistance);
+        robot.drive.mecDriveVertical(robot.DRIVE_SPEED,3.0,2.0);
         robot.drive.waitUntillDone();
         robot.drive.mecTurn(.4,0,1);
         robot.drive.waitUntillDone();
@@ -300,12 +300,12 @@ public class MecAutonomousLevel4_Async extends LinearOpMode {
         robot.robotWait(.5);
         robot.drive.mecTurn(CatMecanumHW.TURN_SPEED,-26,3);
         CatSubsystemHW.waitUntillDone(robot.arm,robot.extend,robot.drive);
-        robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED,10,3.0,CatDriveHW.DRIVE_MODE.driveTilDistance);
+        robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED,10,3.0);
         robot.drive.waitUntillDone();
         robot.drive.mecTurn(CatMecanumHW.TURN_SPEED ,-84,3.5);
         robot.drive.waitUntillDone();
         //drives toward wall and aims toward the craytor
-        robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED,27,6,CatDriveHW.DRIVE_MODE.driveTilDistance);
+        robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED,27,6);
         robot.drive.waitUntillDone();
         robot.drive.mecTurn(CatMecanumHW.TURN_SPEED,-110,2);
         robot.drive.waitUntillDone();
@@ -372,7 +372,7 @@ public class MecAutonomousLevel4_Async extends LinearOpMode {
         robot.drive.mecTurn(.4,2,1);
         robot.drive.waitUntillDone();
         // Drive ahead to deploy marker
-        robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED, 10, 2, CatDriveHW.DRIVE_MODE.driveTilDistance);
+        robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED, 10, 2);
         CatSubsystemHW.waitUntillDone(robot.arm,robot.drive,robot.extend);
         //Finish lower arm
         robot.arm.rotateArm(CatMecanumHW.ARM_DEPOT_DROPOFF);
@@ -386,7 +386,7 @@ public class MecAutonomousLevel4_Async extends LinearOpMode {
         robot.extend.retractArm();
         CatSubsystemHW.waitUntillDone(robot.extend,robot.arm);
         // Drive back to hit gold
-        robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED, -10, 4, CatDriveHW.DRIVE_MODE.driveTilDistance);
+        robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED, -10, 4);
         robot.drive.waitUntillDone();
         robot.arm.rotateArm(CatMecanumHW.ARM_FLOOR);
         //Turn to gold
@@ -421,14 +421,14 @@ public class MecAutonomousLevel4_Async extends LinearOpMode {
             // Drive to crater nearest the audience
             robot.drive.mecTurn(CatMecanumHW.TURN_SPEED ,27,3.5);
             CatSubsystemHW.waitUntillDone(robot.drive,robot.arm,robot.extend);
-            robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED,12,3.0,CatDriveHW.DRIVE_MODE.driveTilDistance);
+            robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED, 12, 3.0);
             robot.drive.waitUntillDone();
             if (closeToWall)
             {
                 robot.drive.mecTurn(CatMecanumHW.TURN_SPEED, 73, 3.5);
                 robot.drive.waitUntillDone();
                 //Lower arm
-                robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED, 32, 3.0, CatDriveHW.DRIVE_MODE.driveTilDistance);
+                robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED, 32, 3.0);
                 robot.drive.waitUntillDone();
                 robot.drive.mecTurn(CatMecanumHW.TURN_SPEED, 110, 1);
                 robot.arm.rotateArm(CatMecanumHW.ARM_OVER_SAMPLING);
@@ -438,23 +438,23 @@ public class MecAutonomousLevel4_Async extends LinearOpMode {
                 robot.drive.waitUntillDone();
                 //Lower arm
                 robot.arm.rotateArm(CatMecanumHW.ARM_OVER_SAMPLING);
-                robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED, 14, 3.0, CatDriveHW.DRIVE_MODE.driveTilDistance);
+                robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED, 14, 3.0);
                 robot.drive.waitUntillDone();
                 robot.drive.mecTurn(CatMecanumHW.TURN_SPEED, 120, 1);
                 robot.drive.waitUntillDone();
-                robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED, 6, 3.0, CatDriveHW.DRIVE_MODE.driveTilDistance);
+                robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED, 6, 3.0);
             }
         } else {
             // Drive to farther crater
             robot.drive.mecTurn(CatMecanumHW.TURN_SPEED ,-27,3.5);
             CatSubsystemHW.waitUntillDone(robot.drive,robot.arm,robot.extend);
-            robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED,10,3.0,CatDriveHW.DRIVE_MODE.driveTilDistance);
+            robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED,10,3.0);
             robot.drive.waitUntillDone();
             robot.drive.mecTurn(CatMecanumHW.TURN_SPEED ,-85,3.5);
             //Lower arm
             robot.arm.rotateArm(CatMecanumHW.ARM_OVER_SAMPLING);
             CatSubsystemHW.waitUntillDone(robot.drive,robot.arm);
-            robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED,14,3.0,CatDriveHW.DRIVE_MODE.driveTilDistance);
+            robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED,14,3.0);
             robot.drive.waitUntillDone();
             robot.drive.mecTurn(CatMecanumHW.TURN_SPEED,-100,1);
             robot.arm.rotateArm(CatMecanumHW.ARM_DEPOT_DROPOFF);

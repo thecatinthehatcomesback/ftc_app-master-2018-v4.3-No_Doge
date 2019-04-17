@@ -56,7 +56,7 @@ public class TesterAutonomous extends LinearOpMode {
         /**
          * After init is pushed but before Start.
          */
-        robot.arm.autoResetArm();
+
 
         waitForStart();
         /**
@@ -66,22 +66,11 @@ public class TesterAutonomous extends LinearOpMode {
 
         Log.d("catbot", String.format(" Hit Start"));
 
+        robot.drive.mecTurn(CatDriveHW.TURN_SPEED, -90, 3);
+        robot.drive.waitUntillDone();
+        robot.drive.mecTurn(CatDriveHW.TURN_SPEED, 90, 2, CatDriveHW.TURN_MODE.TANK);
+        robot.drive.waitUntillDone();
 
-        robot.tail.lowerRobot();
-        robot.tail.isDone();
-        robot.tail.autoResetTail();
-        robot.tail.isDone();
-
-
-        robot.drive.advMecDrive(CatMecanumHW.DRIVE_SPEED, 20, 0  +45, 3);
-        robot.drive.isDone();
-        robot.drive.advMecDrive(CatMecanumHW.DRIVE_SPEED, 20, 90 +45, 3);
-        robot.drive.isDone();
-        robot.drive.advMecDrive(CatMecanumHW.DRIVE_SPEED, 20, 180+45, 3);
-        robot.drive.isDone();
-
-        robot.drive.advMecDrive(CatMecanumHW.DRIVE_SPEED, 20, 270+45, 3);
-        robot.drive.isDone();
 //robot.robotWait();
         /*robot.arm.rotateArm(robot.ARM_OVER_SAMPLING);
         robot.arm.waitUntillDone();

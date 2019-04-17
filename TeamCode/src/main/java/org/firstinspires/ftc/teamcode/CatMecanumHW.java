@@ -58,7 +58,7 @@ public class CatMecanumHW
 
     // Autonomous Drive Speeds
     static final double     DRIVE_SPEED             = 0.6;
-    static final double     HYPER_SPEED             = 0.8;
+    static final double     HYPER_SPEED             = 0.9;
     static final double     CHILL_SPEED             = 0.25;
     static final double     CREEP_SPEED             = 0.10;
     static final double     TURN_SPEED              = 0.6;
