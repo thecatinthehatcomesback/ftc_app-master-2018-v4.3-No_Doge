@@ -5,9 +5,6 @@
     and solve our problems throughout the year without having to
     modify the main TeleOp.
 
-
-    This file is a modified version from the FTC SDK.
-    Modifications by FTC Team #10273, The Cat in the Hat Comes Back.
 */
 package org.firstinspires.ftc.teamcode;
 

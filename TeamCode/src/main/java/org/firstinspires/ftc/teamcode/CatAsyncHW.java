@@ -65,6 +65,8 @@ public class CatAsyncHW
     //LED stuff
     public RevBlinkinLedDriver lights = null;
     public RevBlinkinLedDriver.BlinkinPattern pattern;
+    public RevBlinkinLedDriver underLights = null;
+    public RevBlinkinLedDriver.BlinkinPattern underPattern;
     public static boolean isRedAlliance = true;
 
     // Sensors
@@ -112,7 +114,11 @@ public class CatAsyncHW
         // Blinkin LED stuff //
         lights           = hwMap.get(RevBlinkinLedDriver.class, "blinky");
         pattern          = RevBlinkinLedDriver.BlinkinPattern.RAINBOW_RAINBOW_PALETTE;
+        underLights      = hwMap.get(RevBlinkinLedDriver.class, "under_blinky");
+        underPattern     = RevBlinkinLedDriver.BlinkinPattern.COLOR_WAVES_RAINBOW_PALETTE;
         lights.setPattern(pattern);
+        underLights.setPattern(underPattern);
+
 
         // Define and Initialize Sensors //
         landerSeer       = hwMap.get(ModernRoboticsI2cRangeSensor.class, "lander_seer");

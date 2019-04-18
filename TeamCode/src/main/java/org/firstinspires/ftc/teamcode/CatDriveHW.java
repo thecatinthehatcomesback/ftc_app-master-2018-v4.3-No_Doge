@@ -35,7 +35,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 /**
  * This is NOT an OpMode.
  *
- * This class is used to define all the arm specific hardware for the robot to
+ * This class is used to define all the specific hardware for the robot to
  * allow for multiple operations during autonomous.  In this case, that robot is
  * Jack from the Cat in the Hat Comes Back team during the 2018-2019 season.
  *

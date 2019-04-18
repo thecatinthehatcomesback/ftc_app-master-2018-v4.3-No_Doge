@@ -23,8 +23,6 @@
 
 
 
- This file is a modified version from the FTC SDK.
- Modifications by FTC Team #10273, The Cat in the Hat Comes Back.
 */
 package org.firstinspires.ftc.teamcode;
 
@@ -48,6 +46,7 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
     private boolean isCraterSide = false;
     private boolean parkInOurCrater = false;
     private boolean closeToWall = true;
+    private boolean teamMarker = false;
 
     private CatVisionHW.samplingPos samplingPos = CatVisionHW.samplingPos.RIGHT;
 
@@ -137,12 +136,23 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
                 delayTimer.reset();
             }
 
+            ///TODO: remove this option
             // Change how close to the wall we go
             if (((gamepad1.y) && delayTimer.seconds() > 0.8)) {
                 if (closeToWall) {
                     closeToWall= false;
                 } else {
                     closeToWall = true;
+                }
+                delayTimer.reset();
+            }
+
+            // Change If we go to drop off the team marker or not
+            if (((gamepad1.b) && delayTimer.seconds() > 0.8)) {
+                if (teamMarker) {
+                    teamMarker = false;
+                } else {
+                    teamMarker = true;
                 }
                 delayTimer.reset();
             }
@@ -201,6 +211,11 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
                 telemetry.addData("End position is:", "Next to wall");
             } else {
                 telemetry.addData("End position is:", "Next to Lander Leg");
+            }
+            if (teamMarker){
+                telemetry.addData("Team marker is:", "Dropped off");
+            } else {
+                telemetry.addData("Team marker is:", "Not used");
             }
 
             /**
@@ -302,96 +317,96 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
          */
     }
     public void driveCrater()  throws InterruptedException {
-        //recenters to 0 degrees
-        robot.drive.mecTurn(.4,2,1);
-        robot.drive.waitUntillDone();
-        switch (samplingPos) {
-            case LEFT:
-                robot.drive.mecTurn(robot.TURN_SPEED,-12,2.5);
-                break;
-            case RIGHT:
-                robot.drive.mecTurn(robot.TURN_SPEED,15,2.5);
-                break;
-        }
 
-        //Pick up gold
-        robot.arm.rotateArm(CatMecanumHW.ARM_FLOOR);
-        //wait untill both the arm is lowered and the has driven to the correct position to sample
-        CatSubsystemHW.waitUntillDone(robot.arm, robot.drive);
-        robot.extend.extendArm();
-        robot.extend.waitUntillDone();
-        robot.extend.retractArm();
-        robot.arm.rotateArm(CatMecanumHW.ARM_STRAIGHT_UP);
+           //aims to the correct gold location
+           switch (samplingPos) {
+               case LEFT:
+                   robot.drive.mecTurn(robot.TURN_SPEED, -12, 2.5);
+                   break;
+               case RIGHT:
+                   robot.drive.mecTurn(robot.TURN_SPEED, 19, 2.5);
+                   break;
+               case CENTER:
+                   robot.drive.mecTurn(.4, 4, 1);
+                   break;
+           }
+
+           //Pick up gold
+           robot.arm.rotateArm(CatMecanumHW.ARM_FLOOR);
+           //wait untill both the arm is lowered and the has driven to the correct position to sample
+           CatSubsystemHW.waitUntillDone(robot.arm, robot.drive);
+
+        if (teamMarker) {
+           robot.extend.extendArm();
+           robot.extend.waitUntillDone();
+           robot.extend.retractArm();
+           robot.arm.rotateArm(CatMecanumHW.ARM_STRAIGHT_UP);
 
 
-        //drives forward to avoid hitting the lander's leg
-        robot.robotWait(.5);
-        robot.drive.mecTurn(CatMecanumHW.TURN_SPEED,-26,3);
-        CatSubsystemHW.waitUntillDone(robot.arm, robot.extend, robot.drive);
-        robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED,10,3.0);
-        robot.drive.waitUntillDone();
-        robot.drive.mecTurn(CatMecanumHW.TURN_SPEED ,-84,3.5);
-        robot.drive.waitUntillDone();
-        //drives toward wall and aims toward the crater
-        robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED,27,6);
-        robot.drive.waitUntillDone();
-        robot.drive.mecTurn(CatMecanumHW.TURN_SPEED,-110,2);
-        robot.drive.waitUntillDone();
-        //lower arm
-        robot.arm.rotateArm(CatMecanumHW.ARM_DEPOT_DROPOFF);
-        //Extend arm to depot
-        robot.extend.extendArm();
-        CatSubsystemHW.waitUntillDone(robot.arm,robot.extend);
-        //Spit out team marker
-        robot.arm.intakeServo.setPower(-0.87);
-        robot.robotWait(.5);
-        //Bring back arm
-        robot.arm.rotateArm(CatMecanumHW.ARM_OVER_SAMPLING);
-        robot.arm.waitUntillDone();
-        robot.arm.intakeServo.setPower(0.0);
-        robot.extend.retractArm();
-        robot.extend.waitUntillDone();
-        //lifts arm to avoid hitting the lander's leg
-        robot.arm.rotateArm(CatMecanumHW.ARM_TUCKED_IN);
-        robot.arm.waitUntillDone();
-        //turns to aim at the sample field
-        robot.drive.mecTurn(0.9,12,3);
-        robot.drive.waitUntillDone();
-        robot.arm.rotateArm(CatMecanumHW.ARM_OVER_SAMPLING);
-        robot.extend.extendArm();
-        CatSubsystemHW.waitUntillDone(robot.arm,robot.extend);
-        /**robot.intakeServo.setPower(-.87);
-        //tries to sample from the side
-        switch (samplingPos) {
-            case LEFT:
-                break;
-            case CENTER:
-                robot.mecDriveVertical(CatMecanumHW.DRIVE_SPEED,-7,2.5,CatMecanumHW.DRIVE_MODE.driveTilDistance);
-                robot.extendArm();
-                break;
-            case RIGHT:
-                robot.extendArm();
-                robot.mecDriveVertical(CatMecanumHW.DRIVE_SPEED,5,2.5,CatMecanumHW.DRIVE_MODE.driveTilDistance);
-                break;
-            case UNKNOWN:
-                break;
+           //drives forward to avoid hiting the landers leg
+           robot.robotWait(.5);
+           robot.drive.mecTurn(CatMecanumHW.TURN_SPEED, -26, 3);
+           CatSubsystemHW.waitUntillDone(robot.arm, robot.extend, robot.drive);
+           robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED, 10, 3.0);
+           robot.drive.waitUntillDone();
+           robot.drive.mecTurn(CatMecanumHW.TURN_SPEED, -84, 3.5);
+           robot.drive.waitUntillDone();
+           //drives toward wall and aims toward the craytor
+           robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED, 27, 6);
+           robot.drive.waitUntillDone();
+           robot.drive.mecTurn(CatMecanumHW.TURN_SPEED, -110, 2);
+           robot.drive.waitUntillDone();
+           //lower arm
+           robot.arm.rotateArm(CatMecanumHW.ARM_DEPOT_DROPOFF);
+           //Extend arm to depot
+           robot.extend.extendArm();
+           CatSubsystemHW.waitUntillDone(robot.arm, robot.extend);
+           //Spit out team marker
+           robot.arm.intakeServo.setPower(-0.87);
+           robot.robotWait(.5);
+           //Bring back arm
+           robot.arm.rotateArm(CatMecanumHW.ARM_OVER_SAMPLING);
+           robot.arm.waitUntillDone();
+           robot.arm.intakeServo.setPower(0.0);
+           robot.extend.retractArm();
+           robot.extend.waitUntillDone();
+           //lifts arm to avoid hitting the lander's leg
+           robot.arm.rotateArm(CatMecanumHW.ARM_TUCKED_IN);
+           robot.arm.waitUntillDone();
+           //turns to aim at the sample field
+           robot.drive.mecTurn(0.9, 12, 3);
+           robot.drive.waitUntillDone();
+           robot.arm.rotateArm(CatMecanumHW.ARM_DEPOT_DROPOFF);
+           robot.extend.extendArm();
+           CatSubsystemHW.waitUntillDone(robot.arm, robot.extend);
+       }else{
+            robot.arm.intakeServo.setPower(0.87);
+            robot.extend.extendArm();
+            robot.extend.waitUntillDone();
+            robot.arm.rotateArm(CatMecanumHW.ARM_TUCKED_IN);
+            robot.extend.retractArm();
+            robot.arm.intakeServo.setPower(0.0);
+            //drives back to the lander at the same time the arm rotates.
+            robot.drive.mecTurn(.35,0,2);
+            //This will extend arm so that it reaches full extension and rotation at similar times.
+            robot.arm.setExtenderValue(3000);
+            CatSubsystemHW.waitUntillDone(robot.drive, robot.arm);
+            robot.extend.extenderMotor.setPower(robot.extend.EXTEND_POWER);
+            robot.arm.gateOpen();
+            robot.arm.rotateArm(CatMecanumHW.ARM_SCORE,.65);
+            robot.arm.waitUntillDone();
+            robot.arm.rotateArm(CatMecanumHW.ARM_STRAIGHT_UP);
+            robot.arm.waitUntillDone();
+            //starts to drive away from the lander and to the crater
+            //Once far enough from lander we safely withdraw and rotate arm to crater height
+            robot.extend.retractArm();
+            robot.arm.gateClose();
+
+
+
+
+
         }
-        robot.mecTurn(robot.TURN_SPEED, 77, 1.5);
-        robot.robotWait(.3);
-        robot.mecTurn(CatMecanumHW.TURN_SPEED,90,1.5);
-        robot.intakeServo.setPower(0.0);
-        //puts the arm into the crater
-        robot.rotateArm(CatMecanumHW.ARM_DEPOT_DROPOFF);
-        if (samplingPos==CatVisionHW.samplingPos.LEFT) {
-            robot.extendArm();
-        }
-        robot.mecTurn(CatMecanumHW.TURN_SPEED,25,2.5);
-        robot.rotateArm(CatMecanumHW.ARM_OVER_SAMPLING);
-        //tries to pick up minerals
-        robot.intakeServo.setPower(.87);
-        robot.robotWait(.75);
-        robot.intakeServo.setPower(0.0);
-*/
 
     }
     public void driveDepot() throws InterruptedException {

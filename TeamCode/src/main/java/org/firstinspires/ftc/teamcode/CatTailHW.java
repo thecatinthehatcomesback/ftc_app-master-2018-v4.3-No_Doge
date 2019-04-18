@@ -152,36 +152,6 @@ public class CatTailHW extends CatSubsystemHW
         Log.d("catbot", String.format(" Setting Tail to: -0.4"));
         tailMotor.setPower(-0.8);
 
-
-
-
-        /*while (opMode.opModeIsActive()) {
-            // Get the current encoder value
-            newEncTicks = tailMotor.getCurrentPosition();
-            // Set tail to retract slowly at quarter power
-            tailMotor.setPower(-0.4);
-
-            // Every so often, check the values
-            if (runtime.milliseconds() > 750) {
-                // Once the encoder ticks slows down or stops
-                if ((newEncTicks - oldEncTicks) > -80) {
-                    // Cut power to tail
-                    tailMotor.setPower(0.0);
-                    // Tell EVERYONE!!!
-                    opMode.telemetry.addData("Status: ", "Success!!!");
-                    opMode.telemetry.update();
-                    return;
-                }
-
-                // Otherwise continue as normal and reset timer
-                opMode.telemetry.addData("Status: ", "Still going...");
-                runtime.reset();
-                oldEncTicks = newEncTicks;
-            }
-            opMode.telemetry.addData("Current Enc Ticks: ", newEncTicks);
-            opMode.telemetry.addData("Old Enc Ticks: ", oldEncTicks);
-            opMode.telemetry.update();
-        }*/
     }
 
 
