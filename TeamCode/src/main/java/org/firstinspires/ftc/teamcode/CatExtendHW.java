@@ -44,7 +44,7 @@ public class CatExtendHW extends CatSubsystemHW
     static final double     RETRACT_POWER           = 0.7;
     static final int        EXTEND_IN               = 0;
     static final int        EXTEND_OUT              = -1050;
-    static final int        EXTEND_CRATER           = -700;
+    static final int        EXTEND_CRATER           = -750;
 
     boolean                 isEncoder               = false;
 

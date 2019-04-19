@@ -297,10 +297,10 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
            //aims to the correct gold location
            switch (samplingPos) {
                case LEFT:
-                   robot.drive.mecTurn(CatDriveHW.TURN_SPEED, -12, 2.5);
+                   robot.drive.mecTurn(CatDriveHW.TURN_SPEED, -10, 2.5);
                    break;
                case RIGHT:
-                   robot.drive.mecTurn(CatDriveHW.TURN_SPEED, 19, 2.5);
+                   robot.drive.mecTurn(CatDriveHW.TURN_SPEED, 17, 2.5);
                    break;
                case CENTER:
                    robot.drive.mecTurn(CatDriveHW.CHILL_SPEED, 2, 1);
@@ -361,13 +361,13 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
             robot.extend.waitUntillDone();
             robot.arm.rotateArm(CatMecanumHW.ARM_TUCKED_IN);
             robot.extend.retractArm();
-            robot.arm.intakeServo.setPower(0.0);
             //drives back to the lander at the same time the arm rotates.
             robot.drive.mecTurn(CatDriveHW.CHILL_SPEED,8,2);
             //This will extend arm so that it reaches full extension and rotation at similar times.
             robot.arm.setExtenderValue(3000);
             CatSubsystemHW.waitUntillDone(robot.drive, robot.arm);
             robot.extend.extenderMotor.setPower(robot.extend.EXTEND_POWER);
+            robot.arm.intakeServo.setPower(0.0);
             robot.arm.gateOpen();
             robot.arm.rotateArm(CatMecanumHW.ARM_SCORE,.45);
             robot.arm.waitUntillDone();
@@ -387,7 +387,7 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
                 CatSubsystemHW.waitUntillDone(robot.arm, robot.extend);
 
                 // Drive ahead and pick up
-                robot.drive.mecDriveVertical(CatDriveHW.CHILL_SPEED, 12, 2);
+                robot.drive.mecDriveVertical(CatDriveHW.CREEP_SPEED, 12, 2);
                 robot.extend.extendArm();
                 robot.drive.waitUntillDone();
                 // Bring arm up and in but spit out any extra block
@@ -401,6 +401,8 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
 
                 robot.drive.mecDriveVertical(CatDriveHW.DRIVE_SPEED, -10, 1.5);
                 CatSubsystemHW.waitUntillDone(robot.drive, robot.arm);
+                robot.drive.mecTurn(CatDriveHW.CHILL_SPEED, 8, 2);
+                robot.drive.waitUntillDone();
 
                 robot.arm.setExtenderValue(3000);
                 robot.extend.extenderMotor.setPower(robot.extend.EXTEND_POWER);
@@ -409,6 +411,9 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
                 robot.arm.gateOpen();
                 robot.arm.rotateArm(CatMecanumHW.ARM_SCORE,.45);
                 robot.arm.waitUntillDone();
+                robot.robotWait(0.3);
+                robot.drive.mecTurn(CatDriveHW.CHILL_SPEED, -2, 2);
+                robot.drive.waitUntillDone();
                 robot.arm.rotateArm(CatMecanumHW.ARM_STRAIGHT_UP);
                 robot.arm.waitUntillDone();
                 robot.arm.gateClose();

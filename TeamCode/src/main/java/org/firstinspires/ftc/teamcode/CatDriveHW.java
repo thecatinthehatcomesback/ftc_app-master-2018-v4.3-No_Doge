@@ -56,11 +56,11 @@ public class CatDriveHW extends CatSubsystemHW
     static final double     COUNTS_PER_INCH         = COUNTS_PER_MOTOR_REV / (WHEEL_DIAMETER_INCHES * 3.1415);
 
     // Autonomous Drive Speeds
-    static final double     DRIVE_SPEED             = 0.6;
-    static final double     HYPER_SPEED             = 0.9;
-    static final double     CHILL_SPEED             = 0.25;
-    static final double     CREEP_SPEED             = 0.20;
-    static final double     TURN_SPEED              = 0.6;
+    static final double     HYPER_SPEED             = 0.90;
+    static final double     DRIVE_SPEED             = 0.60;
+    static final double     CHILL_SPEED             = 0.40;
+    static final double     CREEP_SPEED             = 0.25;
+    static final double     TURN_SPEED              = 0.60;
 
     ElapsedTime runtime = new ElapsedTime();
     double timeout = 0;
