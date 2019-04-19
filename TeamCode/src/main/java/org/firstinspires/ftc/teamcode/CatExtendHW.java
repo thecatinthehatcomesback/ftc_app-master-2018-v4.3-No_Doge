@@ -43,8 +43,8 @@ public class CatExtendHW extends CatSubsystemHW
     static final double     EXTEND_POWER            = -0.95;
     static final double     RETRACT_POWER           = 0.7;
     static final int        EXTEND_IN               = 0;
-    static final int        EXTEND_OUT              = -1050;
-    static final int        EXTEND_CRATER           = -750;
+    static final int        EXTEND_OUT              = -910;
+    static final int        EXTEND_CRATER           = -710;
 
     boolean                 isEncoder               = false;
 
@@ -101,7 +101,7 @@ public class CatExtendHW extends CatSubsystemHW
         extenderMotor.setPower(EXTEND_POWER);
         ElapsedTime runtime = new ElapsedTime();
         runtime.reset();
-        while (runtime.seconds() < 0.7){
+        while (runtime.seconds() < 0.6){
             if (!mainHW.opMode.opModeIsActive()) {
                 return;
             }
