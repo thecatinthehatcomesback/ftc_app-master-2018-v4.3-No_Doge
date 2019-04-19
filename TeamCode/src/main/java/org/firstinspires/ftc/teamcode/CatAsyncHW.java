@@ -12,7 +12,6 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -45,7 +44,7 @@ public class CatAsyncHW
     // Autonomous Drive Speeds
     static final double     DRIVE_SPEED             = 0.7;
     static final double     HYPER_SPEED             = 0.95;
-    static final double     CHILL_SPEED             = 0.45;
+    static final double     CHILL_SPEED             = 0.4;
     static final double     CREEP_SPEED             = 0.25;
     static final double     TURN_SPEED              = 0.6;
 
@@ -70,11 +69,11 @@ public class CatAsyncHW
     public static boolean isRedAlliance = true;
 
     // Sensors
-    public ModernRoboticsI2cRangeSensor landerSeer  = null;
-    public ColorSensor frontLeftColor               = null;
-    public ColorSensor frontRightColor              = null;
-    public ColorSensor rearLeftColor                = null;
-    public ColorSensor rearRightColor               = null;
+    //public ModernRoboticsI2cRangeSensor landerSeer  = null;
+    //public ColorSensor frontLeftColor               = null;
+    //public ColorSensor frontRightColor              = null;
+    //public ColorSensor rearLeftColor                = null;
+    //public ColorSensor rearRightColor               = null;
 
 
     /* local OpMode members. */
@@ -115,17 +114,16 @@ public class CatAsyncHW
         lights           = hwMap.get(RevBlinkinLedDriver.class, "blinky");
         pattern          = RevBlinkinLedDriver.BlinkinPattern.RAINBOW_RAINBOW_PALETTE;
         underLights      = hwMap.get(RevBlinkinLedDriver.class, "under_blinky");
-        underPattern     = RevBlinkinLedDriver.BlinkinPattern.COLOR_WAVES_RAINBOW_PALETTE;
+        underPattern     = RevBlinkinLedDriver.BlinkinPattern.RAINBOW_RAINBOW_PALETTE;
         lights.setPattern(pattern);
         underLights.setPattern(underPattern);
 
-
         // Define and Initialize Sensors //
-        landerSeer       = hwMap.get(ModernRoboticsI2cRangeSensor.class, "lander_seer");
-        frontLeftColor   = hwMap.get(ColorSensor.class, "front_left_color");
-        frontRightColor  = hwMap.get(ColorSensor.class, "front_right_color");
-        rearLeftColor    = hwMap.get(ColorSensor.class, "rear_left_color");
-        rearRightColor   = hwMap.get(ColorSensor.class, "rear_right_color");
+        //landerSeer       = hwMap.get(ModernRoboticsI2cRangeSensor.class, "lander_seer");
+        //frontLeftColor   = hwMap.get(ColorSensor.class, "front_left_color");
+        //frontRightColor  = hwMap.get(ColorSensor.class, "front_right_color");
+        //rearLeftColor    = hwMap.get(ColorSensor.class, "rear_left_color");
+        //rearRightColor   = hwMap.get(ColorSensor.class, "rear_right_color");
     }
 
     /**

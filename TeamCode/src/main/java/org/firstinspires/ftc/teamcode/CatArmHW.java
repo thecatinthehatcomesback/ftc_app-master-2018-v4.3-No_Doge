@@ -192,7 +192,7 @@ public class CatArmHW extends CatSubsystemHW
         int current = armMotor.getCurrentPosition();
 
         Log.d("catbot", String.format(" Arm rotate target %d, current %d ", target,current));
-        if (shouldStartExtend&&pastPosGoingUp(posStartExtend)) {
+        if (shouldStartExtend && pastPosGoingUp(posStartExtend)) {
             mainHW.extend.extendArm();
             shouldStartExtend = false;
         }

@@ -1,8 +1,8 @@
 /**
- ResetArmRotation.java
+ resetArmTail.java
 
- A Linear OpMode class that has one simple task: Rotate
- the arm a few times while resetting the encoders so that
+ A Linear OpMode class that has two simple tasks: Reset
+ the arm and tail and reset both encoders so that
  Jack will be within the 18 inch sizing cube and enhance
  autonomous accuracy.  It does this by checking the
  armRotateLimit switch, and rotating the arm accordingly.
@@ -20,8 +20,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@Autonomous(name="Reset Arm", group="CatAuto")
-public class ResetArmRotation extends LinearOpMode {
+@Autonomous(name="Reset Arm & Tail", group="CatAuto")
+public class resetArmTail extends LinearOpMode {
 
     /* Declare OpMode members. */
     CatAsyncHW robot = new CatAsyncHW();  // Use our new mecanum async hardware
@@ -51,17 +51,12 @@ public class ResetArmRotation extends LinearOpMode {
          *
          \*/
         delayTimer.reset();
-        telemetry.addData("Press", "gamepad1 X");
+        telemetry.addData("Press PLAY", "to reset the Arm and Tail");
         telemetry.update();
 
-        // Auto reset the arm
+        // Auto reset the tail and arm
+        robot.tail.autoResetTail();
+        robot.spawnWait(robot.tail);
         robot.arm.autoResetArm();
-
-        /**
-         * This used to be an entire autonomous routine that would reset
-         * the arm after play until we decided to put it into a method
-         * so that we could call it during the autonomous inits using a
-         * separate thread.
-         */
     }
 }

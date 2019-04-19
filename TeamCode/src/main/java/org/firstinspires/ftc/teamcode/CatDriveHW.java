@@ -59,7 +59,7 @@ public class CatDriveHW extends CatSubsystemHW
     static final double     DRIVE_SPEED             = 0.6;
     static final double     HYPER_SPEED             = 0.9;
     static final double     CHILL_SPEED             = 0.25;
-    static final double     CREEP_SPEED             = 0.10;
+    static final double     CREEP_SPEED             = 0.20;
     static final double     TURN_SPEED              = 0.6;
 
     ElapsedTime runtime = new ElapsedTime();
@@ -423,6 +423,8 @@ public class CatDriveHW extends CatSubsystemHW
             runNoEncoders();
             // reset the timeout time and start motion.
             runtime.reset();
+            Log.d("catbot", String.format("Start turn...  target %d, current %d  %s", -targetAngleZ, -getCurrentAngle(), clockwiseTurn ?"CW":"CCW"));
+
 
             // Change the power based on which angle we are turning to
             if (clockwiseTurn) {
@@ -596,7 +598,7 @@ public class CatDriveHW extends CatSubsystemHW
 
                 int zVal = getCurrentAngle();
 
-                Log.d("catbot", String.format("target %d, current %d  %s", targetAngleZ, zVal, clockwiseTurn ? "CW": "CCW"));
+                Log.d("catbot", String.format("target %d, current %d  %s", -targetAngleZ, -zVal, clockwiseTurn ? "CW": "CCW"));
 
                 if ((zVal >= targetAngleZ) && (!clockwiseTurn)) {
                     keepDriving = false;

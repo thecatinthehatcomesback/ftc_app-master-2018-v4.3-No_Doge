@@ -43,9 +43,8 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
     private ElapsedTime delayTimer = new ElapsedTime();
     private double timeDelay;
     private boolean isRedAlliance = true;
-    private boolean isCraterSide = false;
+    private boolean isCraterSide = true;
     private boolean parkInOurCrater = false;
-    private boolean closeToWall = true;
     private boolean teamMarker = false;
 
     private CatVisionHW.samplingPos samplingPos = CatVisionHW.samplingPos.RIGHT;
@@ -77,7 +76,6 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
         robot.drive.resetEncoders();
         idle();
         robot.drive.runToPosition();
-
 
         /**
          * After init is pushed but before Start we
@@ -136,17 +134,6 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
                 delayTimer.reset();
             }
 
-            ///TODO: remove this option
-            // Change how close to the wall we go
-            if (((gamepad1.y) && delayTimer.seconds() > 0.8)) {
-                if (closeToWall) {
-                    closeToWall= false;
-                } else {
-                    closeToWall = true;
-                }
-                delayTimer.reset();
-            }
-
             // Change If we go to drop off the team marker or not
             if (((gamepad1.b) && delayTimer.seconds() > 0.8)) {
                 if (teamMarker) {
@@ -154,12 +141,6 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
                 } else {
                     teamMarker = true;
                 }
-                delayTimer.reset();
-            }
-
-            // Auto reset the arm
-            if (((gamepad1.x) && delayTimer.seconds() > 0.8)) {
-                robot.arm.autoResetArm();
                 delayTimer.reset();
             }
 
@@ -206,11 +187,6 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
                 telemetry.addData("Parking in the Crater:", "On our alliance side...");
             } else {
                 telemetry.addData("Parking in the Crater:", "Of the other alliance's side...");
-            }
-            if (closeToWall) {
-                telemetry.addData("End position is:", "Next to wall");
-            } else {
-                telemetry.addData("End position is:", "Next to Lander Leg");
             }
             if (teamMarker){
                 telemetry.addData("Team marker is:", "Dropped off");
@@ -321,13 +297,13 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
            //aims to the correct gold location
            switch (samplingPos) {
                case LEFT:
-                   robot.drive.mecTurn(robot.TURN_SPEED, -12, 2.5);
+                   robot.drive.mecTurn(CatDriveHW.TURN_SPEED, -12, 2.5);
                    break;
                case RIGHT:
-                   robot.drive.mecTurn(robot.TURN_SPEED, 19, 2.5);
+                   robot.drive.mecTurn(CatDriveHW.TURN_SPEED, 19, 2.5);
                    break;
                case CENTER:
-                   robot.drive.mecTurn(.4, 4, 1);
+                   robot.drive.mecTurn(CatDriveHW.CHILL_SPEED, 2, 1);
                    break;
            }
 
@@ -343,18 +319,18 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
            robot.arm.rotateArm(CatMecanumHW.ARM_STRAIGHT_UP);
 
 
-           //drives forward to avoid hiting the landers leg
+           //drives forward to avoid hitting the landers leg
            robot.robotWait(.5);
-           robot.drive.mecTurn(CatMecanumHW.TURN_SPEED, -26, 3);
+           robot.drive.mecTurn(CatDriveHW.TURN_SPEED, -26, 3);
            CatSubsystemHW.waitUntillDone(robot.arm, robot.extend, robot.drive);
-           robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED, 10, 3.0);
+           robot.drive.mecDriveVertical(CatDriveHW.DRIVE_SPEED, 10, 3.0);
            robot.drive.waitUntillDone();
-           robot.drive.mecTurn(CatMecanumHW.TURN_SPEED, -84, 3.5);
+           robot.drive.mecTurn(CatDriveHW.TURN_SPEED, -84, 3.5);
            robot.drive.waitUntillDone();
            //drives toward wall and aims toward the craytor
-           robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED, 27, 6);
+           robot.drive.mecDriveVertical(CatDriveHW.DRIVE_SPEED, 27, 6);
            robot.drive.waitUntillDone();
-           robot.drive.mecTurn(CatMecanumHW.TURN_SPEED, -110, 2);
+           robot.drive.mecTurn(CatDriveHW.TURN_SPEED, -110, 2);
            robot.drive.waitUntillDone();
            //lower arm
            robot.arm.rotateArm(CatMecanumHW.ARM_DEPOT_DROPOFF);
@@ -379,21 +355,21 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
            robot.arm.rotateArm(CatMecanumHW.ARM_DEPOT_DROPOFF);
            robot.extend.extendArm();
            CatSubsystemHW.waitUntillDone(robot.arm, robot.extend);
-       }else{
+        } else {
             robot.arm.intakeServo.setPower(0.87);
-            robot.extend.extendArm();
+            robot.extend.extendEncoder(CatExtendHW.EXTEND_CRATER);
             robot.extend.waitUntillDone();
             robot.arm.rotateArm(CatMecanumHW.ARM_TUCKED_IN);
             robot.extend.retractArm();
             robot.arm.intakeServo.setPower(0.0);
             //drives back to the lander at the same time the arm rotates.
-            robot.drive.mecTurn(.35,0,2);
+            robot.drive.mecTurn(CatDriveHW.CHILL_SPEED,8,2);
             //This will extend arm so that it reaches full extension and rotation at similar times.
             robot.arm.setExtenderValue(3000);
             CatSubsystemHW.waitUntillDone(robot.drive, robot.arm);
             robot.extend.extenderMotor.setPower(robot.extend.EXTEND_POWER);
             robot.arm.gateOpen();
-            robot.arm.rotateArm(CatMecanumHW.ARM_SCORE,.65);
+            robot.arm.rotateArm(CatMecanumHW.ARM_SCORE,.45);
             robot.arm.waitUntillDone();
             robot.arm.rotateArm(CatMecanumHW.ARM_STRAIGHT_UP);
             robot.arm.waitUntillDone();
@@ -403,9 +379,45 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
             robot.arm.gateClose();
 
 
+            for (int i = 0; i < 2; i++) {
+                // Lower and extend the arm
+                robot.arm.rotateArm(CatMecanumHW.ARM_CRATER_GRAB);
+                robot.extend.extendEncoder(CatExtendHW.EXTEND_CRATER);
+                robot.arm.intakeServo.setPower(0.87);
+                CatSubsystemHW.waitUntillDone(robot.arm, robot.extend);
 
+                // Drive ahead and pick up
+                robot.drive.mecDriveVertical(CatDriveHW.CHILL_SPEED, 12, 2);
+                robot.extend.extendArm();
+                robot.drive.waitUntillDone();
+                // Bring arm up and in but spit out any extra block
+                robot.arm.rotateArm(CatMecanumHW.ARM_OVER_SAMPLING);
+                robot.arm.waitUntillDone();
+                robot.arm.intakeServo.setPower(-0.87);
+                robot.robotWait(0.1);
+                robot.arm.intakeServo.setPower(0.0);
+                robot.arm.rotateArm(CatMecanumHW.ARM_TUCKED_IN);
+                robot.extend.retractArm();
 
+                robot.drive.mecDriveVertical(CatDriveHW.DRIVE_SPEED, -10, 1.5);
+                CatSubsystemHW.waitUntillDone(robot.drive, robot.arm);
 
+                robot.arm.setExtenderValue(3000);
+                robot.extend.extenderMotor.setPower(robot.extend.EXTEND_POWER);
+                robot.robotWait(0.4);
+                // Open gate and score minerals
+                robot.arm.gateOpen();
+                robot.arm.rotateArm(CatMecanumHW.ARM_SCORE,.45);
+                robot.arm.waitUntillDone();
+                robot.arm.rotateArm(CatMecanumHW.ARM_STRAIGHT_UP);
+                robot.arm.waitUntillDone();
+                robot.arm.gateClose();
+            }
+
+            // Get into the crater now
+            robot.arm.rotateArm(CatMecanumHW.ARM_CRATER_SCORE);
+            robot.extend.extendArm();
+            CatSubsystemHW.waitUntillDone(robot.arm, robot.extend);
         }
 
     }
@@ -418,7 +430,7 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
         Log.d("catbot", String.format(" Start extending to depot"));
         robot.extend.extendArm();
         // Drive ahead to deploy marker
-        robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED, 10, 2);
+        robot.drive.mecDriveVertical(CatDriveHW.DRIVE_SPEED, 10, 2);
         CatSubsystemHW.waitUntillDone(robot.arm, robot.drive, robot.extend);
         //Finish lower arm
         robot.arm.rotateArm(CatMecanumHW.ARM_DEPOT_DROPOFF);
@@ -438,7 +450,7 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
          */
         // Drive back to hit gold
         Log.d("catbot", String.format(" back up to hit gold"));
-        robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED, -11, 2);
+        robot.drive.mecDriveVertical(CatDriveHW.DRIVE_SPEED, -11, 2);
         robot.drive.waitUntillDone();
         robot.arm.rotateArm(CatMecanumHW.ARM_FLOOR);
         //Turn to gold correct gold position
@@ -495,42 +507,32 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
 
         if (parkInOurCrater) {
             // Drive to crater nearest the audience
-            robot.drive.mecTurn(CatMecanumHW.TURN_SPEED ,27,3.5);
+            robot.drive.mecTurn(CatDriveHW.TURN_SPEED ,27,3.5);
             CatSubsystemHW.waitUntillDone(robot.drive, robot.extend);
-            robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED,12,3.0);
+            robot.drive.mecDriveVertical(CatDriveHW.DRIVE_SPEED,12,3.0);
             robot.drive.waitUntillDone();
-            if (closeToWall) {
-                robot.drive.mecTurn(CatMecanumHW.TURN_SPEED, 73, 3.5);
-                robot.drive.waitUntillDone();
-                //Lower arm
-                robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED, 32, 3.0);
-                robot.drive.waitUntillDone();
-                robot.drive.mecTurn(CatMecanumHW.TURN_SPEED, 110, 1);
-                robot.arm.rotateArm(CatMecanumHW.ARM_OVER_SAMPLING);
-            } else {
-                robot.drive.mecTurn(CatMecanumHW.TURN_SPEED, 78, 3.5);
-                robot.drive.waitUntillDone();
-                //Lower arm
-                robot.arm.rotateArm(CatMecanumHW.ARM_OVER_SAMPLING);
-                robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED, 14, 3.0);
-                robot.drive.waitUntillDone();
-                robot.drive.mecTurn(CatMecanumHW.TURN_SPEED, 120, 1);
-                robot.drive.waitUntillDone();
-                robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED, 6, 3.0);
-            }
+            robot.drive.mecTurn(CatDriveHW.TURN_SPEED, 78, 3.5);
+            robot.drive.waitUntillDone();
+            //Lower arm
+            robot.arm.rotateArm(CatMecanumHW.ARM_OVER_SAMPLING);
+            robot.drive.mecDriveVertical(CatDriveHW.DRIVE_SPEED, 14, 3.0);
+            robot.drive.waitUntillDone();
+            robot.drive.mecTurn(CatDriveHW.TURN_SPEED, 120, 1);
+            robot.drive.waitUntillDone();
+            robot.drive.mecDriveVertical(CatDriveHW.DRIVE_SPEED, 6, 3.0);
         } else {
             // Drive to farther crater
-            robot.drive.mecTurn(CatMecanumHW.TURN_SPEED ,-27,3.5, CatDriveHW.TURN_MODE.TANK);
+            robot.drive.mecTurn(CatDriveHW.TURN_SPEED ,-27,3.5, CatDriveHW.TURN_MODE.TANK);
             CatSubsystemHW.waitUntillDone(robot.drive, robot.extend);
-            robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED,9,3.0);
+            robot.drive.mecDriveVertical(CatDriveHW.DRIVE_SPEED,9,3.0);
             robot.drive.waitUntillDone();
-            robot.drive.mecTurn(CatMecanumHW.TURN_SPEED ,-87,3.5);
+            robot.drive.mecTurn(CatDriveHW.TURN_SPEED ,-87,3.5);
             //Lower arm
             robot.arm.rotateArm(CatMecanumHW.ARM_OVER_SAMPLING);
             CatSubsystemHW.waitUntillDone(robot.drive,robot.arm);
-            robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED,14,3.0);
+            robot.drive.mecDriveVertical(CatDriveHW.DRIVE_SPEED,14,3.0);
             //robot.drive.waitUntillDone();
-            //robot.drive.mecTurn(CatMecanumHW.TURN_SPEED,-100,1);
+            //robot.drive.mecTurn(CatDriveHW.TURN_SPEED,-100,1);
             robot.arm.rotateArm(CatMecanumHW.ARM_CRATER_GRAB);
         }
 
@@ -552,23 +554,23 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
             //starts bring the arm back in and rotates it to the scoring position
             robot.arm.rotateArm(CatMecanumHW.ARM_TUCKED_IN);
             robot.extend.retractArm();
-            robot.drive.mecTurn(CatMecanumHW.TURN_SPEED ,-90,3.5);
+            robot.drive.mecTurn(CatDriveHW.TURN_SPEED ,-90,3.5);
             //drives back toward the lander
-            robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED, -14, 3.0);
+            robot.drive.mecDriveVertical(CatDriveHW.DRIVE_SPEED, -14, 3.0);
             robot.arm.intakeServo.setPower(0.0);
             robot.drive.waitUntillDone();
-            robot.drive.mecTurn(CatMecanumHW.TURN_SPEED ,-50,3.5);
+            robot.drive.mecTurn(CatDriveHW.TURN_SPEED ,-50,3.5);
             robot.drive.waitUntillDone();
-            robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED,-18,3.0);
+            robot.drive.mecDriveVertical(CatDriveHW.DRIVE_SPEED,-18,3.0);
             robot.drive.waitUntillDone();
             CatSubsystemHW.waitUntillDone(robot.extend, robot.arm);
-            robot.drive.mecTurn(CatMecanumHW.TURN_SPEED,-9,2);
+            robot.drive.mecTurn(CatDriveHW.TURN_SPEED,-9,2);
             robot.robotWait(0.3);
             //recenters to the lander
             robot.drive.mecTurn(0.4,-4,2);
             robot.drive.waitUntillDone();
             //drives into the lander
-            robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED,-3,2.0);
+            robot.drive.mecDriveVertical(CatDriveHW.DRIVE_SPEED,-3,2.0);
             robot.extend.extenderMotor.setPower(robot.extend.EXTEND_POWER);
             robot.robotWait(.4);
             //opens the gate and tries to score the minerals by wiggling them out
@@ -579,14 +581,14 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
             robot.arm.rotateArm(CatMecanumHW.ARM_STRAIGHT_UP);
             robot.arm.waitUntillDone();
             //drives away from the lander and reenters the crater
-            robot.drive.mecDriveVertical(CatMecanumHW.DRIVE_SPEED,12,2);
+            robot.drive.mecDriveVertical(CatDriveHW.DRIVE_SPEED,12,2);
             robot.drive.waitUntillDone();
             //resets the gate and lowers the arm while driving
             robot.arm.gateClose();
             robot.arm.rotateArm(CatMecanumHW.ARM_CRATER_SCORE);
-            robot.drive.mecTurn(CatMecanumHW.TURN_SPEED ,-83,3.5);
+            robot.drive.mecTurn(CatDriveHW.TURN_SPEED ,-83,3.5);
             robot.drive.waitUntillDone();
-            robot.drive.mecDriveVertical(CatMecanumHW.HYPER_SPEED, 20, 2);
+            robot.drive.mecDriveVertical(CatDriveHW.HYPER_SPEED, 20, 2);
             robot.extend.extendArm();
             robot.drive.waitUntillDone();
             //Finishes with all autonomous goals completed and one extra cycle

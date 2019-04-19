@@ -53,8 +53,10 @@ public class JackTeleOp extends LinearOpMode {
         waitForStart();
         if(robot.isRedAlliance) {
             robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_LAVA_PALETTE);
+            robot.underLights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
         } else {
             robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_OCEAN_PALETTE);
+            robot.underLights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
         }
 
 

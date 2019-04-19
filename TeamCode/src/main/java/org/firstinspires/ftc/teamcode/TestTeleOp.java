@@ -17,7 +17,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 
@@ -96,6 +95,18 @@ public class TestTeleOp extends LinearOpMode {
                 driveSpeed = 0.6;
             }
 
+            if (gamepad1.y && (runTime.seconds() > 0.5)) {
+                robot.pattern = robot.pattern.next();
+                runTime.reset();
+                robot.lights.setPattern(robot.pattern);
+            }
+
+            if (gamepad1.a && (runTime.seconds() > 0.5)) {
+                robot.pattern = robot.pattern.previous();
+                runTime.reset();
+                robot.lights.setPattern(robot.pattern);
+            }
+
             // Robot Drive-Direction Selection
             if (gamepad1.dpad_up){
                 inReverse = false;
@@ -143,9 +154,9 @@ public class TestTeleOp extends LinearOpMode {
 
             /** Tail Control **/
             // Once we hit endgame and we haven't been overridden, tell Jack
-            if ((elapsedGameTime.seconds() > 105.0) && !overrodeLiftTail) {
-                liftingTail = true;
-            }
+            //if ((elapsedGameTime.seconds() > 105.0) && !overrodeLiftTail) {
+            //    liftingTail = true;
+            //}
             // Exit the auto lift Tail if the driver touches it
             if (liftingTail && ((Math.abs(gamepad1.left_trigger - gamepad1.right_trigger)) > 0.2)) {
                 // Tell code that we overrode its DREAMS to avoid unwanted repeats!
@@ -254,19 +265,19 @@ public class TestTeleOp extends LinearOpMode {
             // IMU Sensor
             telemetry.addData("Z Y X: ", "%.1f, %.1f, %.1f", angles.firstAngle, angles.secondAngle, angles.thirdAngle);
             // Sensors
-            telemetry.addData("Ultrasonic Level:", "%.3f", robot.landerSeer.getDistance(DistanceUnit.CM));
-            telemetry.addData("FrontLeft: ", "  A: %3d,  R %3d,  G %3d,  B %3d,",
-                    robot.frontLeftColor.alpha(), robot.frontLeftColor.red(),
-                    robot.frontLeftColor.green(), robot.frontLeftColor.blue());
-            telemetry.addData("FrontRight: ", "  A: %3d,  R %3d,  G %3d,  B %3d,",
-                    robot.frontRightColor.alpha(), robot.frontRightColor.red(),
-                    robot.frontRightColor.green(), robot.frontRightColor.blue());
-            telemetry.addData("BackLeft: ", "  A: %3d,  R %3d,  G %3d,  B %3d,",
-                    robot.rearLeftColor.alpha(), robot.rearLeftColor.red(),
-                    robot.rearLeftColor.green(), robot.rearLeftColor.blue());
-            telemetry.addData("BackRight: ", "  A %3d,  R %3d,  G %3d,  B %3d,",
-                    robot.rearRightColor.alpha(), robot.rearRightColor.red(),
-                    robot.rearRightColor.green(), robot.rearRightColor.blue());
+            //telemetry.addData("Ultrasonic Level:", "%.3f", robot.landerSeer.getDistance(DistanceUnit.CM));
+            //telemetry.addData("FrontLeft: ", "  A: %3d,  R %3d,  G %3d,  B %3d,",
+            //        robot.frontLeftColor.alpha(), robot.frontLeftColor.red(),
+            //        robot.frontLeftColor.green(), robot.frontLeftColor.blue());
+            //telemetry.addData("FrontRight: ", "  A: %3d,  R %3d,  G %3d,  B %3d,",
+            //        robot.frontRightColor.alpha(), robot.frontRightColor.red(),
+            //        robot.frontRightColor.green(), robot.frontRightColor.blue());
+            //telemetry.addData("BackLeft: ", "  A: %3d,  R %3d,  G %3d,  B %3d,",
+            //        robot.rearLeftColor.alpha(), robot.rearLeftColor.red(),
+            //        robot.rearLeftColor.green(), robot.rearLeftColor.blue());
+            //telemetry.addData("BackRight: ", "  A %3d,  R %3d,  G %3d,  B %3d,",
+            //        robot.rearRightColor.alpha(), robot.rearRightColor.red(),
+            //        robot.rearRightColor.green(), robot.rearRightColor.blue());
             // LED Telemetry
             telemetry.addData("Pattern", "%s",robot.pattern.toString());
 

@@ -17,6 +17,7 @@ package org.firstinspires.ftc.teamcode;
 import android.util.Log;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -40,7 +41,12 @@ public class CatExtendHW extends CatSubsystemHW
 {
 
     static final double     EXTEND_POWER            = -0.95;
-    static final double     RETRACT_POWER            = 0.7;
+    static final double     RETRACT_POWER           = 0.7;
+    static final int        EXTEND_IN               = 0;
+    static final int        EXTEND_OUT              = -1050;
+    static final int        EXTEND_CRATER           = -700;
+
+    boolean                 isEncoder               = false;
 
     /* Public OpMode members. */
     // Motors
@@ -67,6 +73,10 @@ public class CatExtendHW extends CatSubsystemHW
         // Define motor directions //
         extenderMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
+        DcMotorEx extenderMotorEx =(DcMotorEx) extenderMotor;
+
+        extenderMotorEx.setTargetPositionTolerance(10);
+
         // Set motor modes //
         extenderMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -86,6 +96,8 @@ public class CatExtendHW extends CatSubsystemHW
          * Simply throw the intake on the end
          * of the arm outwards.
          */
+        extenderMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        isEncoder = false;
         extenderMotor.setPower(EXTEND_POWER);
         ElapsedTime runtime = new ElapsedTime();
         runtime.reset();
@@ -100,7 +112,16 @@ public class CatExtendHW extends CatSubsystemHW
          * Simply pull back the intake on the
          * end of the arm outwards.
          */
+        extenderMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        isEncoder = false;
         extenderMotor.setPower(RETRACT_POWER);
+        runtime.reset();
+    }
+    public void extendEncoder(int position) {
+        extenderMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        isEncoder = true;
+        extenderMotor.setTargetPosition(position);
+        extenderMotor.setPower(EXTEND_POWER);
         runtime.reset();
     }
 
@@ -110,6 +131,13 @@ public class CatExtendHW extends CatSubsystemHW
          * Checking to see when the extends and
          * retracts have finished.
          */
+        if (isEncoder) {
+            if (!extenderMotor.isBusy()) {
+                extenderMotor.setPower(0.0);
+                return true;
+            }
+        }
+
         if (runtime.seconds() > 0.7) {
             if (extenderMotor.getPower() == RETRACT_POWER) {
                 extenderMotor.setPower(0.0);
