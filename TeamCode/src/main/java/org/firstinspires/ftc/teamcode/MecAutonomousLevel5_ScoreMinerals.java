@@ -33,6 +33,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import static org.firstinspires.ftc.teamcode.CatVisionHW.samplingPos.LEFT;
+
 
 @Autonomous(name="Score Minerals Autonomous", group="CatAuto")
 public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
@@ -297,13 +299,13 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
            //aims to the correct gold location
            switch (samplingPos) {
                case LEFT:
-                   robot.drive.mecTurn(CatDriveHW.TURN_SPEED, -10, 2.5);
+                   robot.drive.mecTurn(.35, -18, 2.5);
                    break;
                case RIGHT:
                    robot.drive.mecTurn(CatDriveHW.TURN_SPEED, 17, 2.5);
                    break;
                case CENTER:
-                   robot.drive.mecTurn(CatDriveHW.CREEP_SPEED, 2, 1);
+                   robot.drive.mecTurn(CatDriveHW.CREEP_SPEED, 7, 1);
                    break;
            }
 
@@ -363,7 +365,11 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
             robot.arm.rotateArm(CatMecanumHW.ARM_TUCKED_IN);
             robot.extend.retractArm();
             //drives back to the lander at the same time the arm rotates.
-            robot.drive.mecTurn(CatDriveHW.CHILL_SPEED,8,2);
+            if (samplingPos == LEFT){
+                robot.drive.mecTurn(CatDriveHW.CHILL_SPEED, 8, 2);
+            }else {
+                robot.drive.mecTurn(CatDriveHW.CHILL_SPEED,10,2);
+            }
             //This will extend arm so that it reaches full extension and rotation at similar times.
             robot.arm.setExtenderValue(3000);
             CatSubsystemHW.waitUntillDone(robot.drive, robot.arm);
@@ -463,17 +469,19 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
          */
         // Drive back to hit gold
         Log.d("catbot", String.format(" back up to hit gold"));
-        robot.drive.mecDriveVertical(CatDriveHW.DRIVE_SPEED, -11, 2);
+        robot.drive.mecDriveVertical(CatDriveHW.DRIVE_SPEED, -10, 2);
         robot.drive.waitUntillDone();
         robot.arm.rotateArm(CatMecanumHW.ARM_FLOOR);
         //Turn to gold correct gold position
         switch (samplingPos) {
             case LEFT:
-                robot.drive.mecTurn(robot.TURN_SPEED,-19,2.5);
+                robot.drive.mecTurn(robot.TURN_SPEED,-16,2.5);
                 break;
             case RIGHT:
-                robot.drive.mecTurn(robot.TURN_SPEED,19,2.5);
+                robot.drive.mecTurn(robot.TURN_SPEED,16,2.5);
                 break;
+            case CENTER:
+                robot.drive.mecTurn(.35,8,2.5);
         }
         CatSubsystemHW.waitUntillDone(robot.drive, robot.arm);
         //Extend to pick up the gold
@@ -537,7 +545,7 @@ public class MecAutonomousLevel5_ScoreMinerals extends LinearOpMode {
             // Drive to farther crater
             robot.drive.mecTurn(CatDriveHW.TURN_SPEED ,-27,3.5, CatDriveHW.TURN_MODE.TANK);
             CatSubsystemHW.waitUntillDone(robot.drive, robot.extend);
-            robot.drive.mecDriveVertical(CatDriveHW.DRIVE_SPEED,9,3.0);
+            robot.drive.mecDriveVertical(CatDriveHW.DRIVE_SPEED,8,3.0);
             robot.drive.waitUntillDone();
             robot.drive.mecTurn(CatDriveHW.TURN_SPEED ,-87,3.5);
             //Lower arm
