@@ -162,7 +162,7 @@ public class CatArmHW extends CatSubsystemHW
 
     public void rotateArm(int targetPos, double armPowerIn){
         /**
-         * A simple method to move the
+         * A simple method to rotate the arm
          */
 
         // Set the mode to use encoder
@@ -172,9 +172,7 @@ public class CatArmHW extends CatSubsystemHW
         armMotor.setPower(armPowerIn);
 
         // Use the timer as a fail-safe in case the
-
         runtime.reset();
-
     }
 
     public void hungryHungryHippo() {
@@ -239,7 +237,7 @@ public class CatArmHW extends CatSubsystemHW
                     armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     mainHW.robotWait(0.5);
                     armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    armMotor.setTargetPosition(-725);
+                    armMotor.setTargetPosition(-450);
                     armMotor.setPower(0.50);
                     while (armMotor.isBusy()) {
                         mainHW.opMode.telemetry.addData("Inside LOOP", "Still here!");

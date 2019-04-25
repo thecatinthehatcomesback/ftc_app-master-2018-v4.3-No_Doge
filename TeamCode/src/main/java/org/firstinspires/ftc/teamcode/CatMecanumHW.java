@@ -70,8 +70,8 @@ public class CatMecanumHW
     static final double     GATE_CLOSE              = 0.20;
 
     // Arm positions
-    static final int        ARM_FLOOR               = 6900; // was 6680
-    static final int        ARM_CRATER_GRAB         = 6475;
+    static final int        ARM_FLOOR               = 7000; // was 6900
+    static final int        ARM_CRATER_GRAB         = 6525;
     static final int        ARM_CRATER_SCORE        = 5850;
     static final int        ARM_DEPOT_DROPOFF       = 5700;
     static final int        ARM_OVER_SAMPLING       = 5215;
@@ -80,7 +80,7 @@ public class CatMecanumHW
     static final int        ARM_SLOW                = 1900;
     static final int        ARM_TUCKED_IN           = 1800;
     static final int        ARM_TELEOP              = 1650;
-    static final int        ARM_SCORE               = 1250;
+    static final int        ARM_SCORE               = 1050;
     static final int        ARM_STOWED              = 0;
     static final double     EXTEND_POWER            = -0.7;
 

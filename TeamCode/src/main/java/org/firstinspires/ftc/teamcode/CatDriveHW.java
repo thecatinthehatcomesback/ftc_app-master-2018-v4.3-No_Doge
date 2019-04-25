@@ -434,16 +434,16 @@ public class CatDriveHW extends CatSubsystemHW
                     rightFrontMotor.setPower(-power);
                     rightRearMotor.setPower(-power);
                 } else {
-                    rightFrontMotor.setPower(-power/4);
-                    rightRearMotor.setPower(-power/4);
+                    rightFrontMotor.setPower(-power/3);
+                    rightRearMotor.setPower(-power/3);
                 }
             } else {
                 if (turnMode == TURN_MODE.SPIN) {
                     leftFrontMotor.setPower(-power);
                     leftRearMotor.setPower(-power);
                 }  else {
-                    leftFrontMotor.setPower(-power/4);
-                    leftRearMotor.setPower(-power/4);
+                    leftFrontMotor.setPower(-power/3);
+                    leftRearMotor.setPower(-power/3);
                 }
                 rightFrontMotor.setPower(power);
                 rightRearMotor.setPower(power);

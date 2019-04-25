@@ -30,7 +30,7 @@ public class JackTeleOp extends LinearOpMode {
     boolean autoArm             = false;
     boolean slowArm             = false;
     boolean liftingTail         = false;
-    boolean overrodeLiftTail = false;
+    boolean overrodeLiftTail    = false;
 
     // Our constructor for this class
     public JackTeleOp() {
