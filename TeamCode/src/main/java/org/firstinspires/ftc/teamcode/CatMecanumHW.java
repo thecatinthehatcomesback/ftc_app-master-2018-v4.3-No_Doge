@@ -74,7 +74,7 @@ public class CatMecanumHW
     static final int        ARM_CRATER_GRAB         = 6525;
     static final int        ARM_CRATER_SCORE        = 5850;
     static final int        ARM_DEPOT_DROPOFF       = 5700;
-    static final int        ARM_OVER_SAMPLING       = 5215;
+    static final int        ARM_OVER_SAMPLING       = 5000;
     static final int        ARM_EXTEND              = 3750;
     static final int        ARM_STRAIGHT_UP         = 2500;
     static final int        ARM_SLOW                = 1900;

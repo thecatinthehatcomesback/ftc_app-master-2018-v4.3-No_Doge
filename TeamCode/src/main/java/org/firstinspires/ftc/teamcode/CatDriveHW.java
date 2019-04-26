@@ -63,14 +63,14 @@ public class CatDriveHW extends CatSubsystemHW
     static final double     TURN_SPEED              = 0.60;
 
     ElapsedTime runtime = new ElapsedTime();
-    double timeout = 0;
+    double      timeout = 0;
 
-    int targetAngleZ;
-    boolean clockwiseTurn;
-    ColorSensor leftColSen;
-    ColorSensor rightColSen;
-    int baseDelta;
-    static boolean isDone;
+    int             targetAngleZ;
+    int             baseDelta;
+    boolean         clockwiseTurn;
+    ColorSensor     leftColSen;
+    ColorSensor     rightColSen;
+    static boolean  isDone;
 
     // Enums!
     enum DRIVE_METHOD {
@@ -94,6 +94,7 @@ public class CatDriveHW extends CatSubsystemHW
 
     // The IMU sensor object
     BNO055IMU imu;
+
     // State used for updating telemetry
     Orientation angles;
     Acceleration gravity;
