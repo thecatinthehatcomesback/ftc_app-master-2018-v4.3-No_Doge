@@ -17,7 +17,10 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+
+import java.util.List;
 
 import static org.firstinspires.ftc.robotcore.external.tfod.TfodRoverRuckus.LABEL_GOLD_MINERAL;
 import static org.firstinspires.ftc.robotcore.external.tfod.TfodRoverRuckus.LABEL_SILVER_MINERAL;
@@ -39,6 +42,9 @@ public class DemoVisionOpMode extends LinearOpMode {
     // Objects and Detectors
     private VuforiaLocalizer vuforia;
     public  TFObjectDetector tfod;
+
+    // Variables
+    int goldMineralX = 0;
 
 
     @Override
@@ -62,9 +68,37 @@ public class DemoVisionOpMode extends LinearOpMode {
          * Runs after hit start:
          * DO STUFF FOR the OPMODE!!!
          */
+        while (opModeIsActive()) {
+            List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
 
-        // uhhhhh
+            if (updatedRecognitions != null) {
+                for (Recognition recognition : updatedRecognitions) {
+                    if (recognition.getLabel().equals(LABEL_GOLD_MINERAL) && recognition.getConfidence() > 0.5) {
+                        int goldMineralX = (int) recognition.getLeft();
+                        // Look for the Gold Pos and decide which side of the sampling field the gold lies
+                        if (goldMineralX > 450) {
+                            //***Inverted this since the camera was recently placed upside down***//
+                            // Drive one way
+                            telemetry.addData("Drive", "One way");
+                        }
+                        // Drive the other way
+                        telemetry.addData("Drive", "Other way");
+                    }
+                }
+            }
+            telemetry.addData("goldMineralX", goldMineralX);
+            telemetry.update();
+        }
 
+        /**
+         * Plans...
+         *
+         * When it sees the Gold, it will chase it by:
+         * Setting powers to each side in order to line up with the Gold.
+         *
+         * If it doesn't see the gold it will scan for it by:
+         * Turning in a set direction somewhat slowly.
+         */
     }
     /* Initialize standard Hardware interfaces */
     public void initDrive()  throws InterruptedException  {
