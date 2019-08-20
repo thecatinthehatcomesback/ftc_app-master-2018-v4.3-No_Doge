@@ -104,10 +104,10 @@ public class CatDriveHW extends CatSubsystemHW
 
     /* Public OpMode members. */
     // Motors
-    public DcMotor  leftFrontMotor   = null;
-    public DcMotor  rightFrontMotor  = null;
-    public DcMotor leftRearMotor = null;
-    public DcMotor rightRearMotor = null;
+    public DcMotor  leftFrontMotor  = null;
+    public DcMotor  rightFrontMotor = null;
+    public DcMotor  leftRearMotor   = null;
+    public DcMotor  rightRearMotor  = null;
 
     //LED stuff
     public RevBlinkinLedDriver lights = null;
