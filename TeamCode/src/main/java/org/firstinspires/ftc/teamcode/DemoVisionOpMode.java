@@ -48,16 +48,15 @@ public class DemoVisionOpMode extends LinearOpMode {
     int goldMineralXPos     = 0;
     int goldMineralWidth    = 0;
 
-    double forwardPower = 0.20;
-    double leftPower    = 0.00;
-    double rightPower   = 0.00;
+    double forwardPower     = 0.20;
+    double leftPower        = 0.00;
+    double rightPower       = 0.00;
 
     boolean needToDriveAhead    = true;
+    boolean needToDriveBack     = false;
     boolean needToTurn          = false;
     boolean needToTurnLeft      = false;
     boolean needToTurnRight     = false;
-
-
 
 
     @Override
@@ -107,12 +106,12 @@ public class DemoVisionOpMode extends LinearOpMode {
                          * SET FLAGS!
                          */
                         // Look for Gold and decide which side of the sampling field the Gold is.
-                        if (goldMineralXPos > 200) {
+                        if (goldMineralXPos > 250) {
                             needToTurnLeft = true;
                         } else {
                             needToTurnLeft = false;
                         }
-                        if (goldMineralXPos < 400) {
+                        if (goldMineralXPos < 350) {
                             needToTurnRight = true;
                         } else {
                             needToTurnRight = false;
@@ -126,10 +125,15 @@ public class DemoVisionOpMode extends LinearOpMode {
                             needToTurn = true;
                         }
                         // Decide whether the robot needs to drive ahead.
-                        if (goldMineralWidth < 200) {
+                        if (goldMineralWidth < 120) {
                             needToDriveAhead = true;
                         } else {
                             needToDriveAhead = false;
+                        }
+                        if (goldMineralWidth > 200) {
+                            needToDriveBack = true;
+                        } else {
+                            needToDriveBack = false;
                         }
                         timer.reset();
                     }
@@ -161,39 +165,47 @@ public class DemoVisionOpMode extends LinearOpMode {
 
         // If the robot can't see the Gold, just stop and rest until it sees it again.
         if (timer.seconds() > 0.25) {
-            needToDriveAhead = false;
-            needToTurn = false;
+            needToDriveAhead    = false;
+            needToTurn          = false;
+            needToDriveBack     = false;
         }
 
         if (needToDriveAhead && !needToTurn) {
             // Just drive  straight
-            forwardPower = 0.30;
-            leftPower = forwardPower;
-            rightPower = forwardPower;
+            forwardPower   = 0.30;
+            leftPower      = forwardPower;
+            rightPower     = forwardPower;
         } else if (needToDriveAhead && needToTurn) {
             // Add/Subtract some power
-            forwardPower = 0.30;
+            forwardPower   = 0.30;
             if (needToTurnRight) {
-                leftPower = forwardPower + 0.15;
+                leftPower  = forwardPower + 0.20;
                 rightPower = forwardPower - 0.15;
             } else {
-                leftPower = forwardPower - 0.15;
-                rightPower = forwardPower + 0.15;
+                leftPower  = forwardPower - 0.15;
+                rightPower = forwardPower + 0.20;
             }
         } else if (!needToDriveAhead && needToTurn) {
             // Add/Subtract MORE power
             if (needToTurnRight) {
-                leftPower =   0.25;
+                leftPower  =  0.25;
                 rightPower = -0.25;
             } else {
-                leftPower =  -0.25;
+                leftPower  = -0.25;
                 rightPower =  0.25;
             }
         } else {
             // Stop.
-            forwardPower = 0.00;
-            leftPower = forwardPower;
-            rightPower = forwardPower;
+            forwardPower   = 0.00;
+            leftPower      = forwardPower;
+            rightPower     = forwardPower;
+        }
+
+        // Going back is an override
+        if (needToDriveBack) {
+            forwardPower   = -0.20;
+            leftPower      = forwardPower;
+            rightPower     = forwardPower;
         }
 
         // DRIVE //
