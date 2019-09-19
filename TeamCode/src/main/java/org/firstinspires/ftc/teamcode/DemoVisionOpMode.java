@@ -82,20 +82,19 @@ public class DemoVisionOpMode extends LinearOpMode {
          * Runs after hit start:
          * DO STUFF FOR the OPMODE!!!
          */
-        ElapsedTime timer = new ElapsedTime();
+        ElapsedTime ODtimer = new ElapsedTime();
 
         while (opModeIsActive()) {
             List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
 
             if (updatedRecognitions != null) {
                 for (Recognition recognition : updatedRecognitions) {
-                    // Lots of different tfod values placed into Telemetry
-                    /*telemetry.addData("getLabel", recognition.getLabel());
+                    // Lots of different TFOD values placed into Telemetry
+                    telemetry.addData("getLabel", recognition.getLabel());
                     telemetry.addData("getConfidence", recognition.getConfidence());
                     telemetry.addData("getLeft", recognition.getLeft());
                     telemetry.addData("getRight", recognition.getRight());
                     telemetry.addData("getWidth", recognition.getWidth());
-                    telemetry.addData("estimateAngleToObject", recognition.estimateAngleToObject(AngleUnit.DEGREES));*/
 
                     if (recognition.getLabel().equals(LABEL_GOLD_MINERAL) && recognition.getConfidence() > 0.5) {
                         // Define the goldMineral-variables.
@@ -135,11 +134,11 @@ public class DemoVisionOpMode extends LinearOpMode {
                         } else {
                             needToDriveBack = false;
                         }
-                        timer.reset();
+                        ODtimer.reset();
                     }
                 }
             }
-
+        // Bunch of Telemetry:
         telemetry.addData("goldMineralXPos", goldMineralXPos);
         telemetry.addData("goldMineralWidth", goldMineralWidth);
         telemetry.addData("needToDriveAhead", needToDriveAhead);
@@ -148,23 +147,10 @@ public class DemoVisionOpMode extends LinearOpMode {
         telemetry.addData("forwardPower", forwardPower);
         telemetry.addData("leftPower", leftPower);
         telemetry.addData("rightPower", rightPower);
-        /**
-         * Plans:
-         *
-         * When it sees the Gold, it will chase it by:
-         * Giving a constant +power to each side in order to get closer to the Gold.
-         *
-         * If it doesn't see the gold it will scan for it by:
-         * Turning in a set direction somewhat slowly.
-         *
-         * Greater than 200 getWidth = stop
-         *
-         * if needToDriveAhead then drive ahead with one set of left/right difference powers
-         * otherwise use another set of left/right difference powers to turn the bot.
-         */
+
 
         // If the robot can't see the Gold, just stop and rest until it sees it again.
-        if (timer.seconds() > 0.25) {
+        if (ODtimer.seconds() > 0.25) {
             needToDriveAhead    = false;
             needToTurn          = false;
             needToDriveBack     = false;
@@ -258,7 +244,7 @@ public class DemoVisionOpMode extends LinearOpMode {
         //  Instantiate the Vuforia engine
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
 
-        // Loading trackables is not necessary for the Tensor Flow Object Detection engine.
+        // Loading trackables is not necessary for the TensorFlow Object Detection engine.
 
         // Now init the tfod
         int tfodMonitorViewId   = hwMap.appContext.getResources().getIdentifier(

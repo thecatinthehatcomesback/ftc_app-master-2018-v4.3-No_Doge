@@ -233,7 +233,7 @@ public class MecAutonomousLevel2_Intermediate extends LinearOpMode {
         // Enter the rest of the autonomous based on which side we selected near beginning
         if (isCraterSide) {
             driveCrater();
-        }else {
+        } else {
             driveDepot();
         }
 
